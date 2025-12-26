@@ -67,7 +67,7 @@ MIDDLEWARE = [
     "whitenoise.middleware.WhiteNoiseMiddleware",
 ]
 
-ROOT_URLCONF = 'googlefindexor_com.urls'
+ROOT_URLCONF = 'findexors_com.urls'
 
 TEMPLATES = [
     {
@@ -85,7 +85,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'googlefindexor_com.wsgi.application'
+WSGI_APPLICATION = 'findexors_com.wsgi.application'
 
 
 # Database
