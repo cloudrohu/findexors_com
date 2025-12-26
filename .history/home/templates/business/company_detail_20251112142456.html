@@ -1,0 +1,163 @@
+{% extends "dashboard/base.html" %}
+{% load static %}
+
+{% block title %}Edit Company{% endblock %}
+
+{% block head %}
+<style>
+  .panel-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+  }
+  .form-label { font-weight: 500; }
+  .img-preview {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+  }
+  .btn-sm {
+    padding: 4px 10px;
+    font-size: 0.85rem;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+  {% with obj=object|default:company %}
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="mb-0">Edit Company{% if obj %}: {{ obj.company_name }}{% endif %}</h2>
+    <div class="d-flex gap-2">
+      <a href="{% url 'company_list' %}" class="btn btn-outline-secondary btn-sm">
+        <i class="bi bi-list-ul"></i> Back to List
+      </a>
+      {% if obj %}
+        <a href="{% url 'company_detail' obj.pk obj.slug %}" class="btn btn-outline-primary btn-sm">
+          <i class="bi bi-eye"></i> View
+        </a>
+        <a href="{% url 'company_delete' obj.pk %}" class="btn btn-outline-danger btn-sm"
+           onclick="return confirm('Are you sure you want to delete this company?');">
+           <i class="bi bi-trash"></i> Delete
+        </a>
+      {% endif %}
+    </div>
+  </div>
+
+  <form method="post" enctype="multipart/form-data" class="row g-3">
+    {% csrf_token %}
+
+    <div class="col-md-8">
+      <div class="panel-card mb-3">
+        <h5 class="mb-3"><i class="bi bi-building"></i> Company Information</h5>
+
+        <div class="row g-3">
+          <div class="col-md-8">
+            <label class="form-label">{{ form.company_name.label }}</label>
+            {{ form.company_name }}
+            {{ form.company_name.errors }}
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">{{ form.category.label }}</label>
+            {{ form.category }}
+          </div>
+
+          <div class="col-md-4">
+            <label class="form-label">{{ form.city.label }}</label>
+            {{ form.city }}
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">{{ form.locality.label }}</label>
+            {{ form.locality }}
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">{{ form.sub_locality.label }}</label>
+            {{ form.sub_locality }}
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">{{ form.contact_person.label }}</label>
+            {{ form.contact_person }}
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">{{ form.contact_no.label }}</label>
+            {{ form.contact_no }}
+          </div>
+
+          <div class="col-12">
+            <label class="form-label">{{ form.address.label }}</label>
+            {{ form.address }}
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">{{ form.status.label }}</label>
+            {{ form.status }}
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">{{ form.assigned_to.label }}</label>
+            {{ form.assigned_to }}
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">{{ form.website.label }}</label>
+            {{ form.website }}
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">{{ form.google_map.label }}</label>
+            {{ form.google_map }}
+          </div>
+
+          <div class="col-12">
+            <label class="form-label">{{ form.description.label }}</label>
+            {{ form.description }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="panel-card text-center">
+        <h6 class="mb-2">Company Image</h6>
+        {% if obj and obj.image %}
+          <img id="img-preview" src="{{ obj.image.url }}" alt="company image" class="img-preview mb-2">
+        {% else %}
+          <img id="img-preview" src="{% static 'img/placeholder-400x300.png' %}" class="img-preview mb-2" alt="placeholder">
+        {% endif %}
+        {{ form.image }}
+      </div>
+
+      <div class="panel-card mt-3">
+        <h6 class="mb-2">Meta Info</h6>
+        <p class="small text-muted mb-1"><strong>Created:</strong> {% if obj %}{{ obj.create_at|date:"d M Y, H:i" }}{% else %}-{% endif %}</p>
+        <p class="small text-muted mb-1"><strong>Updated:</strong> {% if obj %}{{ obj.update_at|date:"d M Y, H:i" }}{% else %}-{% endif %}</p>
+        <p class="small text-muted mb-1"><strong>Slug:</strong> {% if obj and obj.slug %}{{ obj.slug }}{% else %}-{% endif %}</p>
+
+        <div class="d-grid mt-3">
+          <button type="submit" class="btn btn-primary">Update Company</button>
+          <a href="{% url 'company_list' %}" class="btn btn-outline-secondary mt-2">Cancel</a>
+        </div>
+      </div>
+    </div>
+  </form>
+  {% endwith %}
+</div>
+
+<script>
+  // Image preview
+  const imgInput = document.querySelector('[name="image"]');
+  const imgPreview = document.getElementById('img-preview');
+  if (imgInput) {
+    imgInput.addEventListener('change', function() {
+      const f = this.files && this.files[0];
+      if (!f) return;
+      const reader = new FileReader();
+      reader.onload = e => imgPreview.src = e.target.result;
+      reader.readAsDataURL(f);
+    });
+  }
+</script>
+{% endblock %}

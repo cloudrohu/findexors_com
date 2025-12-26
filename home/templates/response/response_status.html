@@ -1,0 +1,381 @@
+{% extends 'dashboard/base.html' %}
+{% block title %}All Responses{% endblock %}
+
+{% block content %}
+<h4 class="mb-3">All Responses</h4>
+
+<!-- 🖥 DESKTOP TABLE -->
+<div class="table-responsive d-none d-md-block">
+  <table class="table table-bordered table-hover table-sm align-middle">
+    <thead class="thead-dark">
+      <tr>
+        <th>ID</th>
+        <th>Business</th>
+        <th>Person</th>
+        <th>Phone</th>
+        <th>Status</th>
+        <th>City</th>
+        <th style="min-width:300px;">Comments / Voice</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for r in responses %}
+      <tr>
+        <td>MR{{ r.id|stringformat:"03d" }}</td>
+        <td>{{ r.business_name|default:"-" }}</td>
+        <td>{{ r.contact_persone|default:"-" }}</td>
+        <td>{{ r.contact_no|default:"-" }}</td>
+
+        <!-- ⚡ STATUS DROPDOWN -->
+        <td>
+          <select class="form-control form-control-sm status-select" data-id="{{ r.id }}">
+            {% for key, label in r.STATUS_CHOICES %}
+              <option value="{{ key }}" {% if r.status == key %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </select>
+        </td>
+
+        <td>{{ r.city|default:"-" }}</td>
+
+        <td>
+          <!-- 💬 Show only latest comment -->
+            {% with latest_comment=r.comments.last %}
+            {% if latest_comment %}
+                <div class="small text-muted border-bottom py-1">
+                <strong>{{ latest_comment.created_by }}</strong>
+                <span class="text-secondary ml-1" style="font-size:11px;">
+                    {{ latest_comment.create_at|date:"d M Y H:i" }}
+                </span>: {{ latest_comment.comment }}
+                </div>
+            {% else %}
+                <div class="text-muted small">No comments yet.</div>
+            {% endif %}
+            {% endwith %}
+
+          <!-- ➕ Add Comment -->
+          <form class="commentForm mt-1" data-id="{{ r.id }}">
+            {% csrf_token %}
+            <div class="input-group input-group-sm">
+              <input type="text" name="comment" class="form-control" placeholder="Add comment...">
+              <div class="input-group-append">
+                <button class="btn btn-primary btn-sm" type="submit">➕</button>
+              </div>
+            </div>
+          </form>
+
+          <!-- 🎤 Voice Recordings (Only Latest One) -->
+            <div id="voiceList{{ r.id }}" class="mt-1">
+            {% with latest_voice=r.voice_recordings.last %}
+                {% if latest_voice %}
+                <div class="mb-1" id="latest-voice-{{ r.id }}">
+                    <audio controls preload="none" class="w-100">
+                    <source src="{{ latest_voice.file.url }}" type="audio/mpeg">
+                    </audio>
+                    <div class="text-muted small">
+                    {{ latest_voice.uploaded_at|date:"d M Y H:i" }} — {{ latest_voice.uploaded_by|default:"User" }}
+                    </div>
+                </div>
+                {% else %}
+                <div class="text-muted small">No voice yet.</div>
+                {% endif %}
+            {% endwith %}
+            </div>
+
+            <!-- 📤 Upload Voice -->
+            <form class="voiceForm mt-1" data-id="{{ r.id }}" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="input-group input-group-sm">
+                <input type="file" name="file" accept="audio/*" class="form-control p-1">
+                <div class="input-group-append">
+                <button class="btn btn-success btn-sm" type="submit">🎤</button>
+                </div>
+            </div>
+            </form>
+            </td>
+          </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            </div>
+
+<!-- 📱 MOBILE CARD VIEW -->
+<div class="d-md-none">
+  {% for r in responses %}
+  <div class="card mb-3 shadow-sm">
+    <div class="card-body p-2">
+      <div class="d-flex justify-content-between mb-1">
+        <strong>MR{{ r.id|stringformat:"03d" }}</strong>
+
+        <!-- ⚡ STATUS DROPDOWN (MOBILE) -->
+        <select class="form-control form-control-sm status-select" data-id="{{ r.id }}">
+          {% for key, label in r.STATUS_CHOICES %}
+            <option value="{{ key }}" {% if r.status == key %}selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="small text-muted">
+        <div><strong>Business:</strong> {{ r.business_name|default:"-" }}</div>
+        <div><strong>Person:</strong> {{ r.contact_persone|default:"-" }}</div>
+        <div><strong>Phone:</strong> {{ r.contact_no|default:"-" }}</div>
+        <div><strong>City:</strong> {{ r.city|default:"-" }}</div>
+      </div>
+
+      <!-- 💬 Comments -->
+      <div id="commentList{{ r.id }}_mobile" class="mt-2">
+        {% for c in r.comments.all %}
+        <div class="small text-muted border-bottom py-1">
+          <strong>{{ c.created_by }}</strong>
+          <span class="text-secondary ml-1" style="font-size:11px;">
+            {{ c.create_at|date:"d M Y H:i" }}
+          </span>: {{ c.comment }}
+        </div>
+        {% empty %}
+        <div class="text-muted small">No comments yet.</div>
+        {% endfor %}
+      </div>
+
+      <!-- ➕ Add Comment -->
+      <form class="commentForm mt-1" data-id="{{ r.id }}">
+        {% csrf_token %}
+        <div class="input-group input-group-sm">
+          <input type="text" name="comment" class="form-control" placeholder="Add comment...">
+          <div class="input-group-append">
+            <button class="btn btn-primary btn-sm" type="submit">➕</button>
+          </div>
+        </div>
+      </form>
+
+        <!-- 🎤 Voice Recordings (Only Latest One) -->
+      <div id="voiceList{{ r.id }}" class="mt-1">
+        {% with latest_voice=r.voice_recordings.last %}
+          {% if latest_voice %}
+            <div class="mb-1" id="latest-voice-{{ r.id }}">
+              <audio controls preload="none" class="w-100">
+                <source src="{{ latest_voice.file.url }}" type="audio/mpeg">
+              </audio>
+              <div class="text-muted small">
+                {{ latest_voice.uploaded_at|date:"d M Y H:i" }} — {{ latest_voice.uploaded_by|default:"User" }}
+              </div>
+            </div>
+          {% else %}
+            <div class="text-muted small">No voice yet.</div>
+          {% endif %}
+        {% endwith %}
+      </div>
+
+      <!-- 📤 Upload Voice -->
+      <form class="voiceForm mt-1" data-id="{{ r.id }}" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="input-group input-group-sm">
+          <input type="file" name="file" accept="audio/*" class="form-control p-1">
+          <div class="input-group-append">
+            <button class="btn btn-success btn-sm" type="submit">🎤</button>
+          </div>
+        </div>
+      </form>  
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+{% if is_paginated %}
+<nav aria-label="Page navigation" class="mt-3">
+  <ul class="pagination justify-content-center flex-wrap flex-md-nowrap overflow-auto" style="white-space: nowrap;">
+
+    {# ⬅️ Previous Button #}
+    {% if page_obj.has_previous %}
+      <li class="page-item">
+        <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Previous">&laquo;</a>
+      </li>
+    {% else %}
+      <li class="page-item disabled"><span class="page-link">&laquo;</span></li>
+    {% endif %}
+
+    {# 🏠 First Page + Ellipsis #}
+    {% if page_obj.number > 3 %}
+      <li class="page-item"><a class="page-link" href="?page=1">1</a></li>
+      {% if page_obj.number > 4 %}
+        <li class="page-item disabled"><span class="page-link">…</span></li>
+      {% endif %}
+    {% endif %}
+
+    {# 🔢 Pages Around Current Page (2 before, current, 2 after) #}
+    {% for i in page_obj.paginator.page_range %}
+      {% if i >= page_obj.number|add:"-2" and i <= page_obj.number|add:"2" %}
+        {% if page_obj.number == i %}
+          <li class="page-item active"><span class="page-link">{{ i }}</span></li>
+        {% else %}
+          <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+        {% endif %}
+      {% endif %}
+    {% endfor %}
+
+    {# 🏁 Last Page + Ellipsis #}
+    {% if page_obj.number < page_obj.paginator.num_pages|add:"-2" %}
+      {% if page_obj.number < page_obj.paginator.num_pages|add:"-3" %}
+        <li class="page-item disabled"><span class="page-link">…</span></li>
+      {% endif %}
+      <li class="page-item"><a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">{{ page_obj.paginator.num_pages }}</a></li>
+    {% endif %}
+
+    {# ➡️ Next Button #}
+    {% if page_obj.has_next %}
+      <li class="page-item">
+        <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Next">&raquo;</a>
+      </li>
+    {% else %}
+      <li class="page-item disabled"><span class="page-link">&raquo;</span></li>
+    {% endif %}
+
+  </ul>
+</nav>
+{% endif %}
+
+
+
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function getCookie(name) {
+  let cookieValue = null;
+  if (document.cookie && document.cookie !== '') {
+    const cookies = document.cookie.split(';');
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i].trim();
+      if (cookie.substring(0, name.length + 1) === (name + '=')) {
+        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        break;
+      }
+    }
+  }
+  return cookieValue;
+}
+const csrftoken = getCookie('csrftoken');
+
+// 💬 Comment AJAX
+document.querySelectorAll('.commentForm').forEach(form => {
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+    const id = this.dataset.id;
+    const input = this.querySelector('input[name="comment"]');
+    const text = input.value.trim();
+    if (!text) return;
+    fetch(`/response/${id}/ajax/add-comment/`, {
+      method: 'POST',
+      headers: { 'X-CSRFToken': csrftoken, 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({ comment: text })
+    })
+    .then(r => r.json())
+    .then(data => {
+      if (data.success) location.reload();
+      else alert(data.error);
+    });
+  });
+});
+
+document.querySelectorAll('.voiceForm').forEach(form => {
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+    const id = this.dataset.id;
+    const fileInput = this.querySelector('input[type="file"]');
+    if (!fileInput.files.length) return;
+
+    const formData = new FormData();
+    formData.append('file', fileInput.files[0]);
+
+    fetch(`/response/${id}/ajax/add-voice/`, {
+      method: 'POST',
+      headers: { 'X-CSRFToken': csrftoken },
+      body: formData
+    })
+    .then(r => r.json())
+    .then(data => {
+      if (data.success) {
+        const voiceContainer = document.getElementById(`voiceList${id}`);
+        const newHtml = `
+          <div class="mb-1" id="latest-voice-${id}">
+            <audio controls preload="none" class="w-100">
+              <source src="${data.file_url}" type="audio/mpeg">
+            </audio>
+            <div class="text-muted small">
+              ${data.uploaded_at} — ${data.uploaded_by}
+            </div>
+          </div>
+        `;
+        voiceContainer.innerHTML = newHtml;
+        fileInput.value = '';
+      } else {
+        alert(data.error);
+      }
+    })
+    .catch(err => {
+      console.error(err);
+      alert('Upload failed');
+    });
+  });
+});
+
+
+
+
+
+
+// ⚡ Quick Status Change AJAX + Page Filter Logic
+document.querySelectorAll('.status-select').forEach(select => {
+  select.addEventListener('change', function () {
+    const id = this.dataset.id;
+    const newStatus = this.value;
+
+    fetch(`/response/${id}/ajax/update-status/`, {
+      method: 'POST',
+      headers: {
+        'X-CSRFToken': csrftoken,
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      body: new URLSearchParams({ status: newStatus })
+    })
+    .then(r => r.json())
+    .then(data => {
+      if (data.success) {
+        // ✅ Green border flash
+        this.classList.add('border', 'border-success');
+        setTimeout(() => this.classList.remove('border', 'border-success'), 1000);
+
+        // ✅ Check if current page is a status filtered page
+        const currentUrl = window.location.pathname;
+        const statusPagePattern = /\/response\/status\/([^\/]+)\/?/;
+        const match = currentUrl.match(statusPagePattern);
+
+        if (match) {
+          const currentStatus = match[1];
+          // ✅ If new status doesn't match the current filter, reload to refresh list
+          if (newStatus !== currentStatus) {
+            location.reload();
+          }
+        }
+      } else {
+        alert(data.error);
+      }
+    });
+  });
+});
+
+</script>
+{% endblock %}
+
+
+<style>
+.pagination {
+  -webkit-overflow-scrolling: touch;
+}
+.pagination .page-item .page-link {
+  min-width: 36px;
+  text-align: center;
+}
+
+
+
+</style>

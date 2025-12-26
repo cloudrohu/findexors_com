@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Home – Findexors{% endblock %}
+{% block meta_description %}Find trusted local businesses near you on Findexors.{% endblock %}
+
+{% block content %}
+
+<!-- =====================================================
+HERO SEARCH SECTION
+===================================================== -->
+<section class="bg-gradient-to-r from-indigo-600 to-blue-600 text-white py-20">
+  <div class="max-w-7xl mx-auto px-6 text-center">
+
+    <h1 class="text-4xl md:text-5xl font-bold mb-4">
+      Find Trusted Businesses Near You
+    </h1>
+    <p class="text-lg mb-8">
+      Search & connect with verified local businesses
+    </p>
+
+    <form method="get" action="{% url 'search' %}"
+          class="bg-white rounded-xl p-4 flex flex-col md:flex-row gap-3">
+
+      <input type="text" name="q"
+             placeholder="Search business or service"
+             class="flex-1 px-4 py-3 rounded-lg border text-gray-700 outline-none">
+
+      <select name="city"
+              class="px-4 py-3 rounded-lg border text-gray-700">
+        <option value="">Select City</option>
+        {% for city in cities %}
+          <option value="{{ city.id }}">{{ city.title }}</option>
+        {% endfor %}
+      </select>
+
+      <button class="bg-indigo-600 text-white px-6 py-3 rounded-lg font-semibold">
+        Search
+      </button>
+    </form>
+
+    <div class="mt-6">
+      <a href="{% url 'add_business' %}" class="underline font-semibold">
+        Add Your Business – FREE
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- =====================================================
+POPULAR CATEGORIES
+===================================================== -->
+<section class="py-16 bg-gray-50">
+  <div class="max-w-7xl mx-auto px-6">
+
+    <h2 class="text-3xl font-bold text-center mb-10">
+      Popular Categories
+    </h2>
+
+    <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
+      {% for cat in categories %}
+      <a href="{% url 'category_list' cat.slug %}"
+         class="bg-white p-6 rounded-xl shadow text-center hover:shadow-lg transition">
+
+        <div class="text-3xl mb-2">🏢</div>
+        <h3 class="font-semibold">{{ cat.title }}</h3>
+      </a>
+      {% endfor %}
+    </div>
+
+  </div>
+</section>
+
+<!-- =====================================================
+FEATURED BUSINESSES
+===================================================== -->
+<section class="py-16">
+  <div class="max-w-7xl mx-auto px-6">
+
+    <h2 class="text-3xl font-bold text-center mb-10">
+      Featured Businesses
+    </h2>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      {% for company in featured_companies %}
+      <div class="bg-white border rounded-xl p-5 shadow hover:shadow-lg">
+
+        <h3 class="font-bold text-xl mb-1">
+          {{ company.company_name }}
+        </h3>
+
+        <p class="text-sm text-gray-600">
+          {{ company.locality }}, {{ company.city }}
+        </p>
+
+        <p class="mt-2 text-yellow-500">
+          ⭐ {{ company.rating }}/5
+        </p>
+
+        <div class="mt-4 flex gap-3">
+          {% if company.contact_no %}
+          <a href="tel:{{ company.contact_no }}"
+             class="bg-green-500 text-white px-4 py-2 rounded-lg">
+            Call
+          </a>
+          {% endif %}
+
+          <a href="{{ company.get_absolute_url }}"
+             class="bg-indigo-600 text-white px-4 py-2 rounded-lg">
+            Details
+          </a>
+        </div>
+
+      </div>
+      {% empty %}
+      <p class="text-center col-span-full text-gray-500">
+        No featured businesses available.
+      </p>
+      {% endfor %}
+    </div>
+
+  </div>
+</section>
+
+<!-- =====================================================
+WHY FINDEXORS
+===================================================== -->
+<section class="bg-gray-100 py-16">
+  <div class="max-w-7xl mx-auto px-6 text-center">
+
+    <h2 class="text-3xl font-bold mb-10">
+      Why Choose Findexors?
+    </h2>
+
+    <div class="grid md:grid-cols-4 gap-6">
+      <div class="bg-white p-6 rounded-xl shadow">✔ Verified Businesses</div>
+      <div class="bg-white p-6 rounded-xl shadow">📍 Hyper Local Search</div>
+      <div class="bg-white p-6 rounded-xl shadow">⚡ Quick Contact</div>
+      <div class="bg-white p-6 rounded-xl shadow">💼 Free Business Listing</div>
+    </div>
+
+  </div>
+</section>
+
+{% endblock %}

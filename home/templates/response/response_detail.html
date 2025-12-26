@@ -1,0 +1,172 @@
+{% extends 'dashboard/base.html' %}
+{% load static %}
+
+{% block title %}Response — MR{{ response.id|stringformat:"03d" }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-center flex-wrap mb-3">
+    <h4 class="mb-2">
+      📝 Response Details — 
+      <span class="text-primary">MR{{ response.id|stringformat:"03d" }}</span>
+    </h4>
+    <div>
+      <a href="{% url 'response_update' response.id %}" class="btn btn-sm btn-warning">
+        ✏️ Edit
+      </a>
+      <a href="{% url 'response_delete' response.id %}" class="btn btn-sm btn-danger">
+        🗑️ Delete
+      </a>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <ul class="nav nav-tabs" id="responseTabs" role="tablist">
+    <li class="nav-item">
+      <a class="nav-link active" id="overview-tab" data-toggle="tab" href="#overview" role="tab">
+        📋 Overview
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" id="comments-tab" data-toggle="tab" href="#comments" role="tab">
+        💬 Comments ({{ comments|length }})
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" id="voice-tab" data-toggle="tab" href="#voice" role="tab">
+        🎧 Voice ({{ voice_recordings|length }})
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" id="meetings-tab" data-toggle="tab" href="#meetings" role="tab">
+        📅 Meetings ({{ meetings|length }})
+      </a>
+    </li>
+  </ul>
+
+  <!-- Tab Content -->
+  <div class="tab-content border-left border-right border-bottom p-3 bg-white" id="responseTabsContent">
+
+    <!-- 📋 Overview Tab -->
+    <div class="tab-pane fade show active" id="overview" role="tabpanel">
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <strong>Business Name:</strong><br>{{ response.business_name|default:"-" }}
+        </div>
+        <div class="col-md-6 mb-3">
+          <strong>Contact Person:</strong><br>{{ response.contact_persone|default:"-" }}
+        </div>
+        <div class="col-md-6 mb-3">
+          <strong>Contact No:</strong><br>{{ response.contact_no|default:"-" }}
+        </div>
+        <div class="col-md-6 mb-3">
+          <strong>Status:</strong><br>
+          <span class="badge badge-primary">{{ response.status }}</span>
+        </div>
+        <div class="col-md-6 mb-3">
+          <strong>Business Category:</strong><br>{{ response.business_category|default:"-" }}
+        </div>
+        <div class="col-md-6 mb-3">
+          <strong>City:</strong><br>{{ response.city|default:"-" }}
+        </div>
+        <div class="col-md-6 mb-3">
+          <strong>Locality:</strong><br>{{ response.locality_city|default:"-" }}
+        </div>
+        <div class="col-md-12 mb-3">
+          <strong>Requirement Types:</strong><br>
+          {% for req in response.requirement_types.all %}
+            <span class="badge badge-info mr-1 mb-1">{{ req }}</span>
+          {% empty %}
+            -
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <!-- 💬 Comments Tab -->
+    <div class="tab-pane fade" id="comments" role="tabpanel">
+      <!-- Existing Comments -->
+      <div class="mb-3">
+        {% for c in comments %}
+          <div class="border-bottom py-2">
+            <div class="d-flex justify-content-between">
+              <strong>{{ c.created_by|default:"User" }}</strong>
+              <small class="text-muted">{{ c.create_at|date:"d M Y H:i" }}</small>
+            </div>
+            <p class="mb-0">{{ c.comment }}</p>
+          </div>
+        {% empty %}
+          <p class="text-muted text-center">No comments yet.</p>
+        {% endfor %}
+      </div>
+
+      <!-- Add Comment Form -->
+      <form method="post" action="{% url 'add_comment' response.id %}">
+        {% csrf_token %}
+        <div class="form-group">
+          {{ comment_form.comment }}
+        </div>
+        <button type="submit" class="btn btn-primary btn-sm">➕ Add Comment</button>
+      </form>
+    </div>
+
+    <!-- 🎧 Voice Tab -->
+    <div class="tab-pane fade" id="voice" role="tabpanel">
+      <!-- Existing Recordings -->
+      <div class="mb-3">
+        {% for audio in voice_recordings %}
+          <div class="border p-2 rounded mb-2">
+            <audio controls preload="none" class="w-100 mb-1">
+              <source src="{{ audio.file.url }}" type="audio/mpeg">
+              Your browser does not support the audio element.
+            </audio>
+            <div class="d-flex justify-content-between">
+              <small class="text-muted">{{ audio.uploaded_at|date:"d M Y H:i" }}</small>
+              <small>{{ audio.uploaded_by|default:"-" }}</small>
+            </div>
+            {% if audio.note %}
+              <div class="small text-muted mt-1">📝 {{ audio.note }}</div>
+            {% endif %}
+          </div>
+        {% empty %}
+          <p class="text-muted text-center">No voice recordings yet.</p>
+        {% endfor %}
+      </div>
+
+      <!-- Upload Form -->
+      <form method="post" enctype="multipart/form-data" action="{% url 'add_voice_recording' response.id %}">
+        {% csrf_token %}
+        <div class="form-row">
+          <div class="form-group col-md-8">
+            {{ voice_form.file }}
+          </div>
+          <div class="form-group col-md-4">
+            {{ voice_form.note }}
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary btn-sm">⬆️ Upload Recording</button>
+      </form>
+    </div>
+
+    <!-- 📅 Meetings Tab -->
+    <div class="tab-pane fade" id="meetings" role="tabpanel">
+      {% for m in meetings %}
+        <div class="border-bottom py-2">
+          <strong>{{ m.status }}</strong>
+          <div class="small text-muted">
+            {{ m.meeting_date|date:"d M Y H:i" }} — {{ m.assigned_to|default:"-" }}
+          </div>
+          {% if m.comment %}
+            <div class="small mt-1">📝 {{ m.comment }}</div>
+          {% endif %}
+        </div>
+      {% empty %}
+        <p class="text-muted text-center">No meetings found.</p>
+      {% endfor %}
+    </div>
+
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,546 @@
+{% extends "dashboard/base.html" %}
+{% load static %}
+{% block head %}
+  {{ block.super }}
+  {# If your base doesn't include Bootstrap 5 & icons, uncomment these lines: #}
+  <!--
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  -->
+  <style>
+    /* --- Visual theme --- */
+    .accent {
+      background: linear-gradient(90deg,#0ea5e9 0%, #7c3aed 100%);
+      color: white;
+    }
+    .panel-card {
+      border-radius: 12px;
+      box-shadow: 0 8px 30px rgba(15,23,42,0.08);
+      overflow: hidden;
+      transition: transform .18s ease, box-shadow .18s ease;
+    }
+    .panel-card:hover { transform: translateY(-6px); box-shadow: 0 18px 40px rgba(15,23,42,0.12); }
+    .small-muted { font-size: .86rem; color:#6b7280; }
+    .inline-form { background: #fff; border-radius:8px; padding:12px; }
+    .forms-container .inline-form + .inline-form { margin-top:10px; }
+    .section-header { font-weight:600; display:flex; align-items:center; gap:.5rem; }
+    .add-btn { min-width:120px; }
+    .file-input-sm { padding:.25rem .5rem; font-size:.9rem; }
+    /* image preview */
+    .img-preview { width:100%; max-height:160px; object-fit:cover; border-radius:8px; border:1px solid #e6e6e6; }
+    /* small animation for add/remove */
+    .inline-form { transition: all .14s ease; }
+    .inline-form.removed { opacity:0; height:0; margin:0; padding:0; transform:scale(.98); }
+    /* responsive */
+    @media (max-width: 768px) {
+      .two-col .col-md-6 { flex: 0 0 100%; max-width: 100%; }
+    }
+  </style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="mb-0">{% if object %}Edit Company{% else %}Add Company{% endif %}</h2>
+    <div>
+      <a href="{% url 'company_list' %}" class="btn btn-outline-secondary me-2">
+        <i class="bi bi-list-ul"></i> Manage Companies
+      </a>
+      <button form="company-form" class="btn btn-success">
+        <i class="bi bi-save2"></i> Save
+      </button>
+    </div>
+  </div>
+
+  <form id="company-form" method="post" enctype="multipart/form-data" class="panel-card p-4 bg-light" novalidate>
+    {% csrf_token %}
+
+    <!-- DEBUG: show formset prefixes (hidden). Remove when done debugging -->
+    <div style="display:none" id="formset-prefix-debug">
+      meeting prefix: {{ meeting_formset.prefix }} |
+      followup prefix: {{ followup_formset.prefix }} |
+      comment prefix: {{ comment_formset.prefix }} |
+      voice prefix: {{ voice_formset.prefix }} |
+      visit prefix: {{ visit_formset.prefix }}
+    </div>
+    <!-- end debug -->
+
+    <div class="row g-3 two-col">
+      <!-- left: main company info -->
+      <div class="col-md-8">
+        <div class="card mb-3 panel-card p-3">
+          <div class="d-flex justify-content-between align-items-start mb-2">
+            <div>
+              <h5 class="mb-0 section-header"><i class="bi bi-building" style="font-size:1.15rem"></i> Company Information</h5>
+              <small class="small-muted">Basic details & location</small>
+            </div>
+          </div>
+
+          <div class="row g-2 mt-2">
+            <div class="col-md-8">
+              <label class="form-label">{{ form.company_name.label }}</label>
+              {{ form.company_name }}
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">{{ form.category.label }}</label>
+              {{ form.category }}
+            </div>
+
+            <div class="col-md-4">
+              <label class="form-label">{{ form.city.label }}</label>
+              {{ form.city }}
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">{{ form.locality.label }}</label>
+              {{ form.locality }}
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">{{ form.sub_locality.label }}</label>
+              {{ form.sub_locality }}
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">{{ form.contact_person.label }}</label>
+              {{ form.contact_person }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">{{ form.contact_no.label }}</label>
+              {{ form.contact_no }}
+            </div>
+
+            <div class="col-12">
+              <label class="form-label">{{ form.address.label }}</label>
+              {{ form.address }}
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">{{ form.status.label }}</label>
+              {{ form.status }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">{{ form.assigned_to.label }}</label>
+              {{ form.assigned_to }}
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">{{ form.website.label }}</label>
+              {{ form.website }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">{{ form.google_map.label }}</label>
+              {{ form.google_map }}
+            </div>
+
+            <div class="col-12">
+              <label class="form-label">{{ form.description.label }}</label>
+              {{ form.description }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Inline sections as accordion for tidy UX -->
+        <div class="accordion" id="inlineAccordion">
+
+          <!-- Meetings -->
+          <div class="accordion-item panel-card mb-3">
+            <h2 class="accordion-header" id="headingMeet">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseMeet" aria-expanded="false" aria-controls="collapseMeet">
+                <div class="section-header"><i class="bi bi-calendar-check"></i> Meetings</div>
+                <small class="text-muted ms-3">Add scheduled meetings</small>
+              </button>
+            </h2>
+            <div id="collapseMeet" class="accordion-collapse collapse" aria-labelledby="headingMeet" data-bs-parent="#inlineAccordion">
+              <div class="accordion-body">
+                <div class="d-flex justify-content-end mb-2">
+                  <button type="button" class="btn btn-sm btn-primary add-form add-btn" data-prefix="{{ meeting_formset.prefix }}">
+                    <i class="bi bi-plus-lg"></i> Add Meeting
+                  </button>
+                </div>
+
+                {{ meeting_formset.management_form }}
+                <div class="forms-container" id="forms-{{ meeting_formset.prefix }}">
+                  {% for f in meeting_formset.forms %}
+                    <div class="inline-form d-grid" data-form-index="{{ forloop.counter0 }}">
+                      <div class="d-flex justify-content-between align-items-center mb-2">
+                        <strong>Meeting {{ forloop.counter }}</strong>
+                        <div>
+                          {{ f.DELETE }} <span class="small-muted">Delete</span>
+                          <button type="button" class="btn btn-sm btn-outline-danger ms-2 remove-form"><i class="bi bi-x"></i></button>
+                        </div>
+                      </div>
+                      <div class="row g-2">
+                        <div class="col-md-3">{{ f.status.label_tag }} {{ f.status }}</div>
+                        <div class="col-md-4">{{ f.meeting_date.label_tag }} {{ f.meeting_date }}</div>
+                        <div class="col-md-3">{{ f.assigned_to.label_tag }} {{ f.assigned_to }}</div>
+                        <div class="col-md-12">{{ f.comment.label_tag }} {{ f.comment }}</div>
+                      </div>
+                    </div>
+                  {% endfor %}
+                </div>
+
+                <div class="empty-template d-none" id="empty-{{ meeting_formset.prefix }}">
+                  {{ meeting_formset.empty_form.as_p }}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Followups -->
+          <div class="accordion-item panel-card mb-3">
+            <h2 class="accordion-header" id="headingFup">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFup" aria-expanded="false" aria-controls="collapseFup">
+                <div class="section-header"><i class="bi bi-arrow-repeat"></i> Followups</div>
+                <small class="text-muted ms-3">Reminders & next steps</small>
+              </button>
+            </h2>
+            <div id="collapseFup" class="accordion-collapse collapse" aria-labelledby="headingFup" data-bs-parent="#inlineAccordion">
+              <div class="accordion-body">
+                <div class="d-flex justify-content-end mb-2">
+                  <button type="button" class="btn btn-sm btn-primary add-form add-btn" data-prefix="{{ followup_formset.prefix }}">
+                    <i class="bi bi-plus-lg"></i> Add Followup
+                  </button>
+                </div>
+
+                {{ followup_formset.management_form }}
+                <div class="forms-container" id="forms-{{ followup_formset.prefix }}">
+                  {% for f in followup_formset.forms %}
+                    <div class="inline-form" data-form-index="{{ forloop.counter0 }}">
+                      <div class="d-flex justify-content-between align-items-center mb-2">
+                        <strong>Followup {{ forloop.counter }}</strong>
+                        <div>
+                          {{ f.DELETE }} <span class="small-muted">Del</span>
+                          <button type="button" class="btn btn-sm btn-outline-danger ms-2 remove-form"><i class="bi bi-x"></i></button>
+                        </div>
+                      </div>
+                      <div class="row g-2">
+                        <div class="col-md-4">{{ f.status.label_tag }} {{ f.status }}</div>
+                        <div class="col-md-4">{{ f.followup_date.label_tag }} {{ f.followup_date }}</div>
+                        <div class="col-md-4">{{ f.assigned_to.label_tag }} {{ f.assigned_to }}</div>
+                        <div class="col-12">{{ f.comment.label_tag }} {{ f.comment }}</div>
+                      </div>
+                    </div>
+                  {% endfor %}
+                </div>
+                <div class="empty-template d-none" id="empty-{{ followup_formset.prefix }}">
+                  {{ followup_formset.empty_form.as_p }}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Comments -->
+          <div class="accordion-item panel-card mb-3">
+            <h2 class="accordion-header" id="headingCmt">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseCmt" aria-expanded="false" aria-controls="collapseCmt">
+                <div class="section-header"><i class="bi bi-chat-dots"></i> Comments</div>
+                <small class="text-muted ms-3">Quick notes</small>
+              </button>
+            </h2>
+            <div id="collapseCmt" class="accordion-collapse collapse" aria-labelledby="headingCmt" data-bs-parent="#inlineAccordion">
+              <div class="accordion-body">
+                <div class="d-flex justify-content-end mb-2">
+                  <button type="button" class="btn btn-sm btn-primary add-form add-btn" data-prefix="{{ comment_formset.prefix }}">
+                    <i class="bi bi-plus-lg"></i> Add Comment
+                  </button>
+                </div>
+
+                {{ comment_formset.management_form }}
+                <div class="forms-container" id="forms-{{ comment_formset.prefix }}">
+                  {% for f in comment_formset.forms %}
+                    <div class="inline-form">
+                      <div class="d-flex justify-content-between align-items-center mb-2">
+                        <strong>Comment {{ forloop.counter }}</strong>
+                        <button type="button" class="btn btn-sm btn-outline-danger remove-form"><i class="bi bi-x"></i></button>
+                      </div>
+                      <div class="row g-2">
+                        <div class="col-12">{{ f.comment.label_tag }} {{ f.comment }}</div>
+                      </div>
+                    </div>
+                  {% endfor %}
+                </div>
+
+                <div class="empty-template d-none" id="empty-{{ comment_formset.prefix }}">
+                  {{ comment_formset.empty_form.as_p }}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Voice -->
+          <div class="accordion-item panel-card mb-3">
+            <h2 class="accordion-header" id="headingVoc">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseVoc" aria-expanded="false" aria-controls="collapseVoc">
+                <div class="section-header"><i class="bi bi-record-circle"></i> Voice Recordings</div>
+                <small class="text-muted ms-3">Call recordings</small>
+              </button>
+            </h2>
+            <div id="collapseVoc" class="accordion-collapse collapse" aria-labelledby="headingVoc" data-bs-parent="#inlineAccordion">
+              <div class="accordion-body">
+                <div class="d-flex justify-content-end mb-2">
+                  <button type="button" class="btn btn-sm btn-primary add-form add-btn" data-prefix="{{ voice_formset.prefix }}">
+                    <i class="bi bi-plus-lg"></i> Add Voice
+                  </button>
+                </div>
+
+                {{ voice_formset.management_form }}
+                <div class="forms-container" id="forms-{{ voice_formset.prefix }}">
+                  {% for f in voice_formset.forms %}
+                    <div class="inline-form">
+                      <div class="d-flex justify-content-between align-items-center mb-2">
+                        <strong>Voice {{ forloop.counter }}</strong>
+                        <div>
+                          {{ f.DELETE }} <span class="small-muted">Del</span>
+                          <button type="button" class="btn btn-sm btn-outline-danger ms-2 remove-form"><i class="bi bi-x"></i></button>
+                        </div>
+                      </div>
+                      <div class="row g-2">
+                        <div class="col-md-8">{{ f.file.label_tag }} {{ f.file }}</div>
+                      </div>
+                    </div>
+                  {% endfor %}
+                </div>
+
+                <div class="empty-template d-none" id="empty-{{ voice_formset.prefix }}">
+                  {{ voice_formset.empty_form.as_p }}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Visits -->
+          <div class="accordion-item panel-card mb-3">
+            <h2 class="accordion-header" id="headingVst">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseVst" aria-expanded="false" aria-controls="collapseVst">
+                <div class="section-header"><i class="bi bi-geo-alt"></i> Visits</div>
+                <small class="text-muted ms-3">On-field visits</small>
+              </button>
+            </h2>
+            <div id="collapseVst" class="accordion-collapse collapse" aria-labelledby="headingVst" data-bs-parent="#inlineAccordion">
+              <div class="accordion-body">
+                <div class="d-flex justify-content-end mb-2">
+                  <button type="button" class="btn btn-sm btn-primary add-form add-btn" data-prefix="{{ visit_formset.prefix }}">
+                    <i class="bi bi-plus-lg"></i> Add Visit
+                  </button>
+                </div>
+
+                {{ visit_formset.management_form }}
+                <div class="forms-container" id="forms-{{ visit_formset.prefix }}">
+                  {% for f in visit_formset.forms %}
+                    <div class="inline-form">
+                      <div class="d-flex justify-content-between align-items-center mb-2">
+                        <strong>Visit {{ forloop.counter }}</strong>
+                        <button type="button" class="btn btn-sm btn-outline-danger remove-form"><i class="bi bi-x"></i></button>
+                      </div>
+                      <div class="row g-2">
+                        <div class="col-md-4">{{ f.visit_for.label_tag }} {{ f.visit_for }}</div>
+                        <div class="col-md-4">{{ f.visit_type.label_tag }} {{ f.visit_type }}</div>
+                        <div class="col-md-4">{{ f.visit_status.label_tag }} {{ f.visit_status }}</div>
+                        <div class="col-12">{{ f.comment.label_tag }} {{ f.comment }}</div>
+                      </div>
+                    </div>
+                  {% endfor %}
+                </div>
+
+                <div class="empty-template d-none" id="empty-{{ visit_formset.prefix }}">
+                  {{ visit_formset.empty_form.as_p }}
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div> <!-- accordion -->
+
+      </div> <!-- left col -->
+
+      <!-- right: summary card & image -->
+      <div class="col-md-4">
+        <div class="card panel-card p-3 mb-3 text-center">
+          <div class="mb-3">
+            <label class="form-label small-muted">Company Image</label>
+            <div id="image-preview-wrap">
+              {% if object and object.image %}
+                <img src="{{ object.image.url }}" id="img-preview" class="img-preview mb-2" alt="company image" />
+              {% else %}
+                <img src="{% static 'img/placeholder-400x300.png' %}" id="img-preview" class="img-preview mb-2" alt="placeholder" />
+              {% endif %}
+            </div>
+            <div>
+              {{ form.image }}
+            </div>
+          </div>
+
+          <hr>
+          <div class="text-start">
+            <h6 class="mb-1">Quick Actions</h6>
+            <div class="d-grid gap-2">
+              <a href="#" class="btn btn-outline-primary btn-sm"><i class="bi bi-telephone"></i> Call</a>
+              <a href="#" class="btn btn-outline-secondary btn-sm"><i class="bi bi-globe"></i> Open Website</a>
+              <a href="#" class="btn btn-outline-success btn-sm"><i class="bi bi-map"></i> Open Map</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="card panel-card p-3">
+          <h6 class="mb-2">Meta</h6>
+          <p class="small-muted mb-1"><strong>Created:</strong> {% if object %}{{ object.create_at|date:"d M Y, H:i" }}{% else %}-{% endif %}</p>
+          <p class="small-muted mb-1"><strong>Updated:</strong> {% if object %}{{ object.update_at|date:"d M Y, H:i" }}{% else %}-{% endif %}</p>
+          <p class="small-muted mb-0"><strong>Slug:</strong>
+  <span class="text-break">
+    {% if object and object.slug %}
+      {{ object.slug }}
+    {% else %}
+      -
+    {% endif %}
+  </span>
+</p>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-4 d-flex gap-2">
+      <button type="submit" class="btn btn-lg btn-primary"><i class="bi bi-save"></i> Save Company</button>
+      <a href="{% url 'company_list' %}" class="btn btn-lg btn-outline-secondary">Cancel</a>
+    </div>
+  </form>
+</div>
+
+<!-- JS -->
+<script>
+
+document.querySelectorAll('.add-form')   // should return NodeList of buttons
+document.getElementById('forms-' + 'PUT_MEETING_PREFIX_HERE')  // replace with the prefix you saw above
+
+
+(function(){
+
+  // ----- image preview -----
+  const imgInput = document.querySelector('[name="image"]');
+  const imgPreview = document.getElementById('img-preview');
+  if (imgInput) {
+    imgInput.addEventListener('change', function(e){
+      const file = this.files && this.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(ev){ if(imgPreview) imgPreview.src = ev.target.result; };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  // helper to update TOTAL_FORMS
+  function updateTotalForms(prefix) {
+    const total = document.querySelector('input[name="'+prefix+'-TOTAL_FORMS"]');
+    const container = document.getElementById('forms-' + prefix);
+    if (!total || !container) return;
+    const count = container.querySelectorAll('.inline-form').length;
+    total.value = count;
+  }
+
+  // clone empty form (works with file inputs because server provides empty_form)
+  function cloneEmpty(prefix) {
+    const emptyDiv = document.getElementById('empty-' + prefix);
+    if (!emptyDiv) return null;
+    const container = document.getElementById('forms-' + prefix);
+    const index = container.querySelectorAll('.inline-form').length;
+    let html = emptyDiv.innerHTML;
+    html = html.replace(/__prefix__/g, index);
+    const wrapper = document.createElement('div');
+    wrapper.className = 'inline-form';
+    wrapper.innerHTML = html;
+    // add header & remove button (if not already present)
+    const header = document.createElement('div');
+    header.className = 'd-flex justify-content-between align-items-center mb-2';
+    const strong = document.createElement('strong');
+    strong.textContent = 'Item ' + (index + 1);
+    const rm = document.createElement('button');
+    rm.type = 'button';
+    rm.className = 'btn btn-sm btn-outline-danger remove-form';
+    rm.innerHTML = '<i class="bi bi-x"></i>';
+    header.appendChild(strong);
+    header.appendChild(rm);
+    wrapper.insertBefore(header, wrapper.firstChild);
+    return wrapper;
+  }
+
+  // add buttons
+  document.querySelectorAll('.add-form').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      const prefix = btn.dataset.prefix;
+      const container = document.getElementById('forms-' + prefix);
+      const newNode = cloneEmpty(prefix);
+      if (!newNode) return;
+      container.appendChild(newNode);
+      updateTotalForms(prefix);
+      // focus first interactive field
+      const first = newNode.querySelector('input, select, textarea');
+      if (first) first.focus();
+    });
+  });
+
+  // remove button (delegated)
+  document.addEventListener('click', function(ev){
+    if (ev.target.closest && ev.target.closest('.remove-form')) {
+      const btn = ev.target.closest('.remove-form');
+      const node = btn.closest('.inline-form');
+      const container = node.parentElement;
+      // graceful remove
+      node.classList.add('removed');
+      setTimeout(()=>{ node.remove(); updateTotalForms(container.id.replace('forms-','')); }, 120);
+    }
+  });
+
+  // initialize totals on load
+  document.addEventListener('DOMContentLoaded', function(){
+    ['{{ meeting_formset.prefix }}', '{{ followup_formset.prefix }}', '{{ comment_formset.prefix }}', '{{ voice_formset.prefix }}', '{{ visit_formset.prefix }}'].forEach(function(p){
+      updateTotalForms(p);
+    });
+  });
+
+  // city -> locality AJAX
+  const citySelect = document.querySelector('[name="city"]');
+  if (citySelect) {
+    citySelect.addEventListener('change', function(){
+      const cityId = this.value;
+      const localitySelect = document.querySelector('[name="locality"]');
+      const subLocalitySelect = document.querySelector('[name="sub_locality"]');
+      if (!cityId) {
+        if (localitySelect) localitySelect.innerHTML = '<option value="">---------</option>';
+        if (subLocalitySelect) subLocalitySelect.innerHTML = '<option value="">---------</option>';
+        return;
+      }
+      fetch("{% url 'get_localities' %}?city_id=" + cityId)
+        .then(res => res.json())
+        .then(data => {
+          if (localitySelect) {
+            localitySelect.innerHTML = '<option value="">---------</option>';
+            data.forEach(function(it){ const o=document.createElement('option'); o.value=it.id; o.textContent=it.title; localitySelect.appendChild(o); });
+          }
+          if (subLocalitySelect) subLocalitySelect.innerHTML = '<option value="">---------</option>';
+        }).catch(console.error);
+    });
+  }
+
+  const localityMain = document.querySelector('[name="locality"]');
+  if (localityMain) {
+    localityMain.addEventListener('change', function(){
+      const localityId = this.value;
+      const subLocalitySelect = document.querySelector('[name="sub_locality"]');
+      if (!localityId) {
+        if (subLocalitySelect) subLocalitySelect.innerHTML = '<option value="">---------</option>';
+        return;
+      }
+      fetch("{% url 'get_sub_localities' %}?locality_id=" + localityId)
+        .then(res => res.json())
+        .then(data => {
+          if (subLocalitySelect) {
+            subLocalitySelect.innerHTML = '<option value="">---------</option>';
+            data.forEach(function(it){ const o=document.createElement('option'); o.value=it.id; o.textContent=it.title; subLocalitySelect.appendChild(o); });
+          }
+        }).catch(console.error);
+    });
+  }
+
+})();
+</script>
+{% endblock %}

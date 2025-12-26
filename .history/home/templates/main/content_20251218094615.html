@@ -1,0 +1,201 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Findexors – Find Trusted Businesses Near You</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- SEO -->
+    <meta name="description" content="Find trusted local businesses near you. Restaurants, Hotels, Doctors, Contractors & more on Findexors.">
+    <meta name="keywords" content="local business, find services, justdial alternative">
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+<!-- ================= NAVBAR ================= -->
+<header class="bg-white shadow-sm sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+
+        <h1 class="text-2xl font-extrabold text-indigo-600">
+            Findexors
+        </h1>
+
+        <nav class="hidden md:flex gap-8 font-medium">
+            <a href="/" class="hover:text-indigo-600">Home</a>
+            <a href="/categories/" class="hover:text-indigo-600">Categories</a>
+            <a href="/businesses/" class="hover:text-indigo-600">Businesses</a>
+            <a href="/contact/" class="hover:text-indigo-600">Contact</a>
+        </nav>
+
+        <a href="/add-business/"
+           class="bg-indigo-600 text-white px-5 py-2 rounded-lg hover:bg-indigo-700">
+            Add Business
+        </a>
+    </div>
+</header>
+
+<!-- ================= HERO SECTION ================= -->
+<section class="bg-gradient-to-r from-indigo-600 to-blue-600 text-white">
+    <div class="max-w-7xl mx-auto px-6 py-20 text-center">
+
+        <h2 class="text-4xl md:text-5xl font-extrabold mb-4">
+            Find Trusted Businesses Near You
+        </h2>
+
+        <p class="text-lg opacity-90 mb-10">
+            Search & connect with verified local businesses
+        </p>
+
+        <!-- SEARCH BOX -->
+        <form method="get" action="/search/"
+              class="bg-white rounded-xl p-4 flex flex-col md:flex-row gap-3 max-w-4xl mx-auto">
+
+            <select name="city"
+                    class="px-4 py-3 rounded-lg border text-gray-700 w-full md:w-48">
+                <option value="">Select City</option>
+                {% for city in cities %}
+                    <option value="{{ city.id }}">{{ city.title }}</option>
+                {% endfor %}
+            </select>
+
+            <input type="text"
+                   name="q"
+                   placeholder="Search business, locality or service"
+                   class="flex-1 px-4 py-3 rounded-lg border outline-none">
+
+            <button type="submit"
+                    class="bg-indigo-600 text-white px-8 py-3 rounded-lg hover:bg-indigo-700">
+                Search
+            </button>
+        </form>
+    </div>
+</section>
+
+<!-- ================= POPULAR CATEGORIES ================= -->
+<section class="py-16">
+    <div class="max-w-7xl mx-auto px-6">
+
+        <h3 class="text-3xl font-bold text-center mb-12">
+            Popular Categories
+        </h3>
+
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-6">
+
+            {% for cat in categories %}
+            <a href="{{ cat.get_absolute_url }}"
+               class="bg-white rounded-xl shadow hover:shadow-lg p-6 text-center transition">
+
+                {% if cat.icon %}
+                <img src="{{ cat.icon.url }}"
+                     class="w-12 h-12 mx-auto mb-3">
+                {% endif %}
+
+                <h4 class="font-semibold text-gray-800">
+                    {{ cat.title }}
+                </h4>
+            </a>
+            {% endfor %}
+
+        </div>
+    </div>
+</section>
+
+<!-- ================= FEATURED BUSINESSES ================= -->
+<section class="bg-gray-100 py-16">
+    <div class="max-w-7xl mx-auto px-6">
+
+        <h3 class="text-3xl font-bold text-center mb-12">
+            Featured Businesses
+        </h3>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
+
+            {% for biz in featured_businesses %}
+            <div class="bg-white rounded-xl shadow hover:shadow-lg transition p-5">
+
+                <img src="{{ biz.image.url }}"
+                     class="h-40 w-full object-cover rounded-lg mb-4">
+
+                <h4 class="font-semibold text-lg">
+                    {{ biz.name }}
+                </h4>
+
+                <p class="text-sm text-gray-600">
+                    {{ biz.category.title }}
+                </p>
+
+                <p class="text-sm text-gray-500 mt-1">
+                    📍 {{ biz.city.title }}
+                </p>
+
+                <a href="{{ biz.get_absolute_url }}"
+                   class="inline-block mt-4 text-indigo-600 font-medium">
+                    View Details →
+                </a>
+            </div>
+            {% endfor %}
+
+        </div>
+    </div>
+</section>
+
+<!-- ================= WHY FINDEXORS ================= -->
+<section class="py-16">
+    <div class="max-w-7xl mx-auto px-6">
+
+        <h3 class="text-3xl font-bold text-center mb-12">
+            Why Choose Findexors?
+        </h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+
+            <div class="bg-white p-6 rounded-xl shadow">
+                <h4 class="font-bold text-lg mb-2">Verified Listings</h4>
+                <p class="text-gray-600">Only trusted & verified businesses</p>
+            </div>
+
+            <div class="bg-white p-6 rounded-xl shadow">
+                <h4 class="font-bold text-lg mb-2">Easy Search</h4>
+                <p class="text-gray-600">Find services in seconds</p>
+            </div>
+
+            <div class="bg-white p-6 rounded-xl shadow">
+                <h4 class="font-bold text-lg mb-2">Free Listing</h4>
+                <p class="text-gray-600">Grow your business online</p>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- ================= FOOTER ================= -->
+<footer class="bg-gray-900 text-gray-300 py-10">
+    <div class="max-w-7xl mx-auto px-6 text-center">
+
+        <h4 class="text-xl font-bold text-white mb-2">
+            Findexors
+        </h4>
+
+        <p class="text-sm mb-4">
+            Find trusted local businesses near you
+        </p>
+
+        <p class="text-xs">
+            © {{ now|date:"Y" }} Findexors. All rights reserved.
+        </p>
+    </div>
+</footer>
+
+</body>
+</html>

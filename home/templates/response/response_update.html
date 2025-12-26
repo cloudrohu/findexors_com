@@ -1,0 +1,97 @@
+{% extends 'dashboard/base.html' %}
+{% load static %}
+
+{% block title %}
+  {% if object %}
+    Edit Response — MR{{ object.id|stringformat:"03d" }}
+  {% else %}
+    Create New Response
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-lg-8 mx-auto">
+      <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0">
+            {% if object %}
+              ✏️ Edit Response — MR{{ object.id|stringformat:"03d" }}
+            {% else %}
+              ➕ Create New Response
+            {% endif %}
+          </h5>
+        </div>
+        <div class="card-body">
+
+          <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form.non_field_errors }}
+
+            <!-- 📝 Business Info -->
+            <div class="form-group">
+              <label>Business Name</label>
+              {{ form.business_name }}
+            </div>
+
+            <div class="form-row">
+              <div class="form-group col-md-6">
+                <label>Contact Person</label>
+                {{ form.contact_persone }}
+              </div>
+              <div class="form-group col-md-6">
+                <label>Contact No</label>
+                {{ form.contact_no }}
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group col-md-6">
+                <label>Business Category</label>
+                {{ form.business_category }}
+              </div>
+              <div class="form-group col-md-6">
+                <label>Status</label>
+                {{ form.status }}
+              </div>
+            </div>
+
+            <!-- 📍 Location -->
+            <div class="form-row">
+              <div class="form-group col-md-6">
+                <label>City</label>
+                {{ form.city }}
+              </div>
+              <div class="form-group col-md-6">
+                <label>Locality</label>
+                {{ form.locality_city }}
+              </div>
+            </div>
+
+            <!-- 🧾 Requirement Types -->
+            <div class="form-group">
+              <label>{{ form.requirement_types.label }}</label>
+              <div class="border rounded p-2">
+                {{ form.requirement_types }}
+              </div>
+            </div>
+
+            <!-- 💾 Submit -->
+            <div class="text-right mt-3">
+              <a href="{% url 'response_list' %}" class="btn btn-secondary">
+                Cancel
+              </a>
+              <button type="submit" class="btn btn-primary">
+                {% if object %} Update {% else %} Create {% endif %}
+              </button>
+            </div>
+
+          </form>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

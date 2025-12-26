@@ -1,0 +1,250 @@
+{% extends 'dashboard/base.html' %}
+{% load static %}
+{% block title %}{{ title|default:"Edit Company" }}{% endblock %}
+
+{% block content %}
+<style>
+  /* (same styles as you had) */
+  body { background: #f8fafc; font-family: "Inter", sans-serif; }
+  .edit-wrapper { max-width: 1100px; margin: 0 auto; padding: 1rem; }
+  .card { border-radius: 16px; border: none; box-shadow: 0 6px 18px rgba(0,0,0,.06); overflow: hidden; }
+  .card-header { background: linear-gradient(90deg,#2563eb,#3b82f6); border:none; padding:1rem 1.5rem; color:#fff; }
+  .card-header h5 { margin:0; font-weight:600; }
+  .form-section { background:#fff; border-radius:14px; padding:22px; margin-bottom:20px; box-shadow:0 2px 10px rgba(0,0,0,.04); }
+  .section-title { font-weight:700; color:#2563eb; border-left:4px solid #2563eb; padding-left:10px; margin-bottom:1rem; font-size:1.02rem; }
+  label.form-label { font-weight:600; font-size:.92rem; color:#374151; margin-bottom:.25rem; display:block; }
+  input.form-control, select.form-select, textarea.form-control { border-radius:10px; border:1px solid #d1d5db; padding:.55rem .75rem; font-size:.95rem; }
+  .image-preview { width:120px; height:120px; border-radius:10px; object-fit:cover; border:2px solid #e5e7eb; display:block; margin:0 auto 10px; }
+  .alert-error { background:#fee2e2; color:#b91c1c; border-left:4px solid #dc2626; padding:10px 14px; border-radius:8px; margin-bottom:16px; }
+  .btn-success { background:linear-gradient(90deg,#16a34a,#22c55e); border:none; border-radius:10px; padding:.6rem 1.2rem; color:#fff; font-weight:600; }
+  .btn-outline-secondary { border-radius:10px; padding:.55rem 1rem; }
+  @media (max-width:768px) {
+    .edit-wrapper { padding:0.5rem; }
+    .btn-success, .btn-outline-secondary { width:100%; }
+  }
+</style>
+
+<div class="container edit-wrapper mt-4">
+  <div class="card">
+    <div class="card-header">
+      <h5><i class="fas fa-edit me-2"></i> {{ title|default:"Edit Company" }}</h5>
+    </div>
+
+    <div class="card-body bg-light p-4">
+
+      {# show errors if company_form or meeting_form/formset have errors #}
+      {% if company_form.errors or (meeting_form and meeting_form.errors) or (meeting_formset and meeting_formset.non_form_errors) %}
+      <div class="alert-error">
+        <i class="fas fa-times-circle me-2"></i> Please fix the form errors below.
+      </div>
+      {% endif %}
+
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+      {% endfor %}
+
+      <div class="mb-3 d-flex justify-content-between align-items-start">
+        <div>
+          {% if company %}
+            <a class="btn btn-outline-secondary btn-sm me-2" href="{% url 'company_list' %}">← Back to list</a>
+            <a class="btn btn-outline-primary btn-sm me-2" href="{% url 'company_detail' company.pk company.slug %}">View</a>
+            <a class="btn btn-outline-danger btn-sm" href="{% url 'company_delete' company.pk %}" onclick="return confirm('Delete this company?')">Delete</a>
+          {% else %}
+            <a class="btn btn-outline-secondary btn-sm" href="{% url 'company_list' %}">← Back to list</a>
+          {% endif %}
+        </div>
+        <div>
+          <span class="small text-muted">Last updated:
+            {% if company %} {{ company.update_at|date:"d M Y, H:i" }} {% else %} - {% endif %}
+          </span>
+        </div>
+      </div>
+
+      <form method="POST" enctype="multipart/form-data" novalidate>
+        {% csrf_token %}
+
+        <!-- COMPANY DETAILS -->
+        <div class="form-section">
+          <h6 class="section-title"><i class="fas fa-building me-2 text-primary"></i> Company Details</h6>
+
+          <div class="row g-3">
+            {% for field in company_form %}
+              <div class="col-md-6 mb-3">
+                <label class="form-label">{{ field.label }}</label>
+
+                {% if field.name == 'image' %}
+                  <div class="text-center mb-2">
+                    {% if company and company.image %}
+                      <img id="companyImagePreview" src="{{ company.image.url }}" class="image-preview" alt="company image">
+                    {% else %}
+                      <img id="companyImagePreview" src="{% static 'images/no-image.png' %}" class="image-preview" alt="no image">
+                    {% endif %}
+                  </div>
+                  {{ field }}
+                  <small class="text-muted d-block text-center mt-1">Upload a new image (optional)</small>
+                {% else %}
+                  {{ field }}
+                {% endif %}
+
+                {% if field.help_text %}
+                  <small class="text-muted d-block mt-1">{{ field.help_text }}</small>
+                {% endif %}
+                {% if field.errors %}
+                  <div class="text-danger small mt-1">{{ field.errors|striptags }}</div>
+                {% endif %}
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <!-- MEETING DETAILS (single meeting form or meeting_formset) -->
+        <div class="form-section">
+          <h6 class="section-title"><i class="fas fa-handshake me-2 text-success"></i> Meeting Details</h6>
+
+          <div class="row g-3 mb-2">
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Company</label>
+              <div class="form-control bg-light border-0 fw-bold">
+                {% if meeting_form and meeting_form.company.value %}{{ meeting_form.company.value }}
+                {% elif company %}{{ company.company_name }}
+                {% else %}-{% endif %}
+              </div>
+              <small class="text-muted">You cannot change the company for this meeting.</small>
+            </div>
+          </div>
+
+          <div class="row g-3">
+            {# CASE A: single meeting_form provided in context #}
+            {% if meeting_form %}
+              {% for field in meeting_form %}
+                {% if field.name != 'company' %}
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.errors %}
+                      <div class="text-danger small mt-1">{{ field.errors|striptags }}</div>
+                    {% endif %}
+                  </div>
+                {% endif %}
+              {% endfor %}
+
+            {# CASE B: meeting_formset provided in context (multiple inline forms) #}
+            {% elif meeting_formset %}
+              {% for form in meeting_formset.forms %}
+                <div class="col-12 mb-2">
+                  <div class="p-2 border rounded bg-white">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                      <strong>Meeting {{ forloop.counter }}</strong>
+                      <div>{{ form.DELETE }} <span class="small text-muted">Delete</span></div>
+                    </div>
+
+                    <div class="row g-2">
+                      {% for field in form %}
+                        {% if field.name != 'company' %}
+                          <div class="col-md-6 mb-2">
+                            <label class="form-label">{{ field.label }}</label>
+                            {{ field }}
+                            {% if field.errors %}
+                              <div class="text-danger small mt-1">{{ field.errors|striptags }}</div>
+                            {% endif %}
+                          </div>
+                        {% endif %}
+                      {% endfor %}
+                    </div>
+                  </div>
+                </div>
+              {% endfor %}
+              {{ meeting_formset.management_form }}
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="mt-3 d-flex justify-content-between">
+          <a href="{% url 'company_meetings' %}" class="btn btn-outline-secondary">← Back to Meetings</a>
+          <button type="submit" class="btn btn-success"><i class="fas fa-save me-1"></i> Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  // Image preview: use the html_name from form to find input
+  {% if company_form.image %}
+    const imageInputName = "{{ company_form.image.html_name|escapejs }}";
+    const imgInput = document.querySelector('input[type="file"][name="' + imageInputName + '"]');
+    const imgPreview = document.getElementById("companyImagePreview");
+    if (imgInput && imgPreview) {
+      imgInput.addEventListener("change", function (e) {
+        const f = this.files && this.files[0];
+        if (!f) return;
+        const reader = new FileReader();
+        reader.onload = function (ev) { imgPreview.src = ev.target.result; };
+        reader.readAsDataURL(f);
+      });
+    }
+  {% endif %}
+
+  // City -> Locality -> Sub-locality dynamic loading (only if those fields exist)
+  {% if company_form.city and company_form.locality %}
+    const cityName = "{{ company_form.city.html_name|escapejs }}";
+    const localityName = "{{ company_form.locality.html_name|escapejs }}";
+    const subLocalityName = "{{ company_form.sub_locality.html_name|escapejs }}";
+
+    const citySelect = document.querySelector('select[name="' + cityName + '"]');
+    const localitySelect = document.querySelector('select[name="' + localityName + '"]');
+    const subSelect = document.querySelector('select[name="' + subLocalityName + '"]');
+
+    function populate(selectElem, items, selected) {
+      if (!selectElem) return;
+      selectElem.innerHTML = '<option value="">Select</option>';
+      items.forEach(it => {
+        const o = document.createElement('option');
+        o.value = it.id;
+        o.textContent = it.title;
+        if (selected && (selected.toString() === it.id.toString())) o.selected = true;
+        selectElem.appendChild(o);
+      });
+    }
+
+    function loadLocalities(cityId, selectedLocality, selectedSubLocality) {
+      if (!cityId) {
+        if (localitySelect) localitySelect.innerHTML = '<option value="">Select</option>';
+        if (subSelect) subSelect.innerHTML = '<option value="">Select</option>';
+        return;
+      }
+      fetch("{% url 'get_localities' %}?city_id=" + cityId)
+        .then(r => r.json())
+        .then(data => {
+          populate(localitySelect, data, selectedLocality);
+          if (selectedLocality) loadSubLocalities(selectedLocality, selectedSubLocality);
+        }).catch(console.error);
+    }
+
+    function loadSubLocalities(localityId, selectedSubLocality) {
+      if (!localityId) {
+        if (subSelect) subSelect.innerHTML = '<option value="">Select</option>';
+        return;
+      }
+      fetch("{% url 'get_sub_localities' %}?locality_id=" + localityId)
+        .then(r => r.json())
+        .then(data => populate(subSelect, data, selectedSubLocality))
+        .catch(console.error);
+    }
+
+    if (citySelect) {
+      citySelect.addEventListener('change', function () { loadLocalities(this.value); });
+      const preCity = citySelect.value || "";
+      const preLocality = localitySelect ? localitySelect.value : "";
+      const preSub = subSelect ? subSelect.value : "";
+      if (preCity) loadLocalities(preCity, preLocality, preSub);
+    }
+    if (localitySelect) localitySelect.addEventListener('change', function () { loadSubLocalities(this.value); });
+  {% endif %}
+});
+</script>
+{% endblock %}

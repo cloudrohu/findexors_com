@@ -1,0 +1,231 @@
+{% extends 'dashboard/base.html' %}
+{% block title %}All Companies{% endblock %}
+{% load static %}
+{% block content %}
+<h4 class="mb-3">All Companies</h4>
+
+<!-- 🖥 DESKTOP TABLE -->
+<div class="table-responsive d-none d-md-block">
+  <table class="table table-bordered table-hover table-sm align-middle">
+    <thead class="thead-dark">
+      <tr>
+        <th>ID</th>
+        <th>Company</th>
+        <th>Person</th>
+        <th>Phone</th>
+        <th>Status</th>
+        <th>City</th>
+        <th style="min-width:300px;">Comments / Voice</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for c in companies %}
+      <tr>
+        <td>CO{{ c.id|stringformat:"03d" }}</td>
+
+        <!-- 🖼 Company Thumbnail + Name -->
+        <td>
+          <div class="d-flex align-items-center">
+            <img src="{% if c.image %}{{ c.image.url }}{% else %}{% static 'images/no-image.png' %}{% endif %}"
+                 alt="{{ c.company_name }}"
+                 class="mr-2 rounded"
+                 style="width:40px; height:40px; object-fit:cover; border:1px solid #ddd;">
+            <span>{{ c.company_name|default:"-" }}</span>
+          </div>
+        </td>
+
+        <td>{{ c.contact_person|default:"-" }}</td>
+        <td>{{ c.contact_no|default:"-" }}</td>
+
+        <!-- ⚡ STATUS DROPDOWN -->
+        <td>
+          <select class="form-control form-control-sm status-select" data-id="{{ c.id }}">
+            {% for key, label in c.STATUS_CHOICES %}
+              <option value="{{ key }}" {% if c.status == key %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </select>
+        </td>
+
+        <td>{{ c.city|default:"-" }}</td>
+
+        <td>
+          <!-- 💬 Show only latest comment -->
+          {% with latest_comment=c.comments.last %}
+          {% if latest_comment %}
+            <div class="small text-muted border-bottom py-1">
+              <strong>{{ latest_comment.created_by }}</strong>
+              <span class="text-secondary ml-1" style="font-size:11px;">
+                {{ latest_comment.create_at|date:"d M Y H:i" }}
+              </span>: {{ latest_comment.comment }}
+            </div>
+          {% else %}
+            <div class="text-muted small">No comments yet.</div>
+          {% endif %}
+          {% endwith %}
+
+          <!-- ➕ Add Comment -->
+          <form class="commentForm mt-1" data-id="{{ c.id }}">
+            {% csrf_token %}
+            <div class="input-group input-group-sm">
+              <input type="text" name="comment" class="form-control" placeholder="Add comment...">
+              <div class="input-group-append">
+                <button class="btn btn-primary btn-sm" type="submit">➕</button>
+              </div>
+            </div>
+          </form>
+
+          <!-- 🎤 Voice Recordings (Only Latest One) -->
+          <div id="voiceList{{ c.id }}" class="mt-1">
+          {% with latest_voice=c.voice_recordings.last %}
+              {% if latest_voice %}
+              <div class="mb-1" id="latest-voice-{{ c.id }}">
+                  <audio controls preload="none" class="w-100">
+                  <source src="{{ latest_voice.file.url }}" type="audio/mpeg">
+                  </audio>
+                  <div class="text-muted small">
+                  {{ latest_voice.uploaded_at|date:"d M Y H:i" }} — {{ latest_voice.uploaded_by|default:"User" }}
+                  </div>
+              </div>
+              {% else %}
+              <div class="text-muted small">No voice yet.</div>
+              {% endif %}
+          {% endwith %}
+          </div>
+
+          <!-- 📤 Upload Voice -->
+          <form class="voiceForm mt-1" data-id="{{ c.id }}" enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="input-group input-group-sm">
+              <input type="file" name="file" accept="audio/*" class="form-control p-1">
+              <div class="input-group-append">
+              <button class="btn btn-success btn-sm" type="submit">🎤</button>
+              </div>
+          </div>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<!-- 📱 MOBILE CARD VIEW -->
+<div class="d-md-none">
+  {% for c in companies %}
+  <div class="card mb-3 shadow-sm">
+    <div class="card-body p-2">
+
+      <!-- 🖼 Company Thumbnail + Name (Mobile) -->
+      <div class="d-flex align-items-center mb-2">
+        <img src="{% if c.image %}{{ c.image.url }}{% else %}{% static 'images/no-image.png' %}{% endif %}"
+             alt="{{ c.company_name }}"
+             class="mr-2 rounded"
+             style="width:40px; height:40px; object-fit:cover; border:1px solid #ddd;">
+        <div>
+          <strong>{{ c.company_name|default:"-" }}</strong><br>
+          <span class="text-muted small">{{ c.city|default:"-" }}</span>
+        </div>
+      </div>
+
+      <!-- ⚡ STATUS DROPDOWN (MOBILE) -->
+      <div class="d-flex justify-content-between mb-1">
+        <strong>CO{{ c.id|stringformat:"03d" }}</strong>
+        <select class="form-control form-control-sm status-select" data-id="{{ c.id }}">
+          {% for key, label in c.STATUS_CHOICES %}
+            <option value="{{ key }}" {% if c.status == key %}selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="small text-muted">
+        <div><strong>Person:</strong> {{ c.contact_person|default:"-" }}</div>
+        <div><strong>Phone:</strong> {{ c.contact_no|default:"-" }}</div>
+      </div>
+
+      <!-- 💬 Comments -->
+      <div id="commentList{{ c.id }}_mobile" class="mt-2">
+        {% for comment in c.comments.all %}
+        <div class="small text-muted border-bottom py-1">
+          <strong>{{ comment.created_by }}</strong>
+          <span class="text-secondary ml-1" style="font-size:11px;">
+            {{ comment.create_at|date:"d M Y H:i" }}
+          </span>: {{ comment.comment }}
+        </div>
+        {% empty %}
+        <div class="text-muted small">No comments yet.</div>
+        {% endfor %}
+      </div>
+
+      <!-- ➕ Add Comment -->
+      <form class="commentForm mt-1" data-id="{{ c.id }}">
+        {% csrf_token %}
+        <div class="input-group input-group-sm">
+          <input type="text" name="comment" class="form-control" placeholder="Add comment...">
+          <div class="input-group-append">
+            <button class="btn btn-primary btn-sm" type="submit">➕</button>
+          </div>
+        </div>
+      </form>
+
+      <!-- 🎤 Voice -->
+      <div id="voiceList{{ c.id }}" class="mt-1">
+        {% with latest_voice=c.voice_recordings.last %}
+          {% if latest_voice %}
+            <div class="mb-1" id="latest-voice-{{ c.id }}">
+              <audio controls preload="none" class="w-100">
+                <source src="{{ latest_voice.file.url }}" type="audio/mpeg">
+              </audio>
+              <div class="text-muted small">
+                {{ latest_voice.uploaded_at|date:"d M Y H:i" }} — {{ latest_voice.uploaded_by|default:"User" }}
+              </div>
+            </div>
+          {% else %}
+            <div class="text-muted small">No voice yet.</div>
+          {% endif %}
+        {% endwith %}
+      </div>
+
+      <!-- 📤 Upload Voice -->
+      <form class="voiceForm mt-1" data-id="{{ c.id }}" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="input-group input-group-sm">
+          <input type="file" name="file" accept="audio/*" class="form-control p-1">
+          <div class="input-group-append">
+            <button class="btn btn-success btn-sm" type="submit">🎤</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+{% if is_paginated %}
+<nav aria-label="Page navigation" class="mt-3">
+  <ul class="pagination justify-content-center flex-wrap flex-md-nowrap overflow-auto" style="white-space: nowrap;">
+    {% if page_obj.has_previous %}
+      <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Previous">&laquo;</a></li>
+    {% else %}
+      <li class="page-item disabled"><span class="page-link">&laquo;</span></li>
+    {% endif %}
+
+    {% for i in page_obj.paginator.page_range %}
+      {% if i >= page_obj.number|add:"-2" and i <= page_obj.number|add:"2" %}
+        {% if page_obj.number == i %}
+          <li class="page-item active"><span class="page-link">{{ i }}</span></li>
+        {% else %}
+          <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+        {% endif %}
+      {% endif %}
+    {% endfor %}
+
+    {% if page_obj.has_next %}
+      <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Next">&raquo;</a></li>
+    {% else %}
+      <li class="page-item disabled"><span class="page-link">&raquo;</span></li>
+    {% endif %}
+  </ul>
+</nav>
+{% endif %}
+
+{% endblock %}

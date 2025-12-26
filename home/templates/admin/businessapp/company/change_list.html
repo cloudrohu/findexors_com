@@ -1,0 +1,118 @@
+{% extends "admin/change_list.html" %}
+{% load static %}
+
+{% block content %}
+<style>
+.company-card-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
+    gap: 1.5rem;
+    padding: 1rem;
+}
+.company-card {
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    overflow: hidden;
+    transition: all 0.3s ease;
+    position: relative;
+    border: 1px solid #e5e7eb;
+}
+.company-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 18px rgba(0,0,0,0.12);
+}
+.company-card img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    border-bottom: 1px solid #eee;
+}
+.company-body {
+    padding: 1rem 1.2rem;
+}
+.company-title {
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: #1f2937;
+}
+.company-sub {
+    color: #555;
+    font-size: 0.9rem;
+    margin-bottom: 10px;
+}
+.company-field {
+    font-size: 0.88rem;
+    color: #374151;
+    margin: 2px 0;
+}
+.company-field strong {
+    color: #111827;
+    width: 130px;
+    display: inline-block;
+}
+.badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: #2563eb;
+    color: white;
+    padding: 3px 10px;
+    border-radius: 8px;
+    font-size: 0.8rem;
+}
+.company-id {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: #111827;
+    color: white;
+    padding: 3px 10px;
+    border-radius: 8px;
+    font-size: 0.8rem;
+}
+.edit-btn {
+    display: inline-block;
+    margin-top: 10px;
+    background: #2563eb;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    text-decoration: none;
+}
+.footer-info {
+    background: #f9fafb;
+    padding: .6rem 1.2rem;
+    border-top: 1px solid #e5e7eb;
+    font-size: 0.8rem;
+    color: #6b7280;
+}
+</style>
+
+<div class="company-card-container">
+{% for company in cl.result_list %}
+  <div class="company-card">
+    <span class="badge">{{ company.status|default:"Active" }}</span>
+    <span class="company-id">BC{{ company.id }}</span>
+    {% if company.image %}
+      <img src="{{ company.image.url }}" alt="{{ company.company_name }}">
+    {% else %}
+      <img src="{% static 'admin/img/default-thumbnail.png' %}" alt="No Image">
+    {% endif %}
+    <div class="company-body">
+      <div class="company-title">{{ company.company_name }}</div>
+      <div class="company-sub">{{ company.category }} | {{ company.city }} - {{ company.locality }}</div>
+      <div class="company-field"><strong>Contact:</strong> {{ company.contact_person }} - {{ company.contact_no }}</div>
+      <div class="company-field"><strong>Assigned:</strong> {{ company.assigned_to|default:"—" }}</div>
+      <a href="{{ company.id }}/change/" class="edit-btn">✏️ Edit Company</a>
+    </div>
+    <div class="footer-info">
+      🕒 Created: {{ company.create_at|date:"M d, Y h:i A" }} | Updated: {{ company.update_at|date:"M d, Y h:i A" }}
+    </div>
+  </div>
+{% empty %}
+  <p style="padding: 2rem;">No companies found.</p>
+{% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,124 @@
+{% extends 'dashboard/base.html' %}
+{% block title %}Dashboard - My Project{% endblock %}
+{% block content %}
+
+<!-- 📅 COMPANY MEETING MANAGEMENT -->
+<div class="mt-4 mb-4">
+  <h5 class="fw-bold text-primary border-bottom pb-2 text-center text-md-start">
+    Company Meetings - Management <a href="{% url 'company_create' %}" class="btn btn-primary">
+    ➕ Add Company
+</a>
+  </h5>
+  
+
+
+  <div class="row g-3 mt-3 text-center">
+    <!-- ❌ Not Managed -->
+    <div class="col-6 col-sm-6 col-md-3 mb-3">
+      <a href="{% url 'company_meeting_list' 'not-managed' %}" 
+         class="btn w-100 py-3 fw-semibold text-white rounded-pill shadow-sm"
+         style="background: linear-gradient(135deg, #dc3545, #b21f2d); transition: 0.3s ease;">
+        ❌ Not Managed
+        <span class="badge bg-light text-danger ms-2">{{ company_not_managed|length }}</span>
+      </a>
+    </div>
+
+    <!-- 📅 Today -->
+    <div class="col-6 col-sm-6 col-md-3 mb-3">
+      <a href="{% url 'company_meeting_list' 'today' %}" 
+         class="btn w-100 py-3 fw-semibold text-white rounded-pill shadow-sm"
+         style="background: linear-gradient(135deg, #007bff, #004085); transition: 0.3s ease;">
+        📅 Today
+        <span class="badge bg-light text-primary ms-2">{{ company_today|length }}</span>
+      </a>
+    </div>
+
+    <!-- 🌤️ Tomorrow -->
+    <div class="col-6 col-sm-6 col-md-3 mb-3">
+      <a href="{% url 'company_meeting_list' 'tomorrow' %}" 
+         class="btn w-100 py-3 fw-semibold text-white rounded-pill shadow-sm"
+         style="background: linear-gradient(135deg, #17a2b8, #007bff); transition: 0.3s ease;">
+        🌤️ Tomorrow
+        <span class="badge bg-light text-info ms-2">{{ company_tomorrow|length }}</span>
+      </a>
+    </div>
+
+    <!-- 🚀 Upcoming -->
+    <div class="col-6 col-sm-6 col-md-3 mb-3">
+      <a href="{% url 'company_meeting_list' 'upcoming' %}" 
+         class="btn w-100 py-3 fw-semibold text-white rounded-pill shadow-sm"
+         style="background: linear-gradient(135deg, #28a745, #1e7e34); transition: 0.3s ease;">
+        🚀 Upcoming
+        <span class="badge bg-light text-success ms-2">{{ company_upcoming|length }}</span>
+      </a>
+    </div>
+  </div>
+</div>
+
+
+<!-- 📊 RESPONSE MEETINGS MANAGEMENT -->
+<div class="mt-5 mb-4">
+  <h5 class="fw-bold text-success border-bottom pb-2 text-center text-md-start">
+    Response Meetings - Management
+  </h5>
+
+  <div class="row g-3 mt-3 text-center">
+    <!-- ❌ Not Managed -->
+    <div class="col-6 col-sm-6 col-md-3 mb-3">
+      <a href="{% url 'response_meeting_list' 'not-managed' %}" 
+         class="btn w-100 py-3 fw-semibold text-white rounded-pill shadow-sm"
+         style="background: linear-gradient(135deg, #dc3545, #b21f2d); transition: 0.3s ease;">
+        ❌ Not Managed
+        <span class="badge bg-light text-danger ms-2">{{ response_not_managed|length }}</span>
+      </a>
+    </div>
+
+    <!-- 📅 Today -->
+    <div class="col-6 col-sm-6 col-md-3 mb-3">
+      <a href="{% url 'response_meeting_list' 'today' %}" 
+         class="btn w-100 py-3 fw-semibold text-white rounded-pill shadow-sm"
+         style="background: linear-gradient(135deg, #007bff, #004085); transition: 0.3s ease;">
+        📅 Today
+        <span class="badge bg-light text-primary ms-2">{{ response_today|length }}</span>
+      </a>
+    </div>
+
+    <!-- 🌤️ Tomorrow -->
+    <div class="col-6 col-sm-6 col-md-3 mb-3">
+      <a href="{% url 'response_meeting_list' 'tomorrow' %}" 
+         class="btn w-100 py-3 fw-semibold text-white rounded-pill shadow-sm"
+         style="background: linear-gradient(135deg, #17a2b8, #007bff); transition: 0.3s ease;">
+        🌤️ Tomorrow
+        <span class="badge bg-light text-info ms-2">{{ response_tomorrow|length }}</span>
+      </a>
+    </div>
+
+    <!-- 🚀 Upcoming -->
+    <div class="col-6 col-sm-6 col-md-3 mb-3">
+      <a href="{% url 'response_meeting_list' 'upcoming' %}" 
+         class="btn w-100 py-3 fw-semibold text-white rounded-pill shadow-sm"
+         style="background: linear-gradient(135deg, #28a745, #1e7e34); transition: 0.3s ease;">
+        🚀 Upcoming
+        <span class="badge bg-light text-success ms-2">{{ response_upcoming|length }}</span>
+      </a>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+<style>
+a.btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+  filter: brightness(1.1);
+  transition: all 0.3s ease;
+}
+
+@media (max-width: 768px) {
+  .btn {
+    font-size: 0.9rem;
+    padding: 0.75rem;
+  }
+}
+</style>

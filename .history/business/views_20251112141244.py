@@ -1,0 +1,466 @@
+{% extends "dashboard/base.html" %}
+{% load static %}
+{% block head %}
+  {{ block.super }}
+  <!-- Bootstrap Icons optional if not already loaded in base -->
+  <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet"> -->
+  <style>
+    .panel-card { border-radius: 10px; background:#fff; padding:16px; box-shadow:0 6px 20px rgba(2,6,23,.06); }
+    .section-header { font-weight:600; display:flex; align-items:center; gap:.6rem; }
+    .small-muted { color:#6b7280; font-size:.9rem; }
+    .inline-form { background:#fafafa; border-radius:8px; padding:12px; border:1px solid #eee; }
+    .forms-container .inline-form + .inline-form { margin-top:10px; }
+    .img-preview { width:100%; max-height:150px; object-fit:cover; border-radius:6px; border:1px solid #e6e6e6; }
+    .hidden { display:none !important; }
+    .remove-form { cursor:pointer; }
+    .mt-2-small { margin-top:.5rem; font-size:.9rem; color:#6b7280; }
+    .btn-action { min-width:100px; }
+  </style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="mb-0">{% if object %}Edit Company{% else %}Add Company{% endif %}</h2>
+
+    <div class="d-flex align-items-center gap-2">
+      <a href="{% url 'company_list' %}" class="btn btn-outline-secondary btn-sm"><i class="bi bi-list-ul"></i> List</a>
+
+      {% if object %}
+        <a href="{% url 'company_detail' object.pk object.slug %}" class="btn btn-outline-primary btn-sm btn-action"><i class="bi bi-eye"></i> View</a>
+        <a href="{% url 'company_update' object.pk %}" class="btn btn-primary btn-sm btn-action"><i class="bi bi-pencil"></i> Edit</a>
+        <a href="{% url 'company_delete' object.pk %}" class="btn btn-outline-danger btn-sm btn-action"
+           onclick="return confirm('Delete this company?');"><i class="bi bi-trash"></i> Delete</a>
+      {% else %}
+        <a href="{% url 'company_create' %}" class="btn btn-success btn-sm btn-action"><i class="bi bi-plus-lg"></i> New</a>
+      {% endif %}
+    </div>
+  </div>
+
+  <form id="company-form" method="post" enctype="multipart/form-data" class="row g-3" novalidate>
+    {% csrf_token %}
+
+    {# DEBUG (hidden) - remove if you don't need it #}
+    <div id="formset-prefix-debug" class="hidden">
+      meeting prefix: {{ meeting_formset.prefix }} |
+      followup prefix: {{ followup_formset.prefix }} |
+      comment prefix: {{ comment_formset.prefix }} |
+      voice prefix: {{ voice_formset.prefix }} |
+      visit prefix: {{ visit_formset.prefix }}
+    </div>
+
+    <div class="col-md-8">
+      <div class="panel-card mb-3">
+        <div class="d-flex justify-content-between align-items-start">
+          <div>
+            <h5 class="section-header"><i class="bi bi-building"></i> Company Information</h5>
+            <p class="mt-2-small">Edit basic details and location</p>
+          </div>
+        </div>
+
+        <div class="row g-3 mt-2">
+          <div class="col-md-8">
+            <label class="form-label">{{ form.company_name.label }}</label>
+            {{ form.company_name }}
+            {{ form.company_name.errors }}
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">{{ form.category.label }}</label>
+            {{ form.category }}
+            {{ form.category.errors }}
+          </div>
+
+          <div class="col-md-4">
+            <label class="form-label">{{ form.city.label }}</label>
+            {{ form.city }}
+            {{ form.city.errors }}
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">{{ form.locality.label }}</label>
+            {{ form.locality }}
+            {{ form.locality.errors }}
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">{{ form.sub_locality.label }}</label>
+            {{ form.sub_locality }}
+            {{ form.sub_locality.errors }}
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">{{ form.contact_person.label }}</label>
+            {{ form.contact_person }}
+            {{ form.contact_person.errors }}
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">{{ form.contact_no.label }}</label>
+            {{ form.contact_no }}
+            {{ form.contact_no.errors }}
+          </div>
+
+          <div class="col-12">
+            <label class="form-label">{{ form.address.label }}</label>
+            {{ form.address }}
+            {{ form.address.errors }}
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">{{ form.status.label }}</label>
+            {{ form.status }}
+            {{ form.status.errors }}
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">{{ form.assigned_to.label }}</label>
+            {{ form.assigned_to }}
+            {{ form.assigned_to.errors }}
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">{{ form.website.label }}</label>
+            {{ form.website }}
+            {{ form.website.errors }}
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">{{ form.google_map.label }}</label>
+            {{ form.google_map }}
+            {{ form.google_map.errors }}
+          </div>
+
+          <div class="col-12">
+            <label class="form-label">{{ form.description.label }}</label>
+            {{ form.description }}
+            {{ form.description.errors }}
+          </div>
+        </div>
+      </div>
+
+      <!-- inline formsets -->
+      <div class="panel-card mb-3">
+        <h5 class="mb-3 section-header"><i class="bi bi-journal-text"></i> Related items</h5>
+
+        <!-- Meetings -->
+        <div class="mb-3">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <strong>Meetings</strong>
+              <div class="small-muted">Add or edit scheduled meetings</div>
+            </div>
+            <button type="button" class="btn btn-sm btn-primary add-form" data-prefix="{{ meeting_formset.prefix }}"><i class="bi bi-plus-lg"></i> Add</button>
+          </div>
+
+          {{ meeting_formset.management_form }}
+          <div id="forms-{{ meeting_formset.prefix }}" class="forms-container mt-2">
+            {% for f in meeting_formset.forms %}
+              <div class="inline-form" data-form-index="{{ forloop.counter0 }}">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                  <strong>Meeting {{ forloop.counter }}</strong>
+                  <div>
+                    {{ f.DELETE }} <span class="small-muted">Delete</span>
+                    <button type="button" class="btn btn-sm btn-outline-danger remove-form ms-2"><i class="bi bi-x"></i></button>
+                  </div>
+                </div>
+
+                <div class="row g-2">
+                  <div class="col-md-3">{{ f.status.label_tag }} {{ f.status }}</div>
+                  <div class="col-md-4">{{ f.meeting_date.label_tag }} {{ f.meeting_date }}</div>
+                  <div class="col-md-3">{{ f.assigned_to.label_tag }} {{ f.assigned_to }}</div>
+                  <div class="col-12">{{ f.comment.label_tag }} {{ f.comment }}</div>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+
+          <div id="empty-{{ meeting_formset.prefix }}" class="hidden">
+            {{ meeting_formset.empty_form.as_p }}
+          </div>
+        </div>
+
+        <!-- Followups -->
+        <div class="mb-3">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <strong>Followups</strong>
+              <div class="small-muted">Reminders & next steps</div>
+            </div>
+            <button type="button" class="btn btn-sm btn-primary add-form" data-prefix="{{ followup_formset.prefix }}"><i class="bi bi-plus-lg"></i> Add</button>
+          </div>
+
+          {{ followup_formset.management_form }}
+          <div id="forms-{{ followup_formset.prefix }}" class="forms-container mt-2">
+            {% for f in followup_formset.forms %}
+              <div class="inline-form">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                  <strong>Followup {{ forloop.counter }}</strong>
+                  <div>
+                    {{ f.DELETE }} <span class="small-muted">Del</span>
+                    <button type="button" class="btn btn-sm btn-outline-danger remove-form ms-2"><i class="bi bi-x"></i></button>
+                  </div>
+                </div>
+
+                <div class="row g-2">
+                  <div class="col-md-4">{{ f.status.label_tag }} {{ f.status }}</div>
+                  <div class="col-md-4">{{ f.followup_date.label_tag }} {{ f.followup_date }}</div>
+                  <div class="col-md-4">{{ f.assigned_to.label_tag }} {{ f.assigned_to }}</div>
+                  <div class="col-12">{{ f.comment.label_tag }} {{ f.comment }}</div>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+
+          <div id="empty-{{ followup_formset.prefix }}" class="hidden">
+            {{ followup_formset.empty_form.as_p }}
+          </div>
+        </div>
+
+        <!-- Comments -->
+        <div class="mb-3">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <strong>Comments</strong>
+              <div class="small-muted">Quick notes</div>
+            </div>
+            <button type="button" class="btn btn-sm btn-primary add-form" data-prefix="{{ comment_formset.prefix }}"><i class="bi bi-plus-lg"></i> Add</button>
+          </div>
+
+          {{ comment_formset.management_form }}
+          <div id="forms-{{ comment_formset.prefix }}" class="forms-container mt-2">
+            {% for f in comment_formset.forms %}
+              <div class="inline-form">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                  <strong>Comment {{ forloop.counter }}</strong>
+                  <button type="button" class="btn btn-sm btn-outline-danger remove-form"><i class="bi bi-x"></i></button>
+                </div>
+                <div class="row g-2">
+                  <div class="col-12">{{ f.comment.label_tag }} {{ f.comment }}</div>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+
+          <div id="empty-{{ comment_formset.prefix }}" class="hidden">
+            {{ comment_formset.empty_form.as_p }}
+          </div>
+        </div>
+
+        <!-- Voice recordings -->
+        <div class="mb-3">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <strong>Voice recordings</strong>
+              <div class="small-muted">Call recordings</div>
+            </div>
+            <button type="button" class="btn btn-sm btn-primary add-form" data-prefix="{{ voice_formset.prefix }}"><i class="bi bi-plus-lg"></i> Add</button>
+          </div>
+
+          {{ voice_formset.management_form }}
+          <div id="forms-{{ voice_formset.prefix }}" class="forms-container mt-2">
+            {% for f in voice_formset.forms %}
+              <div class="inline-form">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                  <strong>Voice {{ forloop.counter }}</strong>
+                  <div>
+                    {{ f.DELETE }} <span class="small-muted">Del</span>
+                    <button type="button" class="btn btn-sm btn-outline-danger remove-form ms-2"><i class="bi bi-x"></i></button>
+                  </div>
+                </div>
+                <div class="row g-2">
+                  <div class="col-md-8">{{ f.file.label_tag }} {{ f.file }}</div>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+
+          <div id="empty-{{ voice_formset.prefix }}" class="hidden">
+            {{ voice_formset.empty_form.as_p }}
+          </div>
+        </div>
+
+        <!-- Visits -->
+        <div class="mb-3">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <strong>Visits</strong>
+              <div class="small-muted">On-field visits</div>
+            </div>
+            <button type="button" class="btn btn-sm btn-primary add-form" data-prefix="{{ visit_formset.prefix }}"><i class="bi bi-plus-lg"></i> Add</button>
+          </div>
+
+          {{ visit_formset.management_form }}
+          <div id="forms-{{ visit_formset.prefix }}" class="forms-container mt-2">
+            {% for f in visit_formset.forms %}
+              <div class="inline-form">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                  <strong>Visit {{ forloop.counter }}</strong>
+                  <button type="button" class="btn btn-sm btn-outline-danger remove-form"><i class="bi bi-x"></i></button>
+                </div>
+                <div class="row g-2">
+                  <div class="col-md-4">{{ f.visit_for.label_tag }} {{ f.visit_for }}</div>
+                  <div class="col-md-4">{{ f.visit_type.label_tag }} {{ f.visit_type }}</div>
+                  <div class="col-md-4">{{ f.visit_status.label_tag }} {{ f.visit_status }}</div>
+                  <div class="col-12">{{ f.comment.label_tag }} {{ f.comment }}</div>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+
+          <div id="empty-{{ visit_formset.prefix }}" class="hidden">
+            {{ visit_formset.empty_form.as_p }}
+          </div>
+        </div>
+
+      </div><!-- end related items -->
+
+    </div><!-- left column -->
+
+    <div class="col-md-4">
+      <div class="panel-card text-center">
+        <label class="form-label small-muted">Company Image</label>
+        <div class="mb-2">
+          {% if object and object.image %}
+            <img id="img-preview" src="{{ object.image.url }}" class="img-preview" alt="company image">
+          {% else %}
+            <img id="img-preview" src="{% static 'img/placeholder-400x300.png' %}" class="img-preview" alt="placeholder">
+          {% endif %}
+        </div>
+        <div>{{ form.image }}</div>
+      </div>
+
+      <div class="panel-card mt-3">
+        <h6>Meta</h6>
+        <p class="small-muted"><strong>Created:</strong> {% if object %}{{ object.create_at|date:"d M Y, H:i" }}{% else %}-{% endif %}</p>
+        <p class="small-muted"><strong>Updated:</strong> {% if object %}{{ object.update_at|date:"d M Y, H:i" }}{% else %}-{% endif %}</p>
+        <p class="small-muted"><strong>Slug:</strong> {% if object and object.slug %}{{ object.slug }}{% else %}-{% endif %}</p>
+
+        <div class="mt-3 d-grid">
+          <button type="submit" class="btn btn-primary">Save Company</button>
+          <a href="{% url 'company_list' %}" class="btn btn-outline-secondary mt-2">Cancel</a>
+        </div>
+      </div>
+    </div><!-- right column -->
+
+  </form>
+</div>
+
+<!-- JS -->
+<script>
+(function(){
+  // update TOTAL_FORMS for a prefix
+  function updateTotalForms(prefix){
+    const total = document.querySelector('input[name="'+prefix+'-TOTAL_FORMS"]');
+    const container = document.getElementById('forms-' + prefix);
+    if (!total || !container) return;
+    total.value = container.querySelectorAll('.inline-form').length;
+  }
+
+  // clone empty form and replace __prefix__
+  function cloneEmpty(prefix){
+    const empty = document.getElementById('empty-' + prefix);
+    if (!empty) return null;
+    const container = document.getElementById('forms-' + prefix);
+    const index = container.querySelectorAll('.inline-form').length;
+    let html = empty.innerHTML;
+    html = html.replace(/__prefix__/g, index);
+    const div = document.createElement('div');
+    div.className = 'inline-form';
+    div.innerHTML = html;
+    // add remove header button if not present
+    const header = document.createElement('div');
+    header.className = 'd-flex justify-content-between align-items-center mb-2';
+    const strong = document.createElement('strong');
+    strong.textContent = 'Item ' + (index + 1);
+    const rm = document.createElement('button');
+    rm.type = 'button';
+    rm.className = 'btn btn-sm btn-outline-danger remove-form';
+    rm.innerHTML = '<i class="bi bi-x"></i>';
+    header.appendChild(strong);
+    header.appendChild(rm);
+    div.insertBefore(header, div.firstChild);
+    return div;
+  }
+
+  // Add handlers for every add button
+  document.querySelectorAll('.add-form').forEach(btn=>{
+    btn.addEventListener('click', ()=> {
+      const prefix = btn.dataset.prefix;
+      const container = document.getElementById('forms-' + prefix);
+      const newNode = cloneEmpty(prefix);
+      if (!newNode) return;
+      container.appendChild(newNode);
+      updateTotalForms(prefix);
+      const first = newNode.querySelector('input, select, textarea');
+      if (first) first.focus();
+    });
+  });
+
+  // Delegated remove
+  document.addEventListener('click', function(e){
+    const rm = e.target.closest && e.target.closest('.remove-form');
+    if (!rm) return;
+    const node = rm.closest('.inline-form');
+    if (!node) return;
+    const container = node.parentElement;
+    node.remove();
+    const prefix = container.id.replace('forms-','');
+    updateTotalForms(prefix);
+  });
+
+  // initialize totals on DOMContentLoaded
+  document.addEventListener('DOMContentLoaded', function(){
+    const prefixes = [
+      '{{ meeting_formset.prefix }}',
+      '{{ followup_formset.prefix }}',
+      '{{ comment_formset.prefix }}',
+      '{{ voice_formset.prefix }}',
+      '{{ visit_formset.prefix }}'
+    ];
+    prefixes.forEach(p => updateTotalForms(p));
+  });
+
+  // image preview
+  const imgInput = document.querySelector('[name="image"]');
+  const imgPreview = document.getElementById('img-preview');
+  if (imgInput){
+    imgInput.addEventListener('change', function(){
+      const f = this.files && this.files[0];
+      if (!f) return;
+      const reader = new FileReader();
+      reader.onload = function(ev){ if (imgPreview) imgPreview.src = ev.target.result; };
+      reader.readAsDataURL(f);
+    });
+  }
+
+  // city -> locality AJAX (requires urls get_localities & get_sub_localities)
+  const citySelect = document.querySelector('[name="city"]');
+  if (citySelect){
+    citySelect.addEventListener('change', function(){
+      const cityId = this.value;
+      const locality = document.querySelector('[name="locality"]');
+      const subLocality = document.querySelector('[name="sub_locality"]');
+      if (!cityId) { if (locality) locality.innerHTML = '<option value="">---------</option>'; if (subLocality) subLocality.innerHTML = '<option value="">---------</option>'; return; }
+      fetch("{% url 'get_localities' %}?city_id=" + cityId).then(r => r.json()).then(data => {
+        if (locality) {
+          locality.innerHTML = '<option value="">---------</option>';
+          data.forEach(it => { const o = document.createElement('option'); o.value = it.id; o.textContent = it.title; locality.appendChild(o); });
+        }
+        if (subLocality) subLocality.innerHTML = '<option value="">---------</option>';
+      }).catch(console.error);
+    });
+  }
+
+  const localitySelect = document.querySelector('[name="locality"]');
+  if (localitySelect){
+    localitySelect.addEventListener('change', function(){
+      const localityId = this.value;
+      const subLocality = document.querySelector('[name="sub_locality"]');
+      if (!localityId) { if (subLocality) subLocality.innerHTML = '<option value="">---------</option>'; return; }
+      fetch("{% url 'get_sub_localities' %}?locality_id=" + localityId).then(r => r.json()).then(data => {
+        if (subLocality) {
+          subLocality.innerHTML = '<option value="">---------</option>';
+          data.forEach(it => { const o = document.createElement('option'); o.value = it.id; o.textContent = it.title; subLocality.appendChild(o); });
+        }
+      }).catch(console.error);
+    });
+  }
+
+})();
+</script>
+{% endblock %}

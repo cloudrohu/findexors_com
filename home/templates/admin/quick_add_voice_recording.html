@@ -1,0 +1,16 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block content %}
+<h2>🎤 Quick Voice Upload for Response #{{ response_obj.id }}</h2>
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <table>
+        {{ form.as_table }}
+    </table>
+    <div style="margin-top:10px;">
+        <input type="submit" value="Upload" class="default">
+        <a href="javascript:history.back()" class="button cancel-button">Cancel</a>
+    </div>
+</form>
+{% endblock %}

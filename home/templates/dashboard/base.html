@@ -1,0 +1,366 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{% block title %}Dashboard{% endblock %}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- AdminLTE CSS -->
+  <link rel="stylesheet" href="{% static 'dashboard/plugins/fontawesome-free/css/all.min.css' %}">
+  <link rel="stylesheet" href="{% static 'dashboard/dist/css/adminlte.min.css' %}">
+  {% block extra_css %}{% endblock %}
+</head>
+
+<body class="hold-transition sidebar-mini layout-fixed">
+<div class="wrapper">
+
+  <!-- Navbar -->
+  <nav class="main-header navbar navbar-expand navbar-white navbar-light">
+    <ul class="navbar-nav">
+  <!-- Sidebar Toggle -->
+  <li class="nav-item">
+    <a class="nav-link" data-widget="pushmenu" href="#">
+      <i class="fas fa-bars"></i>
+    </a>
+  </li>
+
+  <!-- Home (Always Visible) -->
+  <li class="nav-item">
+    <a href="/" class="nav-link d-flex align-items-center gap-1">
+      <i class="fas fa-home"></i>
+      <span>Home</span>
+    </a>
+  </li>
+
+  <!-- Dashboard (Always Visible) -->
+  <li class="nav-item">
+    <a href="{% url 'dashboard' %}" class="nav-link d-flex align-items-center gap-1">
+      <i class="fas fa-tachometer-alt"></i>
+      <span>Dashboard</span>
+    </a>
+  </li>
+</ul>
+
+
+    <!-- Right navbar -->
+    <ul class="navbar-nav ml-auto">
+      <!-- Notifications Dropdown -->
+      <li class="nav-item dropdown">
+        <a class="nav-link" data-toggle="dropdown" href="#">
+          <i class="far fa-bell"></i>
+          <span class="badge badge-warning navbar-badge">3</span>
+        </a>
+        <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+          <span class="dropdown-header">3 Notifications</span>
+          <div class="dropdown-divider"></div>
+          <a href="#" class="dropdown-item">
+            <i class="fas fa-envelope mr-2"></i> 1 new message
+          </a>
+          <div class="dropdown-divider"></div>
+          <a href="#" class="dropdown-item">
+            <i class="fas fa-users mr-2"></i> 2 friend requests
+          </a>
+        </div>
+      </li>
+    </ul>
+  </nav>
+  <!-- /.navbar -->
+
+  <!-- Sidebar -->
+  <aside class="main-sidebar sidebar-dark-primary elevation-4">
+    <!-- Brand Logo -->
+    <a href="{% url 'dashboard' %}" class="brand-link">
+      <span class="brand-text font-weight-light">AdminLTE Django</span>
+    </a>
+
+    <div class="sidebar">
+    <nav class="mt-2">
+      <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+        <!-- Dashboard -->
+        <li class="nav-item">
+          <a href="{% url 'dashboard' %}" class="nav-link active">
+            <i class="nav-icon fas fa-tachometer-alt"></i>
+            <p> Dashboard </p>
+          </a>
+        </li>
+
+    
+    <li class="nav-item">
+      <a href="#" class="nav-link">
+        <i class="nav-icon fas fa-database"></i>
+        <p>
+          Responses
+          <i class="fas fa-angle-left right"></i>
+        </p>
+      </a>
+      <ul class="nav nav-treeview">
+        <li class="nav-item">
+          <a href="{% url 'response_list' %}" class="nav-link">
+            <i class="far fa-circle nav-icon"></i>
+            <p>All Response</p>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="{% url 'response_status' 'New' %}" class="nav-link">
+            <i class="far fa-circle nav-icon"></i>
+            <p>New</p>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="{% url 'response_status' 'Follow_Up' %}" class="nav-link">
+            <i class="far fa-circle nav-icon"></i>
+            <p>Follow Up</p>
+          </a>
+        </li>
+          <li class="nav-item">
+          <a href="{% url 'response_status' 'Meeting' %}" class="nav-link">
+            <i class="far fa-circle nav-icon"></i>
+            <p>Meeting</p>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="{% url 'response_status' 'Not_received' %}" class="nav-link">
+            <i class="far fa-circle nav-icon"></i>
+            <p>Not Received</p>
+          </a>
+        </li>
+        
+          <li class="nav-item">
+          <a href="{% url 'response_status' 'Training' %}" class="nav-link">
+            <i class="far fa-circle nav-icon"></i>
+            <p>Training</p>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="{% url 'response_status' 'For_job' %}" class="nav-link">
+            <i class="far fa-circle nav-icon"></i>
+            <p>For Job</p>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="{% url 'response_status' 'Fake_lead' %}" class="nav-link">
+            <i class="far fa-circle nav-icon"></i>
+            <p>Fake Lead</p>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="{% url 'response_status' 'Deal_close' %}" class="nav-link">
+            <i class="far fa-circle nav-icon"></i>
+            <p>Deal Close</p>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="{% url 'response_status' 'Software_company' %}" class="nav-link">
+            <i class="far fa-circle nav-icon"></i>
+            <p>Software Company</p>
+          </a>
+        </li>
+      </ul>
+    </li>
+
+    <li class="nav-item">
+      <a href="#" class="nav-link">
+        <i class="nav-icon fas fa-building"></i>
+        <p>
+          Companies
+          <i class="fas fa-angle-left right"></i>
+        </p>
+      </a>
+      <ul class="nav nav-treeview">
+
+        <!-- 📋 All Companies -->
+        <li class="nav-item">
+          <a href="{% url 'company_list' %}" class="nav-link">
+            <i class="far fa-circle nav-icon"></i>
+            <p>All Companies</p>
+          </a>
+        </li>
+
+        <!-- 🟢 Status: New -->
+        <li class="nav-item">
+          <a href="{% url 'company_status' 'New' %}" class="nav-link">
+            <i class="far fa-circle nav-icon"></i>
+            <p>New</p>
+          </a>
+        </li>
+
+        <!-- 🟡 Status: Follow Up -->
+        <li class="nav-item">
+          <a href="{% url 'company_status' 'Follow_Up' %}" class="nav-link">
+            <i class="far fa-circle nav-icon"></i>
+            <p>Follow Up</p>
+          </a>
+        </li>
+
+        <!-- 📅 Status: Meeting -->
+        <li class="nav-item">
+          <a href="{% url 'company_status' 'Meeting' %}" class="nav-link">
+            <i class="far fa-circle nav-icon"></i>
+            <p>Meeting</p>
+          </a>
+        </li>
+
+        <!-- ❌ Status: Not Received -->
+        <li class="nav-item">
+          <a href="{% url 'company_status' 'Not_received' %}" class="nav-link">
+            <i class="far fa-circle nav-icon"></i>
+            <p>Not Received</p>
+          </a>
+        </li>
+
+        <!-- 🕓 Status: Call later -->
+        <li class="nav-item">
+          <a href="{% url 'company_status' 'Call later' %}" class="nav-link">
+            <i class="far fa-circle nav-icon"></i>
+            <p>Call Later</p>
+          </a>
+        </li>
+
+        <!-- 📞 Status: Call Tomorrow -->
+        <li class="nav-item">
+          <a href="{% url 'company_status' 'Call Tomorrow' %}" class="nav-link">
+            <i class="far fa-circle nav-icon"></i>
+            <p>Call Tomorrow</p>
+          </a>
+        </li>
+
+        <!-- 📴 Status: Switched Off -->
+        <li class="nav-item">
+          <a href="{% url 'company_status' 'Switched Off' %}" class="nav-link">
+            <i class="far fa-circle nav-icon"></i>
+            <p>Switched Off</p>
+          </a>
+        </li>
+
+        <!-- 🚫 Status: Not Interested -->
+        <li class="nav-item">
+          <a href="{% url 'company_status' 'Not Interested' %}" class="nav-link">
+            <i class="far fa-circle nav-icon"></i>
+            <p>Not Interested</p>
+          </a>
+        </li>
+
+        <!-- ⚠️ Status: Invalid Number -->
+        <li class="nav-item">
+          <a href="{% url 'company_status' 'Invalid Number Off' %}" class="nav-link">
+            <i class="far fa-circle nav-icon"></i>
+            <p>Invalid Number</p>
+          </a>
+        </li>
+
+        <!-- ⏳ Status: They Will Connect -->
+        <li class="nav-item">
+          <a href="{% url 'company_status' 'They Will Connect' %}" class="nav-link">
+            <i class="far fa-circle nav-icon"></i>
+            <p>They Will Connect</p>
+          </a>
+        </li>
+
+      </ul>
+    </li>
+
+    <li class="nav-item">
+      <a href="#" class="nav-link">
+          <i class="far fa-calendar-check nav-icon"></i>
+        <p>Meeting<i class="fas fa-angle-left right"></i></p>
+      </a>
+
+      <ul class="nav nav-treeview">
+        <li class="nav-item">
+          <a href="{% url 'company_meetings' %}" class="nav-link">
+            <i class="far fa-calendar-check nav-icon"></i>
+            <p>Company</p>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="{% url 'response_meetings' %}" class="nav-link">
+            <i class="far fa-calendar-check nav-icon"></i>
+            <p>Response</p>
+          </a>
+        </li>
+
+        
+      </ul>
+    </li>
+
+    <!-- Admin Link -->
+    <li class="nav-item">
+      <a href="/admin" class="nav-link">
+        <i class="nav-icon fas fa-cogs"></i>
+        <p>Admin Panel</p>
+      </a>
+    </li>
+  </ul>
+</nav>
+
+    </div>
+  </aside>
+  <!-- /.sidebar -->
+
+  <!-- Content Wrapper -->
+  <div class="content-wrapper">
+    <section class="content pt-3">
+      <div class="container-fluid">
+        {% block content %}
+        <!-- Page specific content will come here -->
+        {% endblock %}
+      </div>
+    </section>
+  </div>
+  <!-- /.content-wrapper -->
+
+</div>
+
+<!-- Scripts -->
+<script src="{% static 'dashboard/plugins/jquery/jquery.min.js' %}"></script>
+<script src="{% static 'dashboard/plugins/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+<script src="{% static 'dashboard/dist/js/adminlte.min.js' %}"></script>
+{% block extra_js %}{% endblock %}
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const toggleLinks = document.querySelectorAll('.toggle-submenu');
+
+    toggleLinks.forEach(link => {
+      link.addEventListener('click', function (e) {
+        e.preventDefault();
+        const submenu = this.nextElementSibling;
+
+        // Pehle sab band karo
+        document.querySelectorAll('.submenu').forEach(sm => {
+          if (sm !== submenu) {
+            sm.style.display = 'none';
+          }
+        });
+
+        // Phir clicked wala toggle karo
+        submenu.style.display = submenu.style.display === 'block' ? 'none' : 'block';
+      });
+    });
+
+    // By default sab submenus band
+    document.querySelectorAll('.submenu').forEach(sm => sm.style.display = 'none');
+  });
+</script>
+
+
+<style>
+.navbar-nav .nav-item .nav-link {
+  font-weight: 500;
+  padding: 8px 14px;
+}
+
+.navbar-nav .nav-item .nav-link i {
+  margin-right: 6px;
+}
+
+@media (max-width: 768px) {
+  .navbar-nav .nav-item .nav-link {
+    font-size: 0.95rem;
+  }
+}
+</style>
+
+</body>
+</html>

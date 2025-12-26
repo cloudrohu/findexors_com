@@ -1,0 +1,88 @@
+<!-- ================= HERO SEARCH ================= -->
+<section class="bg-gradient-to-r from-indigo-600 to-blue-600 text-white py-20">
+    <div class="max-w-7xl mx-auto px-6 text-center">
+
+        <h1 class="text-4xl md:text-5xl font-bold mb-4">
+            Find Trusted Businesses Near You
+        </h1>
+
+        <p class="text-lg mb-8">
+            Search & connect with verified local businesses
+        </p>
+
+        <form method="get" action="{% url 'search' %}"
+              class="bg-white rounded-xl p-4 flex flex-col md:flex-row gap-3">
+
+            <input type="text" name="q"
+                   placeholder="Search business or service"
+                   class="flex-1 px-4 py-3 rounded-lg border outline-none text-gray-700">
+
+            <select name="city"
+                    class="px-4 py-3 rounded-lg border text-gray-700">
+                <option value="">Select City</option>
+                {% for city in cities %}
+                    <option value="{{ city.id }}">{{ city.title }}</option>
+                {% endfor %}
+            </select>
+
+            <button class="bg-indigo-600 text-white px-6 py-3 rounded-lg font-semibold">
+                Search
+            </button>
+        </form>
+
+    </div>
+</section>
+
+<!-- ================= CATEGORIES ================= -->
+<section class="py-16 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-6">
+
+        <h2 class="text-3xl font-bold text-center mb-10">
+            Popular Categories
+        </h2>
+
+        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
+            {% for cat in categories %}
+            <a href="{% url 'category_list' cat.slug %}"
+               class="bg-white p-6 rounded-xl shadow hover:shadow-lg text-center">
+                <h3 class="font-semibold">{{ cat.title }}</h3>
+            </a>
+            {% endfor %}
+        </div>
+
+    </div>
+</section>
+
+<!-- ================= FEATURED BUSINESSES ================= -->
+<section class="py-16">
+    <div class="max-w-7xl mx-auto px-6">
+
+        <h2 class="text-3xl font-bold text-center mb-10">
+            Featured Businesses
+        </h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {% for company in featured_companies %}
+            <div class="bg-white border rounded-xl p-5 shadow">
+
+                <h3 class="font-bold text-xl">
+                    {{ company.company_name }}
+                </h3>
+
+                <p class="text-sm text-gray-600">
+                    {{ company.locality }}, {{ company.city }}
+                </p>
+
+                <div class="mt-4 flex gap-3">
+                    <a href="{{ company.get_absolute_url }}"
+                       class="bg-indigo-600 text-white px-4 py-2 rounded-lg">
+                        View
+                    </a>
+                </div>
+
+            </div>
+            {% endfor %}
+        </div>
+
+    </div>
+</section>

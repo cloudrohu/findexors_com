@@ -1,0 +1,287 @@
+{% extends 'dashboard/base.html' %}
+{% block title %}All Meetings & Responses{% endblock %}
+
+{% block content %}
+
+<h4 class="mb-3">🗓 Meetings Filter</h4>
+
+<form method="get" class="mb-4 bg-light p-3 rounded shadow-sm">
+  <div class="row g-2 align-items-end">
+    <!-- existing filter fields as is -->
+    <div class="col-md-2 col-6">
+      <label class="small fw-bold">From Date</label>
+      <input type="date" name="date_from" class="form-control form-control-sm"
+             value="{{ request.GET.date_from }}">
+    </div>
+
+    <div class="col-md-2 col-6">
+      <label class="small fw-bold">To Date</label>
+      <input type="date" name="date_to" class="form-control form-control-sm"
+             value="{{ request.GET.date_to }}">
+    </div>
+
+    <div class="col-md-2 col-6">
+      <label class="small fw-bold">City</label>
+      <select name="city" class="form-control form-control-sm">
+        <option value="">All</option>
+        {% for c in cities %}
+          <option value="{{ c.id }}" {% if request.GET.city == c.id|stringformat:'s' %}selected{% endif %}>{{ c }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="col-md-2 col-6">
+      <label class="small fw-bold">Locality</label>
+      <select name="locality" class="form-control form-control-sm">
+        <option value="">All</option>
+        {% for l in localities %}
+          <option value="{{ l.id }}" {% if request.GET.locality == l.id|stringformat:'s' %}selected{% endif %}>{{ l }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="col-md-2 col-6">
+      <label class="small fw-bold">Status</label>
+      <select name="status" class="form-control form-control-sm">
+        <option value="">All</option>
+        {% for s in statuses %}
+          <option value="{{ s }}" {% if request.GET.status == s %}selected{% endif %}>{{ s }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="col-md-2 col-6">
+      <label class="small fw-bold">Assigned To</label>
+      <select name="assigned_to" class="form-control form-control-sm">
+        <option value="">All</option>
+        {% for s in staff_list %}
+          <option value="{{ s.id }}" {% if request.GET.assigned_to == s.id|stringformat:'s' %}selected{% endif %}>
+            {{ s.user.get_full_name|default:s.user.username }}
+          </option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="col-md-2 col-6">
+      <label class="small fw-bold">Category</label>
+      <select name="category" class="form-control form-control-sm">
+        <option value="">All</option>
+        {% for c in categories %}
+          <option value="{{ c.id }}" {% if request.GET.category == c.id|stringformat:'s' %}selected{% endif %}>{{ c }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="col-md-2 col-6">
+      <label class="small fw-bold">Requirement Type</label>
+      <select name="requirement" class="form-control form-control-sm">
+        <option value="">All</option>
+        {% for r in requirements %}
+          <option value="{{ r.id }}" {% if request.GET.requirement == r.id|stringformat:'s' %}selected{% endif %}>{{ r }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="col-md-2 col-12 text-end mt-2 mt-md-0">
+      <button type="submit" class="btn btn-sm btn-primary w-100">
+        <i class="fas fa-filter me-1"></i> Filter
+      </button>
+    </div>
+    <div class="col-md-2 col-12 mt-2 mt-md-0">
+      <a href="{% url 'response_meetings' %}" class="btn btn-sm btn-secondary w-100">
+        <i class="fas fa-undo me-1"></i> Reset
+      </a>
+    </div>
+  </div>
+</form>
+
+<h5 class="mb-3">🗓 Total {{ page_obj.paginator.count }} Meetings</h5>
+
+<div class="table-responsive d-none d-md-block">
+  <table class="table table-bordered table-hover table-sm align-middle">
+    <thead class="thead-dark">
+      <tr>
+        <th>ID</th>
+        <th>Meeting Details</th>
+        <th>Response Details</th>
+        <th>Assigned To</th>
+        <th>Created / Updated</th>
+        <th class="text-center">Action</th>  <!-- Added Action Column -->
+      </tr>
+    </thead>
+    <tbody>
+      {% for m in meetings %}
+      <tr>
+        <td><strong>#{{ m.id }}</strong></td>
+
+        <td style="min-width:250px;">
+          <div class="small">
+            <strong>Status:</strong> {{ m.status|default:"-" }}<br>
+            {% if m.meeting_date %}
+              <strong>Meeting Date:</strong> {{ m.meeting_date|date:"d M Y H:i" }}<br>
+            {% endif %}
+            {% if m.comment %}
+              <strong>Comment:</strong> {{ m.comment|default:"-" }}<br>
+            {% endif %}
+            {% if m.assigned_to %}
+              <strong>Assigned Staff:</strong>
+              {{ m.assigned_to.user.get_full_name|default:m.assigned_to.user.username }}<br>
+            {% endif %}
+            <strong>Created:</strong> {{ m.create_at|date:"d M Y H:i" }}<br>
+            <strong>Updated:</strong> {{ m.update_at|date:"d M Y H:i" }}
+          </div>
+        </td>
+
+        <td style="min-width:350px;">
+          {% if m.response %}
+          <div class="border rounded bg-light p-2 small">
+            <strong>Response ID:</strong> MR{{ m.response.id|stringformat:"03d" }}<br>
+            <strong>Status:</strong> {{ m.response.status|default:"-" }}<br>
+            <strong>Contact Person:</strong> {{ m.response.contact_persone|default:"-" }}<br>
+            <strong>Phone:</strong> {{ m.response.contact_no|default:"-" }}<br>
+            <strong>Business Name:</strong> {{ m.response.business_name|default:"-" }}<br>
+            <strong>Business Category:</strong> {{ m.response.business_category|default:"-" }}<br>
+            <strong>Requirement Types:</strong>
+            {% for req in m.response.requirement_types.all %}
+              <span class="badge bg-secondary">{{ req.name }}</span>
+            {% empty %}
+              -
+            {% endfor %}
+            <br>
+            <strong>City:</strong> {{ m.response.city|default:"-" }}<br>
+            <strong>Locality:</strong> {{ m.response.locality_city|default:"-" }}<br>
+            <strong>Assigned To:</strong>
+            {% if m.response.assigned_to %}
+              {{ m.response.assigned_to.user.get_full_name|default:m.response.assigned_to.user.username }}
+            {% else %}
+              -
+            {% endif %}<br>
+            <strong>Created By:</strong>
+            {% if m.response.created_by %}
+              {{ m.response.created_by.get_full_name|default:m.response.created_by.username }}
+            {% else %}
+              -
+            {% endif %}<br>
+            <strong>Created On:</strong> {{ m.response.create_at|date:"d M Y H:i" }}<br>
+            <strong>Updated By:</strong>
+            {% if m.response.updated_by %}
+              {{ m.response.updated_by.get_full_name|default:m.response.updated_by.username }}
+            {% else %}
+              -
+            {% endif %}<br>
+            <strong>Updated On:</strong> {{ m.response.update_at|date:"d M Y H:i" }}
+          </div>
+          {% else %}
+            <div class="text-muted small">No linked response.</div>
+          {% endif %}
+        </td>
+
+        <td>
+          {% if m.assigned_to %}
+            {{ m.assigned_to.user.get_full_name|default:m.assigned_to.user.username }}
+          {% else %}
+            -
+          {% endif %}
+        </td>
+
+        <td class="small text-muted">
+          <div>
+            {% if m.created_by %}
+              <strong>{{ m.created_by.get_full_name|default:m.created_by.username }}</strong><br>
+              <span>{{ m.create_at|date:"d M Y H:i" }}</span>
+            {% else %}
+              -
+            {% endif %}
+          </div>
+          <div class="mt-1">
+            {% if m.updated_by %}
+              <strong>{{ m.updated_by.get_full_name|default:m.updated_by.username }}</strong><br>
+              <span>{{ m.update_at|date:"d M Y H:i" }}</span>
+            {% endif %}
+          </div>
+        </td>
+
+        <!-- ✏️ EDIT BUTTON (added only this) -->
+        <td class="text-center">
+          <a href="{% url 'edit_response_meeting' m.id %}" class="btn btn-sm btn-outline-primary">
+            <i class="fas fa-edit"></i> Edit
+          </a>
+        </td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="6" class="text-center text-muted">No meetings found.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<!-- 📱 MOBILE CARD VIEW -->
+<div class="d-md-none">
+  {% for m in meetings %}
+  <div class="card mb-3 shadow-sm">
+    <div class="card-body p-2 small">
+      <h6>🗓 {{ m.id }}. <strong>{{ m.meeting_date|date:"d M Y H:i" }}</strong></h6>
+      <strong>Status:</strong> {{ m.status }}<br>
+      {% if m.comment %}
+        <strong>Comment:</strong> {{ m.comment }}<br>
+      {% endif %}
+      <strong>Assigned To:</strong>
+      {% if m.assigned_to %}
+        {{ m.assigned_to.user.get_full_name|default:m.assigned_to.user.username }}
+      {% else %}
+        -
+      {% endif %}
+      <hr class="my-2">
+      {% if m.response %}
+        <strong>Business:</strong> {{ m.response.business_name|default:"-" }}<br>
+        <strong>Person:</strong> {{ m.response.contact_persone|default:"-" }}<br>
+        <strong>Phone:</strong> {{ m.response.contact_no|default:"-" }}<br>
+        <strong>Locality:</strong> {{ m.response.locality_city|default:"-" }}<br>
+        <strong>City:</strong> {{ m.response.city|default:"-" }}<br>
+        <strong>Category:</strong> {{ m.response.business_category|default:"-" }}<br>
+        <strong>Req:</strong>
+        {% for req in m.response.requirement_types.all %}
+          <span class="badge bg-secondary">{{ req.name }}</span>
+        {% empty %}
+          -
+        {% endfor %}
+      {% endif %}
+      <div class="text-end mt-2">
+        <a href="{% url 'edit_response_meeting' m.id %}" class="btn btn-sm btn-outline-primary">
+          <i class="fas fa-edit"></i> Edit
+        </a>
+      </div>
+    </div>
+  </div>
+  {% empty %}
+  <div class="text-center text-muted">No meetings available.</div>
+  {% endfor %}
+</div>
+
+{% if is_paginated %}
+<nav aria-label="Pagination" class="mt-3">
+  <ul class="pagination justify-content-center flex-wrap">
+    {% if page_obj.has_previous %}
+      <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">&laquo;</a></li>
+    {% else %}
+      <li class="page-item disabled"><span class="page-link">&laquo;</span></li>
+    {% endif %}
+    {% for num in page_obj.paginator.page_range %}
+      {% if page_obj.number == num %}
+        <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+      {% elif num > page_obj.number|add:-2 and num < page_obj.number|add:2 %}
+        <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+      {% endif %}
+    {% endfor %}
+    {% if page_obj.has_next %}
+      <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">&raquo;</a></li>
+    {% else %}
+      <li class="page-item disabled"><span class="page-link">&raquo;</span></li>
+    {% endif %}
+  </ul>
+</nav>
+{% endif %}
+
+{% endblock %}

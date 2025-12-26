@@ -1,0 +1,95 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- ================= BASIC ================= -->
+    <meta charset="UTF-8">
+    <title>{% block title %}Findexors – Find Trusted Businesses{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- ================= SEO ================= -->
+    <meta name="description" content="{% block meta_description %}Find trusted local businesses near you on Findexors.{% endblock %}">
+    <meta name="keywords" content="{% block meta_keywords %}business listing, local services, findexors{% endblock %}">
+    <meta name="author" content="Findexors">
+
+    <!-- ================= FAVICON ================= -->
+    <link rel="icon" href="{% static 'assets/images/favicon.png' %}">
+
+    <!-- ================= TAILWIND ================= -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- ================= FONT AWESOME ================= -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+    {% block extra_css %}{% endblock %}
+</head>
+
+<body class="bg-gray-50 text-gray-800">
+
+<header class="bg-white shadow sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+
+        <a href="{% url 'home' %}" class="text-2xl font-bold text-indigo-600">
+            Findexors
+        </a>
+
+        <nav class="hidden md:flex items-center gap-6 font-medium">
+            <a href="{% url 'home' %}" class="hover:text-indigo-600">Home</a>
+            <a href="#" class="hover:text-indigo-600">Categories</a>
+            <a href="#" class="hover:text-indigo-600">Businesses</a>
+            <a href="#" class="hover:text-indigo-600">Contact</a>
+        </nav>
+
+        <a href="#" class="bg-indigo-600 text-white px-5 py-2 rounded-lg font-semibold">
+            Add Business
+        </a>
+    </div>
+</header>
+
+<main>
+    {% block content %}{% endblock %}
+</main>
+
+<footer class="bg-gray-900 text-gray-300 mt-20">
+    <div class="max-w-7xl mx-auto px-6 py-10 grid md:grid-cols-4 gap-8">
+
+        <div>
+            <h3 class="text-xl font-bold text-white mb-3">Findexors</h3>
+            <p class="text-sm">Discover trusted local businesses near you.</p>
+        </div>
+
+        <div>
+            <h4 class="font-semibold text-white mb-3">Quick Links</h4>
+            <ul class="space-y-2 text-sm">
+                <li><a href="{% url 'home' %}" class="hover:text-white">Home</a></li>
+                <li><a href="#" class="hover:text-white">Categories</a></li>
+                <li><a href="#" class="hover:text-white">Add Business</a></li>
+            </ul>
+        </div>
+
+        <div>
+            <h4 class="font-semibold text-white mb-3">Support</h4>
+            <ul class="space-y-2 text-sm">
+                <li><a href="#" class="hover:text-white">Privacy Policy</a></li>
+                <li><a href="#" class="hover:text-white">Terms</a></li>
+            </ul>
+        </div>
+
+        <div>
+            <h4 class="font-semibold text-white mb-3">Follow Us</h4>
+            <div class="flex gap-4 text-lg">
+                <a href="#"><i class="fab fa-facebook"></i></a>
+                <a href="#"><i class="fab fa-instagram"></i></a>
+                <a href="#"><i class="fab fa-linkedin"></i></a>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-center text-sm py-4 border-t border-gray-700">
+        © {% now "Y" %} Findexors. All rights reserved.
+    </div>
+</footer>
+
+{% block extra_js %}{% endblock %}
+</body>
+</html>

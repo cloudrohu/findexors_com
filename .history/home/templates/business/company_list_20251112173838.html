@@ -1,0 +1,432 @@
+{% extends 'dashboard/base.html' %}
+{% block title %}All Companies{% endblock %}
+{% load static %}
+{% block content %}
+
+<form method="get" class="mb-4 bg-light p-3 rounded shadow-sm">
+  <div class="row g-2 align-items-end">
+    <div class="col-md-2 col-6">
+      <label class="small fw-bold">From Date</label>
+      <input type="date" name="date_from" class="form-control form-control-sm"
+             value="{{ request.GET.date_from }}">
+    </div>
+    <div class="col-md-2 col-6">
+      <label class="small fw-bold">To Date</label>
+      <input type="date" name="date_to" class="form-control form-control-sm"
+             value="{{ request.GET.date_to }}">
+    </div>
+
+    <div class="col-md-2 col-6 filter-field">
+      <label class="small fw-bold">City</label>
+      <div class="jet-filter">
+        <input type="text" class="jet-input" id="cityFilter" placeholder="Type or select city">
+        <div class="jet-dropdown" id="cityDropdown">
+          <div class="jet-option" data-value="">All</div>
+          {% for city in cities %}
+            <div class="jet-option" data-value="{{ city.id }}">{{ city }}</div>
+          {% endfor %}
+        </div>
+      </div>
+      <input type="hidden" name="city" id="cityHidden" value="{{ request.GET.city }}">
+    </div>
+
+    <div class="col-md-2 col-6 filter-field">
+      <label class="small fw-bold">Locality</label>
+      <div class="jet-filter">
+        <input type="text" class="jet-input" id="localityFilter" placeholder="Type or select locality">
+        <div class="jet-dropdown" id="localityDropdown">
+          <div class="jet-option" data-value="">All</div>
+          {% for l in localities %}
+            <div class="jet-option" data-value="{{ l.id }}">{{ l }}</div>
+          {% endfor %}
+        </div>
+      </div>
+      <input type="hidden" name="locality" id="localityHidden" value="{{ request.GET.locality }}">
+    </div>
+
+    <div class="col-md-2 col-6 filter-field">
+      <label class="small fw-bold">Meeting Status</label>
+      <div class="jet-filter">
+        <input type="text" class="jet-input" id="statusFilter" placeholder="Type or select status">
+        <div class="jet-dropdown" id="statusDropdown">
+          <div class="jet-option" data-value="">All</div>
+          {% for s in statuses %}
+            <div class="jet-option" data-value="{{ s }}">{{ s }}</div>
+          {% endfor %}
+        </div>
+      </div>
+      <input type="hidden" name="status" id="statusHidden" value="{{ request.GET.status }}">
+    </div>
+
+    <div class="col-md-2 col-6 filter-field">
+      <label class="small fw-bold">Assigned To</label>
+      <div class="jet-filter">
+        <input type="text" class="jet-input" id="assignedFilter" placeholder="Type or select staff">
+        <div class="jet-dropdown" id="assignedDropdown">
+          <div class="jet-option" data-value="">All</div>
+          {% for s in staff_list %}
+            <div class="jet-option" data-value="{{ s.id }}">{{ s }}</div>
+          {% endfor %}
+        </div>
+      </div>
+      <input type="hidden" name="assigned_to" id="assignedHidden" value="{{ request.GET.assigned_to }}">
+    </div>
+
+    <div class="col-md-2 col-6 filter-field">
+      <label class="small fw-bold">Category</label>
+      <div class="jet-filter">
+        <input type="text" class="jet-input" id="categoryFilter" placeholder="Type or select category">
+        <div class="jet-dropdown" id="categoryDropdown">
+          <div class="jet-option" data-value="">All</div>
+          {% for c in categories %}
+            <div class="jet-option" data-value="{{ c.id }}">{{ c }}</div>
+          {% endfor %}
+        </div>
+      </div>
+      <input type="hidden" name="category" id="categoryHidden" value="{{ request.GET.category }}">
+    </div>
+
+    <div class="col-md-2 col-12 mt-2 mt-md-0">
+      <button type="submit" class="btn btn-sm btn-primary w-100">
+        <i class="fas fa-filter me-1"></i> Filter
+      </button>
+    </div>
+
+    <div class="col-md-2 col-12 mt-2 mt-md-0">
+      <a href="{% url 'company_meetings' %}" class="btn btn-sm btn-secondary w-100">
+        <i class="fas fa-undo me-1"></i> Reset
+      </a>
+    </div>
+
+  </div>
+</form>
+
+<script>
+function jetFilter(inputId, dropdownId, hiddenId) {
+  const input = document.getElementById(inputId);
+  const dropdown = document.getElementById(dropdownId);
+  const hidden = document.getElementById(hiddenId);
+
+  input.addEventListener('focus', () => dropdown.style.display = 'block');
+  input.addEventListener('blur', () => { setTimeout(() => dropdown.style.display = 'none', 200); });
+
+  input.addEventListener('keyup', () => {
+    const val = input.value.toLowerCase();
+    dropdown.querySelectorAll('.jet-option').forEach(opt => {
+      opt.style.display = opt.textContent.toLowerCase().includes(val) ? 'block' : 'none';
+    });
+  });
+
+  dropdown.querySelectorAll('.jet-option').forEach(opt => {
+    opt.addEventListener('click', () => {
+      input.value = opt.textContent;
+      hidden.value = opt.dataset.value;
+      dropdown.style.display = 'none';
+    });
+  });
+}
+
+jetFilter('cityFilter', 'cityDropdown', 'cityHidden');
+jetFilter('localityFilter', 'localityDropdown', 'localityHidden');
+jetFilter('statusFilter', 'statusDropdown', 'statusHidden');
+jetFilter('assignedFilter', 'assignedDropdown', 'assignedHidden');
+jetFilter('categoryFilter', 'categoryDropdown', 'categoryHidden');
+</script>
+
+<h4 class="mb-3 d-flex align-items-center">
+  All Companies&nbsp;&nbsp;—&nbsp;&nbsp;
+  <span class="badge bg-primary" style="font-size:0.9rem; padding:0.4em 0.7em;">
+    {{ page_obj.paginator.count }}
+  </span>
+</h4>
+
+<!-- DESKTOP TABLE -->
+<div class="table-responsive d-none d-md-block">
+  <table class="table table-bordered table-hover table-sm align-middle">
+    <thead class="thead-dark">
+      <tr>
+        <th>ID</th>
+        <th>Company</th>
+        <th>Category</th>
+        <th>Person</th>
+        <th>Phone</th>
+        <th>Status</th>
+        <th>Locality</th>
+        <th>Address</th>
+        <th>Follow-up / Meeting</th>
+        <th>Created By</th>
+        <th>Updated By</th>
+        <th>Created</th>
+        <th>Updated</th>
+        <th style="min-width:300px;">Comments / Voice</th>
+        <th style="width:160px;">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for c in companies %}
+      <tr>
+        <td>CO{{ c.id|stringformat:"03d" }}</td>
+        <td>
+          <div class="d-flex align-items-center">
+            <img src="{% if c.image %}{{ c.image.url }}{% else %}{% static 'images/no-image.png' %}{% endif %}"
+                 alt="{{ c.company_name }}"
+                 class="mr-2 rounded"
+                 style="width:40px; height:40px; object-fit:cover; border:1px solid #ddd;">
+            <span>{{ c.company_name|default:"-" }}</span>
+          </div>
+        </td>
+        <td>{{ c.category.title|default:"-" }}</td>
+        <td>{{ c.contact_person|default:"-" }}</td>
+        <td>{{ c.contact_no|default:"-" }}</td>
+        <td>
+          <select class="form-control form-control-sm status-select" data-id="{{ c.id }}">
+            {% for key, label in c.STATUS_CHOICES %}
+              <option value="{{ key }}" {% if c.status == key %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </select>
+        </td>
+        <td>{{ c.locality|default:"-" }}</td>
+        <td class="text-muted small">{{ c.address|default:"-" }}</td>
+        <td>
+          {% if c.followup_meeting %}
+            {{ c.followup_meeting|date:"d M Y H:i" }}
+          {% else %}
+            <span class="text-muted small">No schedule</span>
+          {% endif %}
+        </td>
+        <td>{{ c.created_by|default:"-" }}</td>
+        <td>{{ c.updated_by|default:"-" }}</td>
+        <td>{{ c.create_at|date:"d M Y H:i" }}</td>
+        <td>{{ c.update_at|date:"d M Y H:i" }}</td>
+
+        <!-- Comments / Voice -->
+        <td style="min-width:300px;">
+          {% with latest_comment=c.comments.last %}
+            {% if latest_comment %}
+              <div class="small text-muted border-bottom py-1">
+                <strong>{{ latest_comment.created_by }}</strong>
+                <span class="text-secondary ms-1" style="font-size:11px;">
+                  {{ latest_comment.create_at|date:"d M Y H:i" }}
+                </span>: {{ latest_comment.comment }}
+              </div>
+            {% else %}
+              <div class="text-muted small">No comments yet.</div>
+            {% endif %}
+          {% endwith %}
+
+          <form class="commentForm mt-1" data-id="{{ c.id }}">
+            {% csrf_token %}
+            <div class="input-group input-group-sm">
+              <input type="text" name="comment" class="form-control" placeholder="Add comment...">
+              <div class="input-group-append">
+                <button class="btn btn-primary btn-sm" type="submit">➕</button>
+              </div>
+            </div>
+          </form>
+
+          <div id="voiceList{{ c.id }}" class="mt-1">
+            {% with latest_voice=c.voice_recordings.last %}
+              {% if latest_voice %}
+                <div class="mb-1" id="latest-voice-{{ c.id }}">
+                  <audio controls preload="none" class="w-100">
+                    <source src="{{ latest_voice.file.url }}" type="audio/mpeg">
+                  </audio>
+                  <div class="text-muted small">
+                    {{ latest_voice.uploaded_at|date:"d M Y H:i" }} — {{ latest_voice.uploaded_by|default:"User" }}
+                  </div>
+                </div>
+              {% else %}
+                <div class="text-muted small">No voice yet.</div>
+              {% endif %}
+            {% endwith %}
+          </div>
+
+          <form class="voiceForm mt-1" data-id="{{ c.id }}" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="input-group input-group-sm">
+              <input type="file" name="file" accept="audio/*" class="form-control p-1">
+              <div class="input-group-append">
+                <button class="btn btn-success btn-sm" type="submit">🎤</button>
+              </div>
+            </div>
+          </form>
+        </td>
+
+        <!-- Actions -->
+        <td class="text-center">
+          <div class="btn-group btn-group-sm" role="group" aria-label="actions">
+           <a href="{% url 'company_update' c.pk c.slug %}" class="btn btn-outline-primary" title="Edit">
+        <i class="bi bi-pencil"></i> Edit
+      </a>
+
+
+            <a href="{% url 'company_detail' c.pk c.slug %}" class="btn btn-outline-secondary" title="View">
+              <i class="bi bi-eye"></i> View
+            </a>
+            <a href="{% url 'company_delete' c.pk %}" class="btn btn-outline-danger"
+               onclick="return confirm('Are you sure you want to delete this company?');" title="Delete">
+              <i class="bi bi-trash"></i> Delete
+            </a>
+          </div>
+        </td>
+
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<!-- MOBILE CARDS -->
+<div class="d-md-none">
+  {% for c in companies %}
+  <div class="card mb-3 shadow-sm border-0" style="border-left: 4px solid #007bff;">
+    <div class="card-body p-2">
+      <div class="d-flex align-items-center mb-2">
+        <img src="{% if c.image %}{{ c.image.url }}{% else %}{% static 'images/no-image.png' %}{% endif %}"
+             alt="{{ c.company_name }}" style="width:40px; height:40px; object-fit:cover; border:1px solid #ddd;" class="rounded me-2">
+        <div>
+          <strong>{{ c.company_name|default:"-" }}</strong><br>
+          <span class="text-muted small">{{ c.locality|default:"-" }}, {{ c.city|default:"-" }}</span>
+        </div>
+      </div>
+
+      <div class="small text-muted mb-2">
+        <div><strong>Category:</strong> {{ c.category.title|default:"-" }}</div>
+      </div>
+
+      <div class="d-flex justify-content-between mb-2">
+        <strong>BC{{ c.id|stringformat:"03d" }}</strong>
+        <select class="form-control form-control-sm status-select" data-id="{{ c.id }}" style="width:45%;">
+          {% for key, label in c.STATUS_CHOICES %}
+            <option value="{{ key }}" {% if c.status == key %}selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <span class="text-muted small">{{ c.address|default:"-" }}</span>
+      <br><br>
+
+      <div class="small text-muted mb-2">
+        <div><strong>Person:</strong> {{ c.contact_person|default:"-" }}</div>
+        <div><strong>Phone:</strong> {{ c.contact_no|default:"-" }}</div>
+        <div><strong>Follow-up:</strong>
+          {% if c.followup_meeting %}
+            {{ c.followup_meeting|date:"d M Y H:i" }}
+          {% else %}
+            <span class="text-muted small">No schedule</span>
+          {% endif %}
+        </div>
+        <hr class="my-1">
+        <div><strong>Created:</strong> {{ c.create_at|date:"d M Y H:i" }}/{{ c.created_by|default:"-" }} </div>
+        <div><strong>Updated:</strong> {{ c.update_at|date:"d M Y H:i" }}/{{ c.updated_by|default:"-" }}</div>
+      </div>
+
+      <div id="commentList{{ c.id }}_mobile" class="mt-2">
+        {% for comment in c.comments.all %}
+        <div class="small text-muted border-bottom py-1">
+          <strong>{{ comment.created_by }}</strong>
+          <span class="text-secondary ms-1" style="font-size:11px;">
+            {{ comment.create_at|date:"d M Y H:i" }}
+          </span>: {{ comment.comment }}
+        </div>
+        {% empty %}
+        <div class="text-muted small">No comments yet.</div>
+        {% endfor %}
+      </div>
+
+      <form class="commentForm mt-1" data-id="{{ c.id }}">
+        {% csrf_token %}
+        <div class="input-group input-group-sm">
+          <input type="text" name="comment" class="form-control" placeholder="Add comment...">
+          <div class="input-group-append">
+            <button class="btn btn-primary btn-sm" type="submit">➕</button>
+          </div>
+        </div>
+      </form>
+
+      <div id="voiceList{{ c.id }}" class="mt-2">
+        {% with latest_voice=c.voice_recordings.last %}
+          {% if latest_voice %}
+            <div class="mb-1" id="latest-voice-{{ c.id }}">
+              <audio controls preload="none" class="w-100">
+                <source src="{{ latest_voice.file.url }}" type="audio/mpeg">
+              </audio>
+              <div class="text-muted small">
+                {{ latest_voice.uploaded_at|date:"d M Y H:i" }} — {{ latest_voice.uploaded_by|default:"User" }}
+              </div>
+            </div>
+          {% else %}
+            <div class="text-muted small">No voice yet.</div>
+          {% endif %}
+        {% endwith %}
+      </div>
+
+      <form class="voiceForm mt-1" data-id="{{ c.id }}" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="input-group input-group-sm">
+          <input type="file" name="file" accept="audio/*" class="form-control p-1">
+          <div class="input-group-append">
+            <button class="btn btn-success btn-sm" type="submit">🎤</button>
+          </div>
+        </div>
+      </form>
+
+      <div class="d-flex gap-2 mt-2">
+        <a href="{% url 'company_update' c.pk c.slug %}" class="btn btn-outline-primary" title="Edit">
+          <i class="bi bi-pencil"></i> Edit
+        </a>
+
+
+        <a href="{% url 'company_detail' c.pk c.slug %}" class="btn btn-sm btn-outline-secondary w-50">
+          <i class="bi bi-eye"></i> View
+        </a>
+        <!-- optional delete as small button -->
+        <a href="{% url 'company_delete' c.pk %}" class="btn btn-sm btn-danger w-100 mt-1"
+           onclick="return confirm('Delete this company?');">
+          <i class="bi bi-trash"></i> Delete
+        </a>
+      </div>
+
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+{% if is_paginated %}
+<nav aria-label="Page navigation" class="mt-3">
+  <ul class="pagination justify-content-center flex-wrap flex-md-nowrap overflow-auto" style="white-space: nowrap;">
+    {% if page_obj.has_previous %}
+      <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Previous">&laquo;</a></li>
+    {% else %}
+      <li class="page-item disabled"><span class="page-link">&laquo;</span></li>
+    {% endif %}
+
+    {% for i in page_obj.paginator.page_range %}
+      {% if i >= page_obj.number|add:"-2" and i <= page_obj.number|add:"2" %}
+        {% if page_obj.number == i %}
+          <li class="page-item active"><span class="page-link">{{ i }}</span></li>
+        {% else %}
+          <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+        {% endif %}
+      {% endif %}
+    {% endfor %}
+
+    {% if page_obj.has_next %}
+      <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Next">&raquo;</a></li>
+    {% else %}
+      <li class="page-item disabled"><span class="page-link">&raquo;</span></li>
+    {% endif %}
+  </ul>
+</nav>
+{% endif %}
+
+<style>
+  .jet-filter { position: relative; }
+  .jet-input { width: 100%; padding: 6px 8px; border: 1px solid #d0d5dc; border-radius: 4px; font-size:13px; background:#fff; }
+  .jet-input:focus { outline:none; border-color:#58b3e7; box-shadow:0 0 0 2px rgba(88,179,231,0.12); }
+  .jet-dropdown { position:absolute; top:100%; left:0; right:0; max-height:180px; overflow-y:auto; background:#fff; border:1px solid #d0d5dc; border-top:none; display:none; z-index:100; box-shadow:0 3px 8px rgba(0,0,0,0.08); }
+  .jet-option { padding:6px 10px; cursor:pointer; font-size:13px; color:#333; }
+  .jet-option:hover { background:#e9f4fb; }
+</style>
+
+{% endblock %}

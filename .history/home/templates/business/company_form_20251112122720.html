@@ -1,0 +1,354 @@
+{% extends "dashboard/base.html" %}
+{% load static %}
+{% block content %}
+<div class="container my-4">
+  <h2 class="mb-3">{% if object %}Edit Company{% else %}Add Company{% endif %}</h2>
+
+  <form method="post" enctype="multipart/form-data" id="company-form">
+    {% csrf_token %}
+    <div class="card mb-3 p-3">
+      <h5>Company Information</h5>
+      {{ form.non_field_errors }}
+      <div class="row g-2">
+        <div class="col-md-6">
+          {{ form.company_name.label_tag }} {{ form.company_name }}
+        </div>
+        <div class="col-md-3">
+          {{ form.category.label_tag }} {{ form.category }}
+        </div>
+        <div class="col-md-3">
+          {{ form.status.label_tag }} {{ form.status }}
+        </div>
+
+        <div class="col-md-4">
+          {{ form.city.label_tag }} {{ form.city }}
+        </div>
+        <div class="col-md-4">
+          {{ form.locality.label_tag }} {{ form.locality }}
+        </div>
+        <div class="col-md-4">
+          {{ form.sub_locality.label_tag }} {{ form.sub_locality }}
+        </div>
+
+        <div class="col-md-6">
+          {{ form.contact_person.label_tag }} {{ form.contact_person }}
+        </div>
+        <div class="col-md-6">
+          {{ form.contact_no.label_tag }} {{ form.contact_no }}
+        </div>
+
+        <div class="col-12">
+          {{ form.address.label_tag }} {{ form.address }}
+        </div>
+
+        <div class="col-md-6">
+          {{ form.website.label_tag }} {{ form.website }}
+        </div>
+        <div class="col-md-6">
+          {{ form.google_map.label_tag }} {{ form.google_map }}
+        </div>
+
+        <div class="col-12">
+          {{ form.description.label_tag }} {{ form.description }}
+        </div>
+
+        <div class="col-md-6">
+          {{ form.image.label_tag }} {{ form.image }}
+        </div>
+        <div class="col-md-6">
+          {{ form.assigned_to.label_tag }} {{ form.assigned_to }}
+        </div>
+      </div>
+    </div>
+
+    <!-- ---------------------------
+         Inline formsets sections
+         --------------------------- -->
+
+    {% comment %} Meetings {% endcomment %}
+    <div class="card mb-3 p-3">
+      <div class="d-flex justify-content-between align-items-center">
+        <h5>Meetings</h5>
+        <button type="button" class="btn btn-sm btn-outline-primary add-form" data-prefix="{{ meeting_formset.prefix }}">+ Add Meeting</button>
+      </div>
+
+      {{ meeting_formset.management_form }}
+      <div class="forms-container" id="forms-{{ meeting_formset.prefix }}">
+        {% for f in meeting_formset.forms %}
+          <div class="inline-form border rounded p-2 mb-2">
+            <div class="d-flex justify-content-end">
+              <button type="button" class="btn btn-sm btn-danger remove-form">Remove</button>
+            </div>
+            {{ f.id }}  {# hidden pk field if editing #}
+            <div class="row g-2">
+              <div class="col-md-3">{{ f.status.label_tag }} {{ f.status }}</div>
+              <div class="col-md-4">{{ f.meeting_date.label_tag }} {{ f.meeting_date }}</div>
+              <div class="col-md-3">{{ f.assigned_to.label_tag }} {{ f.assigned_to }}</div>
+              <div class="col-md-2">{{ f.DELETE }} <small class="text-muted">Delete</small></div>
+              <div class="col-12">{{ f.comment.label_tag }} {{ f.comment }}</div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+
+      <div class="empty-template d-none" id="empty-{{ meeting_formset.prefix }}">
+        {{ meeting_formset.empty_form.as_p }}
+      </div>
+    </div>
+
+    {% comment %} Followups {% endcomment %}
+    <div class="card mb-3 p-3">
+      <div class="d-flex justify-content-between align-items-center">
+        <h5>Followups</h5>
+        <button type="button" class="btn btn-sm btn-outline-primary add-form" data-prefix="{{ followup_formset.prefix }}">+ Add Followup</button>
+      </div>
+
+      {{ followup_formset.management_form }}
+      <div class="forms-container" id="forms-{{ followup_formset.prefix }}">
+        {% for f in followup_formset.forms %}
+          <div class="inline-form border rounded p-2 mb-2">
+            <div class="d-flex justify-content-end">
+              <button type="button" class="btn btn-sm btn-danger remove-form">Remove</button>
+            </div>
+            {{ f.id }}
+            <div class="row g-2">
+              <div class="col-md-4">{{ f.status.label_tag }} {{ f.status }}</div>
+              <div class="col-md-4">{{ f.followup_date.label_tag }} {{ f.followup_date }}</div>
+              <div class="col-md-3">{{ f.assigned_to.label_tag }} {{ f.assigned_to }}</div>
+              <div class="col-md-1">{{ f.DELETE }} <small class="text-muted">Del</small></div>
+              <div class="col-12">{{ f.comment.label_tag }} {{ f.comment }}</div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+
+      <div class="empty-template d-none" id="empty-{{ followup_formset.prefix }}">
+        {{ followup_formset.empty_form.as_p }}
+      </div>
+    </div>
+
+    {% comment %} Comments {% endcomment %}
+    <div class="card mb-3 p-3">
+      <div class="d-flex justify-content-between align-items-center">
+        <h5>Comments</h5>
+        <button type="button" class="btn btn-sm btn-outline-primary add-form" data-prefix="{{ comment_formset.prefix }}">+ Add Comment</button>
+      </div>
+
+      {{ comment_formset.management_form }}
+      <div class="forms-container" id="forms-{{ comment_formset.prefix }}">
+        {% for f in comment_formset.forms %}
+          <div class="inline-form border rounded p-2 mb-2">
+            <div class="d-flex justify-content-end">
+              <button type="button" class="btn btn-sm btn-danger remove-form">Remove</button>
+            </div>
+            {{ f.id }}
+            <div class="row g-2">
+              <div class="col-12">{{ f.comment.label_tag }} {{ f.comment }}</div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+
+      <div class="empty-template d-none" id="empty-{{ comment_formset.prefix }}">
+        {{ comment_formset.empty_form.as_p }}
+      </div>
+    </div>
+
+    {% comment %} Voice recordings {% endcomment %}
+    <div class="card mb-3 p-3">
+      <div class="d-flex justify-content-between align-items-center">
+        <h5>Voice Recordings</h5>
+        <button type="button" class="btn btn-sm btn-outline-primary add-form" data-prefix="{{ voice_formset.prefix }}">+ Add Voice</button>
+      </div>
+
+      {{ voice_formset.management_form }}
+      <div class="forms-container" id="forms-{{ voice_formset.prefix }}">
+        {% for f in voice_formset.forms %}
+          <div class="inline-form border rounded p-2 mb-2">
+            <div class="d-flex justify-content-end">
+              <button type="button" class="btn btn-sm btn-danger remove-form">Remove</button>
+            </div>
+            {{ f.id }}
+            <div class="row g-2">
+              <div class="col-md-8">{{ f.file.label_tag }} {{ f.file }}</div>
+              <div class="col-md-4">{{ f.DELETE }} <small class="text-muted">Delete</small></div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+
+      <div class="empty-template d-none" id="empty-{{ voice_formset.prefix }}">
+        {{ voice_formset.empty_form.as_p }}
+      </div>
+    </div>
+
+    {% comment %} Visits {% endcomment %}
+    <div class="card mb-3 p-3">
+      <div class="d-flex justify-content-between align-items-center">
+        <h5>Visits</h5>
+        <button type="button" class="btn btn-sm btn-outline-primary add-form" data-prefix="{{ visit_formset.prefix }}">+ Add Visit</button>
+      </div>
+
+      {{ visit_formset.management_form }}
+      <div class="forms-container" id="forms-{{ visit_formset.prefix }}">
+        {% for f in visit_formset.forms %}
+          <div class="inline-form border rounded p-2 mb-2">
+            <div class="d-flex justify-content-end">
+              <button type="button" class="btn btn-sm btn-danger remove-form">Remove</button>
+            </div>
+            {{ f.id }}
+            <div class="row g-2">
+              <div class="col-md-3">{{ f.visit_for.label_tag }} {{ f.visit_for }}</div>
+              <div class="col-md-3">{{ f.visit_type.label_tag }} {{ f.visit_type }}</div>
+              <div class="col-md-3">{{ f.visit_status.label_tag }} {{ f.visit_status }}</div>
+              <div class="col-md-3">{{ f.DELETE }} <small class="text-muted">Delete</small></div>
+              <div class="col-12">{{ f.comment.label_tag }} {{ f.comment }}</div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+
+      <div class="empty-template d-none" id="empty-{{ visit_formset.prefix }}">
+        {{ visit_formset.empty_form.as_p }}
+      </div>
+    </div>
+
+    <div class="d-flex gap-2">
+      <button type="submit" class="btn btn-success">Save</button>
+      <a href="{% url 'company_list' %}" class="btn btn-secondary">Cancel</a>
+    </div>
+  </form>
+</div>
+
+<!-- --------------------------
+     JS: clone empty_form, update indexes, city->locality AJAX
+     -------------------------- -->
+<script>
+(function(){
+  // helper: update TOTAL_FORMS field
+  function updateTotalForms(prefix, container) {
+    const total = document.querySelector('input[name="'+prefix+'-TOTAL_FORMS"]');
+    if (!total) return;
+    const count = container.querySelectorAll('.inline-form').length;
+    total.value = count;
+  }
+
+  // clone empty form (Django's empty_form contains '__prefix__' placeholders)
+  function cloneEmpty(prefix) {
+    const emptyDiv = document.getElementById('empty-' + prefix);
+    if (!emptyDiv) return null;
+    // get HTML and replace __prefix__ with current index
+    const container = document.getElementById('forms-' + prefix);
+    const index = container.querySelectorAll('.inline-form').length;
+    let html = emptyDiv.innerHTML;
+    html = html.replace(/__prefix__/g, index);
+    // wrap into node
+    const wrapper = document.createElement('div');
+    wrapper.className = 'inline-form border rounded p-2 mb-2';
+    wrapper.innerHTML = html;
+    // add remove button
+    const btnWrap = document.createElement('div');
+    btnWrap.className = 'd-flex justify-content-end';
+    const rm = document.createElement('button');
+    rm.type = 'button';
+    rm.className = 'btn btn-sm btn-danger remove-form';
+    rm.textContent = 'Remove';
+    btnWrap.appendChild(rm);
+    wrapper.insertBefore(btnWrap, wrapper.firstChild);
+    return wrapper;
+  }
+
+  // event delegation for add buttons
+  document.querySelectorAll('.add-form').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      const prefix = btn.dataset.prefix;
+      const container = document.getElementById('forms-' + prefix);
+      const newNode = cloneEmpty(prefix);
+      if (!newNode) return;
+      container.appendChild(newNode);
+      updateTotalForms(prefix, container);
+      // focus first input (nice UX)
+      const firstInput = newNode.querySelector('input, select, textarea');
+      if (firstInput) firstInput.focus();
+    });
+  });
+
+  // event delegation for remove buttons
+  document.addEventListener('click', function(e){
+    if (e.target && e.target.classList.contains('remove-form')) {
+      const node = e.target.closest('.inline-form');
+      if (!node) return;
+      const prefix = node.closest('.forms-container').id.replace('forms-','');
+      node.remove();
+      updateTotalForms(prefix, document.getElementById('forms-' + prefix));
+    }
+  });
+
+  // On page load ensure TOTAL_FORMS reflect rendered count (useful when editing)
+  document.addEventListener('DOMContentLoaded', function(){
+    ['{{ meeting_formset.prefix }}', '{{ followup_formset.prefix }}', '{{ comment_formset.prefix }}', '{{ voice_formset.prefix }}', '{{ visit_formset.prefix }}'].forEach(function(p){
+      const container = document.getElementById('forms-' + p);
+      if (container) updateTotalForms(p, container);
+    });
+  });
+
+  // Small AJAX helper: when city changes, load localities
+  const citySelect = document.querySelector('[name="city"]');
+  if (citySelect) {
+    citySelect.addEventListener('change', function(){
+      const cityId = this.value;
+      const localitySelect = document.querySelector('[name="locality"]');
+      const subLocalitySelect = document.querySelector('[name="sub_locality"]');
+      if (!cityId) {
+        if (localitySelect) localitySelect.innerHTML = '<option value="">---------</option>';
+        if (subLocalitySelect) subLocalitySelect.innerHTML = '<option value="">---------</option>';
+        return;
+      }
+      fetch("{% url 'get_localities' %}?city_id=" + cityId)
+        .then(res => res.json())
+        .then(data => {
+          if (localitySelect) {
+            localitySelect.innerHTML = '<option value="">---------</option>';
+            data.forEach(function(item){
+              const o = document.createElement('option');
+              o.value = item.id;
+              o.textContent = item.title;
+              localitySelect.appendChild(o);
+            });
+          }
+          if (subLocalitySelect) subLocalitySelect.innerHTML = '<option value="">---------</option>';
+        })
+        .catch(err => console.error(err));
+    });
+  }
+
+  // When locality changes, load sub-localities
+  const localitySelectMain = document.querySelector('[name="locality"]');
+  if (localitySelectMain) {
+    localitySelectMain.addEventListener('change', function(){
+      const localityId = this.value;
+      const subLocalitySelect = document.querySelector('[name="sub_locality"]');
+      if (!localityId) {
+        if (subLocalitySelect) subLocalitySelect.innerHTML = '<option value="">---------</option>';
+        return;
+      }
+      fetch("{% url 'get_sub_localities' %}?locality_id=" + localityId)
+        .then(res => res.json())
+        .then(data => {
+          if (subLocalitySelect) {
+            subLocalitySelect.innerHTML = '<option value="">---------</option>';
+            data.forEach(function(item){
+              const o = document.createElement('option');
+              o.value = item.id;
+              o.textContent = item.title;
+              subLocalitySelect.appendChild(o);
+            });
+          }
+        })
+        .catch(err => console.error(err));
+    });
+  }
+
+})();
+</script>
+{% endblock %}

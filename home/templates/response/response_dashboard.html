@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block title %}रिस्पॉन्स डैशबोर्ड{% endblock %}
+
+{% block content %}
+    <h1 class="mb-4">रिस्पॉन्स डैशबोर्ड</h1>
+    
+    <div class="row mb-5">
+        <div class="col-lg-3 col-6">
+            <div class="card text-white bg-info mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">कुल रिस्पॉन्स</h5>
+                    <p class="card-text fs-2">{{ kpis.total_responses }}</p>
+                </div>
+                <div class="card-footer small">पूरे समय का डेटा</div>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-6">
+            <div class="card text-white bg-warning mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">नए रिस्पॉन्स (Action Needed)</h5>
+                    <p class="card-text fs-2">{{ kpis.total_new }}</p>
+                </div>
+                <div class="card-footer small">जिनसे संपर्क नहीं हुआ</div>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-6">
+            <div class="card text-white bg-success mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">डील क्लोज्ड (Won)</h5>
+                    <p class="card-text fs-2">{{ kpis.total_deals_closed }}</p>
+                </div>
+                <div class="card-footer small">सफलतापूर्वक परिवर्तित</div>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-6">
+            <div class="card text-white bg-danger mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">कन्वर्जन रेट</h5>
+                    <p class="card-text fs-2">{{ kpis.conversion_rate }}</p>
+                </div>
+                <div class="card-footer small">रिस्पॉन्स से क्लोज्ड डील</div>
+            </div>
+        </div>
+    </div>
+    <a href="{% url 'response_create' %}" class="btn btn-primary mb-3">
+        + नया रिस्पॉन्स जोड़ें
+    </a>
+
+    <ul class="nav nav-tabs mb-4">
+        {% for tab in tab_list %}
+        <li class="nav-item">
+            <a class="nav-link {% if tab.slug == current_status_slug %}active{% endif %}" 
+               href="{% url 'response_dashboard_status' status_slug=tab.slug %}">
+                {{ tab.name }} 
+                {% if tab.count > 0 %}
+                    <span class="badge bg-secondary rounded-pill ms-1">{{ tab.count }}</span>
+                {% endif %}
+            </a>
+        </li>
+        {% endfor %}
+    </ul>
+
+    <div class="card p-3">
+        </div>
+
+{% endblock %}
