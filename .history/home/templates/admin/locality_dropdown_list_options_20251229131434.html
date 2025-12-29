@@ -1,0 +1,9 @@
+<option value="">---------</option>
+{% for locality in localities %}
+<option value="{{ locality.pk }}">{{ locality.title }}</option>
+{% endfor %}
+
+<option value="">---------</option>
+{% for sub in sub_localities %}
+<option value="{{ sub.pk }}">{{ sub.title }}</option>
+{% endfor %}

@@ -5,39 +5,39 @@ django.jQuery(document).ready(function($) {
     var subLocalityField = $('#id_sub_locality');
     var projectField = $('#id_project');
 
-    // --- Logic: Dropdown ko Reset aur Disable karne ka ---
+    // --- FUNCTION: Dropdown ko Reset aur Disable (Lock) karna ---
     function disableDropdown(field) {
         field.html('<option value="">---------</option>');
-        field.prop('disabled', true); // LOCK kar diya
-        field.css('background-color', '#e9ecef'); // Grey color
+        field.prop('disabled', true); // LOCK
+        field.css('background-color', '#e9ecef'); // Grey look
         field.css('cursor', 'not-allowed');
     }
 
     function enableDropdown(field) {
-        field.prop('disabled', false); // UNLOCK kar diya
-        field.css('background-color', '#ffffff'); // White color
+        field.prop('disabled', false); // UNLOCK
+        field.css('background-color', '#ffffff'); // White look
         field.css('cursor', 'default');
     }
 
-    // --- Page Load Logic ---
-    // Agar City khali hai, to Locality, SubLocality, Project sab LOCK rahenge
+    // --- INITIAL CHECK (Page Load) ---
+    // Agar City khali hai (New Form), to sab lock kar do
     if (!cityField.val()) {
         disableDropdown(localityField);
         disableDropdown(subLocalityField);
         disableDropdown(projectField);
     } 
-    // Agar Locality khali hai, to uske neeche wale LOCK rahenge
+    // Agar Locality khali hai, to uske neeche wale lock
     else if (!localityField.val()) {
         disableDropdown(subLocalityField);
         disableDropdown(projectField);
     }
 
-    // --- EVENT 1: City Change Logic ---
+    // --- EVENT 1: Jab City Change Hogi ---
     cityField.change(function() {
         var url = "/ajax/load-localities/";  
         var cityId = $(this).val();
 
-        // City badalte hi niche wale sab LOCK
+        // Niche walo ko pehle lock karo
         disableDropdown(localityField);
         disableDropdown(subLocalityField);
         disableDropdown(projectField);
@@ -49,12 +49,15 @@ django.jQuery(document).ready(function($) {
                 success: function(data) {
                     localityField.html(data);
                     enableDropdown(localityField); // Data aane par UNLOCK
+                },
+                error: function(xhr, status, error) {
+                    console.error("Error loading localities:", error);
                 }
             });
         }
     });
 
-    // --- EVENT 2: Locality Change Logic ---
+    // --- EVENT 2: Jab Locality Change Hogi ---
     localityField.change(function() {
         var url = "/ajax/load-sub-localities/";
         var localityId = $(this).val();
@@ -68,10 +71,14 @@ django.jQuery(document).ready(function($) {
                 data: { 'locality': localityId },
                 success: function(data) {
                     subLocalityField.html(data);
-                    enableDropdown(subLocalityField); // Data aane par UNLOCK
+                    enableDropdown(subLocalityField); // UNLOCK
                     enableDropdown(projectField); // Project bhi UNLOCK
+                },
+                error: function(xhr, status, error) {
+                    console.error("Error loading sub-localities:", error);
                 }
             });
         }
     });
+
 });
