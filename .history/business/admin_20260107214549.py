@@ -322,7 +322,7 @@ class SocialLinkAdmin(AutoUserAdminMixin, admin.ModelAdmin):
 @admin.register(Error)
 class ErrorAdmin(AutoUserAdminMixin, admin.ModelAdmin):
     list_display = ("id", "company", "title", "error")
-    readonly_fields = ( "create_at", "update_at")
+    readonly_fields = ("created_by", "updated_by", "create_at", "update_at")
 
 @admin.register(Images)
 class ImagesAdmin(AutoUserAdminMixin, admin.ModelAdmin):

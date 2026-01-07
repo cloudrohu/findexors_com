@@ -244,66 +244,35 @@ class Faq(models.Model):
 
 
 # ============================================================
-# FOLLOWUP MODEL (FINAL)
+# FOLLOWUP MODEL
 # ============================================================
 class Followup(models.Model):
-
     FOLLOWUP_STATUS_CHOICES = [
-        ("New Followup", "New Followup"),
-        ("Re Followup", "Re Followup"),
-        ("Cancelled", "Cancelled"),
-        ("Deal Done", "Deal Done"),
+        ("New Followup", "New Followup"), ("Re Followup", "Re Followup"),
+        ("Cancelled", "Cancelled"), ("Deal Done", "Deal Done"),
     ]
-
-    company = models.OneToOneField(
-        Company,
-        on_delete=models.CASCADE,
-        related_name="followup"
-    )
-
-    status = models.CharField(
-        max_length=25,
-        choices=FOLLOWUP_STATUS_CHOICES,
-        verbose_name="Followup Status"
-    )
-
-    followup_date = models.DateTimeField(
-        blank=True,
-        null=True,
-        verbose_name="Followup Date & Time"
-    )
-
-    assigned_to = models.ForeignKey(
-        Staff,
-        related_name='business_followup_assigned',
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True
-    )
-
+    company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='followups')
+    status = models.CharField(max_length=25, choices=FOLLOWUP_STATUS_CHOICES, verbose_name="Followup Status")
+    followup_date = models.DateTimeField(blank=True, null=True, verbose_name="Followup Date & Time")
+    assigned_to = models.ForeignKey(Staff, related_name='business_followup_assigned', on_delete=models.SET_NULL, null=True, blank=True)
     comment = models.CharField(max_length=500, null=True, blank=True)
-
     create_at = models.DateTimeField(auto_now_add=True)
     update_at = models.DateTimeField(auto_now=True)
-
-    created_by = models.ForeignKey(
-        User,
-        related_name='business_followup_created',
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True
-    )
-
-    updated_by = models.ForeignKey(
-        User,
-        related_name='business_followup_updated',
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True
-    )
+    created_by = models.ForeignKey(User, related_name='business_followup_created', on_delete=models.SET_NULL, null=True, blank=True)
+    updated_by = models.ForeignKey(User, related_name='business_followup_updated', on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self):
-        return f"{self.company} - {self.status}"
+        return f"Followup {self.id} - {self.status}"
+
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['company'],
+                condition=Q(status__in=["New Followup", "Re Followup"]),
+                name='unique_active_followup_per_company'
+            )
+        ]
 
 class Meeting(models.Model):
 

@@ -120,11 +120,13 @@ class VoiceRecordingInline(admin.StackedInline):
     model = VoiceRecording
     extra = 1
     classes = ("tab-4-voice-recordings",)
+    exclude = ("created_by", "updated_by", "create_at", "update_at")
 
 class VisitInline(admin.StackedInline):
     model = Visit
     extra = 1
     classes = ("tab-5-visits",)
+    exclude = ("created_by", "updated_by", "create_at", "update_at")
 
 class FollowupInline(admin.StackedInline):
     model = Followup
@@ -238,14 +240,14 @@ class CommentAdmin(AutoUserAdminMixin, admin.ModelAdmin):
 @admin.register(VoiceRecording)
 class VoiceRecordingAdmin(AutoUserAdminMixin, admin.ModelAdmin):
     list_display = ("id", "company", "file", "uploaded_by", "uploaded_at")
-    readonly_fields = ("uploaded_at", "uploaded_by",)
+    readonly_fields = ("created_by", "updated_by", "create_at", "update_at")
 
 
 @admin.register(Visit)
 class VisitAdmin(AutoUserAdminMixin, admin.ModelAdmin):
     list_display = ("id", "company", "visit_type", "visit_status", "uploaded_by", "uploaded_at")
     list_filter = ("visit_type", "visit_status")
-    readonly_fields = ("uploaded_by", "uploaded_at", "updated_at",)
+    readonly_fields = ("created_by", "updated_by", "create_at", "update_at")
 
 
 @admin.register(Followup)
@@ -312,17 +314,17 @@ class MeetingAdmin(AutoUserAdminMixin, admin.ModelAdmin):
 @admin.register(Approx)
 class ApproxAdmin(AutoUserAdminMixin, admin.ModelAdmin):
     list_display = ("id", "title", "category", "city", "locality")
-    readonly_fields = ("create_at", "update_at")
+    readonly_fields = ("created_by", "updated_by", "create_at", "update_at")
 
 @admin.register(SocialLink)
 class SocialLinkAdmin(AutoUserAdminMixin, admin.ModelAdmin):
     list_display = ("id", "company", "social_site", "link")
-    readonly_fields = ( "create_at", "update_at")
+    readonly_fields = ("created_by", "updated_by", "create_at", "update_at")
 
 @admin.register(Error)
 class ErrorAdmin(AutoUserAdminMixin, admin.ModelAdmin):
     list_display = ("id", "company", "title", "error")
-    readonly_fields = ( "create_at", "update_at")
+    readonly_fields = ("created_by", "updated_by", "create_at", "update_at")
 
 @admin.register(Images)
 class ImagesAdmin(AutoUserAdminMixin, admin.ModelAdmin):
@@ -331,4 +333,3 @@ class ImagesAdmin(AutoUserAdminMixin, admin.ModelAdmin):
 @admin.register(Faq)
 class FaqAdmin(AutoUserAdminMixin, admin.ModelAdmin):
     list_display = ("id", "company", "questions")
-    readonly_fields = ("create_at", "update_at")

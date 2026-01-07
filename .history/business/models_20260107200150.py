@@ -3,7 +3,6 @@ from django.contrib.auth.models import User
 from django.utils.html import mark_safe
 from django.utils.text import slugify
 from ckeditor_uploader.fields import RichTextUploadingField
-from django.db.models import Q
 
 # Utility aur Response app ke imports
 from utility.models import (
@@ -46,7 +45,7 @@ class Company(models.Model):
     project = models.ForeignKey(Project, on_delete=models.SET_NULL, null=True, blank=True)
 
     address = models.CharField(max_length=500, blank=True, null=True)
-    description = models.CharField(max_length=500, blank=True, null=True)
+    description = RichTextUploadingField(blank=True, null=True)
 
     # 👇 CHANGE: unique=True for Number
     contact_no = models.CharField(max_length=50, unique=True, blank=True, null=True)
@@ -104,6 +103,9 @@ class Company(models.Model):
 
 
 
+
+
+
 # ============================================================
 # COMMENT MODEL
 # ============================================================
@@ -115,7 +117,9 @@ class Comment(models.Model):
     created_by = models.ForeignKey(User, related_name='business_comments_created', on_delete=models.SET_NULL, null=True, blank=True)
     updated_by = models.ForeignKey(User, related_name='business_comments_updated', on_delete=models.SET_NULL, null=True, blank=True)
 
-
+    class Meta:
+        verbose_name_plural = "3. Comments"
+        ordering = ['-create_at']
 
     def __str__(self):
         return f"Comment {self.id} - {self.comment[:25] if self.comment else ''}"
@@ -130,6 +134,9 @@ class VoiceRecording(models.Model):
     uploaded_at = models.DateTimeField(auto_now_add=True)
     uploaded_by = models.ForeignKey(User, related_name='business_voice_uploaded', on_delete=models.SET_NULL, null=True, blank=True)
 
+    class Meta:
+        verbose_name_plural = "4. Voice Recordings"
+        ordering = ['-uploaded_at']
 
     def __str__(self):
         return f"Voice Recording for {self.company} ({self.uploaded_at.strftime('%d-%m-%Y %H:%M')})"
@@ -169,6 +176,9 @@ class Visit(models.Model):
     uploaded_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    class Meta:
+        verbose_name_plural = "5. Visits"
+        ordering = ['-uploaded_at']
 
     def __str__(self):
         return f"{self.company.company_name} - {self.visit_type} ({self.visit_status})"
@@ -244,121 +254,60 @@ class Faq(models.Model):
 
 
 # ============================================================
-# FOLLOWUP MODEL (FINAL)
+# FOLLOWUP MODEL
 # ============================================================
 class Followup(models.Model):
-
     FOLLOWUP_STATUS_CHOICES = [
-        ("New Followup", "New Followup"),
-        ("Re Followup", "Re Followup"),
-        ("Cancelled", "Cancelled"),
-        ("Deal Done", "Deal Done"),
+        ("New Followup", "New Followup"), ("Re Followup", "Re Followup"),
+        ("Cancelled", "Cancelled"), ("Deal Done", "Deal Done"),
     ]
-
-    company = models.OneToOneField(
-        Company,
-        on_delete=models.CASCADE,
-        related_name="followup"
-    )
-
-    status = models.CharField(
-        max_length=25,
-        choices=FOLLOWUP_STATUS_CHOICES,
-        verbose_name="Followup Status"
-    )
-
-    followup_date = models.DateTimeField(
-        blank=True,
-        null=True,
-        verbose_name="Followup Date & Time"
-    )
-
-    assigned_to = models.ForeignKey(
-        Staff,
-        related_name='business_followup_assigned',
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True
-    )
-
+    company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='followups')
+    status = models.CharField(max_length=25, choices=FOLLOWUP_STATUS_CHOICES, verbose_name="Followup Status")
+    followup_date = models.DateTimeField(blank=True, null=True, verbose_name="Followup Date & Time")
+    assigned_to = models.ForeignKey(Staff, related_name='business_followup_assigned', on_delete=models.SET_NULL, null=True, blank=True)
     comment = models.CharField(max_length=500, null=True, blank=True)
-
     create_at = models.DateTimeField(auto_now_add=True)
     update_at = models.DateTimeField(auto_now=True)
-
-    created_by = models.ForeignKey(
-        User,
-        related_name='business_followup_created',
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True
-    )
-
-    updated_by = models.ForeignKey(
-        User,
-        related_name='business_followup_updated',
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True
-    )
+    created_by = models.ForeignKey(User, related_name='business_followup_created', on_delete=models.SET_NULL, null=True, blank=True)
+    updated_by = models.ForeignKey(User, related_name='business_followup_updated', on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self):
-        return f"{self.company} - {self.status}"
+        return f"Followup {self.id} - {self.status}"
 
+    class Meta:
+        verbose_name_plural = "3. Followups"
+
+
+# ============================================================
+# MEETING MODEL
+# ============================================================
 class Meeting(models.Model):
-
     MEETING_STATUS_CHOICES = [
-        ("New Meeting", "New Meeting"),
-        ("Re Meeting", "Re Meeting"),
-        ("Cancelled", "Cancelled"),
-        ("Deal Done", "Deal Done"),
+        ("New Meeting", "New Meeting"), ("Re Meeting", "Re Meeting"),
+        ("Cancelled", "Cancelled"), ("Deal Done", "Deal Done"),
     ]
-
-    company = models.OneToOneField(
-        Company,
-        on_delete=models.CASCADE,
-        related_name="meeting"
-    )
-
-    status = models.CharField(
-        max_length=25,
-        choices=MEETING_STATUS_CHOICES,
-        verbose_name="Meeting Status"
-    )
-
-    meeting_date = models.DateTimeField(
-        blank=True,
-        null=True,
-        verbose_name="Meeting Date & Time"
-    )
-
-    assigned_to = models.ForeignKey(
-        Staff,
-        related_name='business_meeting_assigned',
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True
-    )
-
+    company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='meetings')
+    status = models.CharField(max_length=25, choices=MEETING_STATUS_CHOICES, verbose_name="Meeting Status")
+    meeting_date = models.DateTimeField(blank=True, null=True, verbose_name="Meeting Date & Time")
+    assigned_to = models.ForeignKey(Staff, related_name='business_meeting_assigned', on_delete=models.SET_NULL, null=True, blank=True)
     comment = models.CharField(max_length=500, null=True, blank=True)
-
     create_at = models.DateTimeField(auto_now_add=True)
     update_at = models.DateTimeField(auto_now=True)
-
-    created_by = models.ForeignKey(
-        User,
-        related_name='business_meeting_created',
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True
-    )
-    updated_by = models.ForeignKey(
-        User,
-        related_name='business_meeting_updated',
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True
-    )
+    created_by = models.ForeignKey(User, related_name='business_meeting_created', on_delete=models.SET_NULL, null=True, blank=True)
+    updated_by = models.ForeignKey(User, related_name='business_meeting_updated', on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self):
-        return f"{self.company} - {self.status}"
+        return f"Meeting {self.id} - {self.status}"
+
+    class Meta:
+        verbose_name_plural = "2. Meetings"
+
+    class Meta:
+        verbose_name_plural = "3. Followups"
+        constraints = [
+            models.UniqueConstraint(
+                fields=['company'],
+                condition=Q(status__in=["New Followup", "Re Followup"]),
+                name='unique_active_followup_per_company'
+            )
+        ]
