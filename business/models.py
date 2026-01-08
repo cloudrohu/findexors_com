@@ -49,7 +49,12 @@ class Company(models.Model):
     description = models.CharField(max_length=500, blank=True, null=True)
 
     # 👇 CHANGE: unique=True for Number
-    contact_no = models.CharField(max_length=50, unique=True, blank=True, null=True)
+    contact_no = models.CharField(
+    max_length=50,
+    blank=True,
+    null=True
+)
+
     
     email = models.EmailField(blank=True, null=True)
     website = models.URLField(blank=True, null=True)
