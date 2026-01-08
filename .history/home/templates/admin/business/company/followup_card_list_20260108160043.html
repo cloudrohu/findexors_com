@@ -55,8 +55,8 @@
     font-size:13px;
     text-decoration:none;
 }
-.edit-btn{border:1px solid #ddd}
 .call-btn{background:#0f766e;color:#fff;margin-right:8px}
+.edit-btn{border:1px solid #ddd}
 .call-btn{
     background:#0f766e;
     color:#fff;
@@ -74,24 +74,35 @@
 {% for obj in cl.result_list %}
 <div class="card">
 
-<div class="header">
-    <div class="logo">
+<!-- ================= COMPANY HEADER ================= -->
+<div class="header" style="display:flex; align-items:center; gap:10px;">
+
+    <!-- LOGO -->
+    <div class="logo" style="width:40px;height:40px;background:#f3f4f6;border-radius:4px;overflow:hidden;flex-shrink:0;">
         {% if obj.company.logo %}
-            <img src="{{ obj.company.logo.url }}">
+            <img src="{{ obj.company.logo.url }}" style="width:100%;height:100%;object-fit:cover;">
         {% endif %}
     </div>
 
-    <div class="title">
-        <span class="badge green">
-            C{{ obj.company.id|stringformat:"03d" }}
-        </span>
+    <!-- TITLE + IDS -->
+    <div>
+        <div class="title" style="font-size:16px;font-weight:700;line-height:1.2;">
+            {{ obj.company.company_name }}
+        </div>
 
-        <span class="badge red">
-            M{{ obj.id|stringformat:"03d" }}
-        </span>
+        <div style="font-size:12px;color:#555;margin-top:2px;">
+            🏢 <strong>C{{ obj.company.id|stringformat:"03d" }}</strong>
 
-        {{ obj.company.company_name }}
+            {% if obj.id %}
+                {% if cl.model._meta.model_name == "meeting" %}
+                    | 📅 <strong>M{{ obj.id|stringformat:"03d" }}</strong>
+                {% elif cl.model._meta.model_name == "followup" %}
+                    | 🔁 <strong>F{{ obj.id|stringformat:"03d" }}</strong>
+                {% endif %}
+            {% endif %}
+        </div>
     </div>
+
 </div>
 
 
@@ -106,8 +117,8 @@
     <span class="badge">{{ obj.company.category }}</span>
     <span class="badge">{{ obj.company.status }}</span>
 </div>
-<hr style="border:none; border-top:1px solid #e5e7eb; margin:7px 0;">
 
+<hr>
 
 <!-- ================= COMPANY CONTACT ================= -->
 <div class="meta">
@@ -116,14 +127,14 @@
     ✉️ {{ obj.company.email|default:"—" }}<br>
     🌐 {{ obj.company.website|default:"—" }}
 </div>
-<hr style="border:none; border-top:1px solid #e5e7eb; margin:7px 0;">
 
+<hr>
 
-<!-- ================= MEETING DETAILS ================= -->
+<!-- ================= FOLLOWUP DETAILS ================= -->
 <div class="meta">
-    📅 <strong>Meeting Status:</strong> {{ obj.status }}<br>
-    🕒 <strong>Meeting Date:</strong>
-    {{ obj.meeting_date|date:"d M Y, h:i A"|default:"—" }}<br>
+    🔁 <strong>Followup Status:</strong> {{ obj.status }}<br>
+    🕒 <strong>Followup Date:</strong>
+    {{ obj.followup_date|date:"d M Y, h:i A"|default:"—" }}<br>
     👤 <strong>Assigned To:</strong> {{ obj.assigned_to|default:"—" }}
 </div>
 
@@ -131,8 +142,7 @@
 <div class="meta">💬 {{ obj.comment|truncatechars:120 }}</div>
 {% endif %}
 
-<hr style="border:none; border-top:1px solid #e5e7eb; margin:7px 0;">
-
+<hr>
 
 <!-- ================= AUDIT ================= -->
 <div class="meta">
@@ -172,8 +182,6 @@
     </a>
 
 </div>
-
-
 
 
 </div>

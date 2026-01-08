@@ -226,74 +226,15 @@ class VisitAdmin(AutoUserAdminMixin, admin.ModelAdmin):
 
 @admin.register(Followup)
 class FollowupAdmin(AutoUserAdminMixin, admin.ModelAdmin):
-
     change_list_template = "admin/business/company/followup_card_list.html"
 
     list_display = (
-        "id",
-        "company",
-        "status",
-        "followup_date",
-        "assigned_to",
-        "created_by",
+        "id", "company", "status",
+        "followup_date", "assigned_to", "created_by"
     )
 
-    # 🔍 BASIC SEARCH
-    search_fields = (
-        "company__company_name",
-        "company__contact_no",
-    )
-
-    # 🎛 COMPANY-LIKE FILTERS
-    list_filter = (
-        "status",
-        "assigned_to",
-        "company__category",
-        "company__city",
-        "company__locality",
-        "company__project",
-    )
-
-    readonly_fields = (
-        "created_by",
-        "updated_by",
-        "create_at",
-        "update_at",
-    )
-
-    # 🔥 ADVANCED SEARCH (C001 / F001)
-    def get_search_results(self, request, queryset, search_term):
-        queryset, use_distinct = super().get_search_results(
-            request, queryset, search_term
-        )
-
-        if search_term:
-            term = search_term.upper().strip()
-
-            # 👉 COMPANY ID SEARCH (C016)
-            if term.startswith("C"):
-                num = term.replace("C", "").lstrip("0")
-                if num.isdigit():
-                    queryset |= self.model.objects.filter(
-                        company__id=int(num)
-                    )
-
-            # 👉 FOLLOWUP ID SEARCH (F004)
-            if term.startswith("F"):
-                num = term.replace("F", "").lstrip("0")
-                if num.isdigit():
-                    queryset |= self.model.objects.filter(
-                        id=int(num)
-                    )
-
-            # 👉 NUMBER SEARCH (CONTACT)
-            if term.isdigit():
-                queryset |= self.model.objects.filter(
-                    company__contact_no__icontains=term
-                )
-
-        return queryset, use_distinct
-
+    search_fields = ("company__company_name",)
+    list_filter = ("status", "assigned_to")
     readonly_fields = ("created_by", "updated_by", "create_at", "update_at")
 
 
