@@ -55,6 +55,8 @@ class Company(models.Model):
     blank=True,
     null=True
 )
+
+
     
     email = models.EmailField(blank=True, null=True)
     website = models.URLField(blank=True, null=True)
