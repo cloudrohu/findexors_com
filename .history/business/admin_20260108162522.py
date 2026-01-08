@@ -168,7 +168,7 @@ class CompanyAdmin(AutoUserAdminMixin, admin.ModelAdmin):
                     queryset |= self.model.objects.filter(id=int(num))
 
         return queryset, use_distinct
-    list_filter = ("status", "category", "city", "locality", "project",ContactNumberFilter,)
+    list_filter = ("status", "category", "city", "locality", "project","ContactNumberFilter",)
 
     readonly_fields = (
         "created_by",
