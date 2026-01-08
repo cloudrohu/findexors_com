@@ -1,0 +1,86 @@
+{% extends "admin/change_list.html" %}
+{% load static %}
+
+{% block extrastyle %}
+{{ block.super }}
+<style>
+.card-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(420px,1fr));
+    gap:18px;
+    margin-top:20px;
+}
+.card{
+    background:#fff;
+    border-radius:14px;
+    box-shadow:0 10px 25px rgba(0,0,0,.08);
+    padding:14px;
+}
+.card-title{
+    font-size:16px;
+    font-weight:700;
+}
+.meta{font-size:13px;color:#555;margin-top:4px;}
+.badge{
+    display:inline-block;
+    padding:4px 10px;
+    font-size:12px;
+    border-radius:20px;
+    background:#eef2ff;
+    margin:6px 6px 0 0;
+}
+.actions{margin-top:10px;}
+.actions a{
+    padding:7px 14px;
+    border-radius:20px;
+    font-size:13px;
+    text-decoration:none;
+}
+.edit-btn{border:1px solid #ddd;}
+</style>
+{% endblock %}
+
+{% block result_list %}
+<div class="card-grid">
+{% for obj in cl.result_list %}
+<div class="card">
+
+    <div class="card-title">
+        🔁 {{ obj.company.company_name }}
+    </div>
+
+    <div class="meta">📍 {{ obj.company.locality }} {{ obj.company.city }}</div>
+
+    <span class="badge">{{ obj.status }}</span>
+    {% if obj.followup_date %}
+        <span class="badge">🕒 {{ obj.followup_date|date:"d M Y, h:i A" }}</span>
+    {% endif %}
+
+    {% if obj.assigned_to %}
+    <div class="meta">👤 Assigned: {{ obj.assigned_to }}</div>
+    {% endif %}
+
+    {% if obj.comment %}
+    <div class="meta">💬 {{ obj.comment|truncatechars:80 }}</div>
+    {% endif %}
+
+    <hr>
+
+    <div class="meta">
+        👤 Created: {{ obj.created_by|default:"—" }},
+        {{ obj.create_at|date:"d M Y, h:i A" }}<br>
+        ✏️ Updated: {{ obj.updated_by|default:"—" }},
+        {{ obj.update_at|date:"d M Y, h:i A" }}
+    </div>
+
+    <div class="actions">
+        <a class="edit-btn"
+           href="{% url 'admin:business_followup_change' obj.id %}">
+            Edit Followup
+        </a>
+    </div>
+
+</div>
+{% endfor %}
+</div>
+{% endblock %}

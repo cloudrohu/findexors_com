@@ -132,57 +132,33 @@
         <span class="badge">{{ obj.category }}</span>
         <span class="badge">{{ obj.status }}</span>
     </div>
-
-    <div class="company-location">
-        💬
-        {{ obj.description}}
+<br>
+<div class="card mb-3" style="max-width: 540px;" >
+    <div class="row g-0">
+        <div class="col-md-4">
+            <img
+                src="Image Source"
+                class="img-fluid rounded-start"
+                alt="Card title"
+            />
+        </div>
+        <div class="col-md-8">
+            <div class="card-body">
+                <h5 class="card-title">Card title</h5>
+                <p class="card-text">
+                    This is a wider card with supporting text below as a
+                    natural lead-in to additional content. This content is a
+                    little bit longer.
+                </p>
+                <p class="card-text">
+                    <small class="text-muted"
+                        >Last updated 3 mins ago</small
+                    >
+                </p>
+            </div>
+        </div>
     </div>
-<hr style="border:none; border-top:1px solid #e5e7eb; margin:7px 0;">
-
-<!-- ================= FOLLOWUP ================= -->
-{% if obj.followup %}
-<div class="company-location">
-    🔁 <strong>Followup:</strong>
-    {{ obj.followup.status }}
-    {% if obj.followup.followup_date %}
-        ({{ obj.followup.followup_date|date:"d M Y, h:i A" }})
-    {% endif %}
 </div>
-{% endif %}
-
-<!-- ================= MEETING ================= -->
-{% if obj.meeting %}
-<div class="company-location">
-    📅 <strong>Meeting:</strong>
-    {{ obj.meeting.status }}
-    {% if obj.meeting.meeting_date %}
-        ({{ obj.meeting.meeting_date|date:"d M Y, h:i A" }})
-    {% endif %}
-</div>
-{% endif %}
-
-<!-- ================= LAST VISIT ================= -->
-{% with last_visit=obj.visits.last %}
-{% if last_visit %}
-<div class="company-location">
-    🚶 <strong>Visit:</strong>
-    {{ last_visit.visit_type }} — {{ last_visit.visit_status }}
-</div>
-{% endif %}
-{% endwith %}
-
-<!-- ================= LATEST COMMENT ================= -->
-{% with last_comment=obj.comments.last %}
-{% if last_comment %}
-<div class="company-location">
-    💬 <strong>Comment:</strong>
-    {{ last_comment.comment|truncatechars:80 }}
-</div>
-{% endif %}
-{% endwith %}
-
-
-<hr style="border:none; border-top:1px solid #e5e7eb; margin:7px 0;">
 
     <!-- AUDIT -->
     <div class="company-meta">
@@ -192,39 +168,16 @@
         {{ obj.updated_at|date:"d M Y, h:i A" }}
     </div>
 
-<hr style="border:none; border-top:1px solid #e5e7eb; margin:7px 0;">
-
     <!-- ACTIONS -->
-    <!-- ================= ACTIONS ================= -->
-<div class="card-actions">
-
-    <!-- 📞 CALL -->
-    {% if obj.contact_no %}
-    <a class="view-btn"
-       href="tel:{{ obj.contact_no }}"
-       style="text-decoration:none;">
-        📞 {{ obj.contact_no }}
-    </a>
-    {% endif %}
-
-    <!-- 💬 WHATSAPP -->
-    {% if obj.contact_no %}
-    <a class="whatsapp-btn"
-       href="https://wa.me/{{ obj.contact_no }}?text=Hello%20{{ obj.company_name }}"
-       target="_blank"
-       style="text-decoration:none;">
-        💬 WhatsApp
-    </a>
-    {% endif %}
-
-    <!-- ✏️ EDIT -->
-    <a class="edit-btn"
-       href="{% url 'admin:business_company_change' obj.id %}">
-        Edit
-    </a>
-
-</div>
-
+    <div class="card-actions">
+        <a class="view-btn" href="tel:{{ obj.contact_no }}" style="text-decoration:none; color:inherit;">
+            📞 {{ obj.contact_no }}
+        </a>
+        <a class="edit-btn"
+           href="{% url 'admin:business_company_change' obj.id %}">
+            Edit
+        </a>
+    </div>
 
 </div>
 {% endfor %}

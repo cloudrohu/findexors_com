@@ -131,36 +131,28 @@
 </div>
 
 <!-- ================= ACTIONS ================= -->
-<!-- ================= ACTIONS ================= -->
 <div class="actions">
 
     <!-- 📞 CALL -->
-    {% if obj.company.contact_no %}
     <a class="call-btn"
-       href="tel:{{ obj.company.contact_no }}"
-       style="text-decoration:none;">
+       href="tel:{{ obj.company.contact_no }}">
         📞 {{ obj.company.contact_no }}
     </a>
-    {% endif %}
 
     <!-- 💬 WHATSAPP -->
-    {% if obj.company.contact_no %}
-    <a class="whatsapp-btn"
-       href="https://wa.me/{{ obj.company.contact_no }}?text=Hello%20{{ obj.company.company_name }}"
-       target="_blank"
-       style="text-decoration:none;">
+    <a class="edit-btn"
+       href="https://wa.me/{{ obj.company.contact_no|whatsapp_number }}?text=Hello%20{{ obj.company.company_name }}"
+       target="_blank">
         💬 WhatsApp
     </a>
-    {% endif %}
 
     <!-- ✏️ EDIT -->
     <a class="edit-btn"
-       href="{% url 'admin:business_followup_change' obj.id %}">
+       href="{% url 'admin:business_company_change' obj.company.id %}">
         Edit
     </a>
 
 </div>
-
 
 </div>
 {% endfor %}

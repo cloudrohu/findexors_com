@@ -134,10 +134,10 @@
     </div>
 
     <div class="company-location">
-        💬
-        {{ obj.description}}
-    </div>
-<hr style="border:none; border-top:1px solid #e5e7eb; margin:7px 0;">
+    💬 <strong>Comment:</strong>
+    {{ obj.description}}
+</div>
+<hr style="border:none; border-top:1px solid #e5e7eb; margin:12px 0;">
 
 <!-- ================= FOLLOWUP ================= -->
 {% if obj.followup %}
@@ -182,7 +182,7 @@
 {% endwith %}
 
 
-<hr style="border:none; border-top:1px solid #e5e7eb; margin:7px 0;">
+<hr style="border:none; border-top:1px solid #e5e7eb; margin:12px 0;">
 
     <!-- AUDIT -->
     <div class="company-meta">
@@ -192,39 +192,16 @@
         {{ obj.updated_at|date:"d M Y, h:i A" }}
     </div>
 
-<hr style="border:none; border-top:1px solid #e5e7eb; margin:7px 0;">
-
     <!-- ACTIONS -->
-    <!-- ================= ACTIONS ================= -->
-<div class="card-actions">
-
-    <!-- 📞 CALL -->
-    {% if obj.contact_no %}
-    <a class="view-btn"
-       href="tel:{{ obj.contact_no }}"
-       style="text-decoration:none;">
-        📞 {{ obj.contact_no }}
-    </a>
-    {% endif %}
-
-    <!-- 💬 WHATSAPP -->
-    {% if obj.contact_no %}
-    <a class="whatsapp-btn"
-       href="https://wa.me/{{ obj.contact_no }}?text=Hello%20{{ obj.company_name }}"
-       target="_blank"
-       style="text-decoration:none;">
-        💬 WhatsApp
-    </a>
-    {% endif %}
-
-    <!-- ✏️ EDIT -->
-    <a class="edit-btn"
-       href="{% url 'admin:business_company_change' obj.id %}">
-        Edit
-    </a>
-
-</div>
-
+    <div class="card-actions">
+        <a class="view-btn" href="tel:{{ obj.contact_no }}" style="text-decoration:none; color:inherit;">
+            📞 {{ obj.contact_no }}
+        </a>
+        <a class="edit-btn"
+           href="{% url 'admin:business_company_change' obj.id %}">
+            Edit
+        </a>
+    </div>
 
 </div>
 {% endfor %}
