@@ -131,14 +131,7 @@ class CompanyAdmin(AutoUserAdminMixin, admin.ModelAdmin):
     search_fields = ("company_name", "contact_no")
     list_filter = ("status", "category", "city", "locality", "project")
 
-    readonly_fields = (
-        "created_by",
-        "updated_by",
-        "created_at",
-        "updated_at",
-        "logo_preview",
-        "slug",
-    )
+    readonly_fields = ("slug", "created_at", "updated_at", "logo_preview")
 
     fieldsets = (
         ("🏢 Company Info", {
@@ -182,31 +175,16 @@ class CompanyAdmin(AutoUserAdminMixin, admin.ModelAdmin):
 @admin.register(Comment)
 class CommentAdmin(AutoUserAdminMixin, admin.ModelAdmin):
     list_display = ("id", "company", "comment", "created_by", "create_at")
-    readonly_fields = (
-        "created_by",
-        "updated_by",
-        "create_at",
-        "update_at",
-    )
 
 
 @admin.register(VoiceRecording)
 class VoiceRecordingAdmin(AutoUserAdminMixin, admin.ModelAdmin):
     list_display = ("id", "company", "file", "uploaded_by", "uploaded_at")
-    readonly_fields = (
-        "uploaded_by",
-        "uploaded_at",
-    )
 
 
 @admin.register(Visit)
 class VisitAdmin(AutoUserAdminMixin, admin.ModelAdmin):
     list_display = ("id", "company", "visit_type", "visit_status", "uploaded_by")
-    readonly_fields = (
-        "uploaded_by",
-        "uploaded_at",
-        "updated_at",
-    )
 
 
 @admin.register(Followup)
@@ -242,19 +220,11 @@ class MeetingAdmin(AutoUserAdminMixin, admin.ModelAdmin):
 @admin.register(Approx)
 class ApproxAdmin(AutoUserAdminMixin, admin.ModelAdmin):
     list_display = ("id", "title", "category", "city", "locality")
-    readonly_fields = (
-        "create_at",
-        "update_at",
-    )
 
 
 @admin.register(SocialLink)
 class SocialLinkAdmin(AutoUserAdminMixin, admin.ModelAdmin):
     list_display = ("id", "company", "social_site", "link")
-    readonly_fields = (
-        "create_at",
-        "update_at",
-    )
 
 
 @admin.register(Error)
@@ -270,7 +240,3 @@ class ImagesAdmin(AutoUserAdminMixin, admin.ModelAdmin):
 @admin.register(Faq)
 class FaqAdmin(AutoUserAdminMixin, admin.ModelAdmin):
     list_display = ("id", "company", "questions")
-    readonly_fields = (
-        "create_at",
-        "update_at",
-    )

@@ -1,0 +1,143 @@
+{% extends "admin/change_list.html" %}
+{% load static %}
+
+{% block extrastyle %}
+{{ block.super }}
+<style>
+.company-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.company-card {
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 10px 25px rgba(0,0,0,.08);
+    display: flex;
+    overflow: hidden;
+}
+
+.company-img {
+    width: 150px;
+    background: #f3f4f6;
+}
+.company-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.company-content {
+    padding: 15px;
+    flex: 1;
+}
+
+.company-title {
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.company-location {
+    font-size: 13px;
+    color: #666;
+    margin: 6px 0;
+}
+
+.badge {
+    display: inline-block;
+    padding: 4px 10px;
+    font-size: 12px;
+    border-radius: 20px;
+    background: #eef2ff;
+    margin-right: 5px;
+}
+
+.contact {
+    font-weight: 600;
+    margin-top: 6px;
+}
+
+.card-actions {
+    margin-top: 12px;
+}
+
+.card-actions a {
+    padding: 8px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    text-decoration: none;
+}
+
+.view-btn {
+    background: #ff6a00;
+    color: #fff;
+}
+
+.edit-btn {
+    border: 1px solid #ddd;
+    margin-left: 8px;
+}
+</style>
+{% endblock %}
+
+{% block result_list %}
+<div class="company-cards">
+    {% for obj in cl.result_list %}
+    <div class="company-card">
+
+        <div class="company-img">
+            {% if obj.logo %}
+                <img src="{{ obj.logo.url }}">
+            {% endif %}
+        </div>
+
+        <div class="company-content">
+            <div class="company-title">{{ obj.company_name }}</div>
+
+            <div class="company-location">
+                📍 {{ obj.address }}
+            </div>
+
+            <div class="company-location">
+            {{ obj.locality }} {{ obj.city }}
+            </div>
+                        
+            <div>
+                <span class="badge">{{ obj.category }}</span>
+                <span class="badge">{{ obj.status }}</span>
+            </div>
+
+            <div class="contact">
+    📞 
+                <a href="tel:{{ obj.contact_no }}" style="text-decoration:none; color:inherit;">
+                    {{ obj.contact_no }}
+                </a>
+            </div>
+
+            <!-- ✅ AUDIT INFO SHOW -->
+            <div class="company-meta" style="margin-top:8px; font-size:12px; color:#555;">
+                👤 <strong>Created:</strong> {{ obj.created_by|default:"—" }}, 🕒 {{ obj.created_at|date:"d M Y, h:i A" }} <br>
+                ✏️ <strong>Updated:</strong> {{ obj.updated_by|default:"—" }} , 🕒 {{ obj.updated_at|date:"d M Y, h:i A" }}<br>
+                <strong>Created At:</strong>  <br>
+                🔄 <strong>Updated At:</strong> 
+            </div>
+
+            <div class="card-actions">
+                <a class="view-btn"
+                   href="{% url 'admin:business_company_change' obj.id %}">
+                    View Details
+                </a>
+
+                <a class="edit-btn"
+                   href="{% url 'admin:business_company_change' obj.id %}">
+                    Edit
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+<br>
+{% endblock %}

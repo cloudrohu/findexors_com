@@ -270,7 +270,3 @@ class ImagesAdmin(AutoUserAdminMixin, admin.ModelAdmin):
 @admin.register(Faq)
 class FaqAdmin(AutoUserAdminMixin, admin.ModelAdmin):
     list_display = ("id", "company", "questions")
-    readonly_fields = (
-        "create_at",
-        "update_at",
-    )
