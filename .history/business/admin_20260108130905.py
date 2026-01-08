@@ -193,7 +193,7 @@ class FollowupAdmin(AutoUserAdminMixin, admin.ModelAdmin):
 
     list_display = (
         "id", "company", "status",
-        "followup_date", "assigned_to", "created_by"
+        "meeting_date", "assigned_to", "created_by"
     )
 
     search_fields = ("company__company_name",)

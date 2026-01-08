@@ -189,16 +189,7 @@ class VisitAdmin(AutoUserAdminMixin, admin.ModelAdmin):
 
 @admin.register(Followup)
 class FollowupAdmin(AutoUserAdminMixin, admin.ModelAdmin):
-    change_list_template = "admin/business/company/followup_card_list.html"
-
-    list_display = (
-        "id", "company", "status",
-        "followup_date", "assigned_to", "created_by"
-    )
-
-    search_fields = ("company__company_name",)
-    list_filter = ("status", "assigned_to")
-    readonly_fields = ("created_by", "updated_by", "create_at", "update_at")
+    list_display = ("id", "company", "status", "followup_date", "assigned_to")
 
 
 @admin.register(Meeting)
