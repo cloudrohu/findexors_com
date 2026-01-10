@@ -1,0 +1,128 @@
+<h1 style="color:red;">CARD TEMPLATE LOADED ✅</h1>
+
+
+{% extends "admin/change_list.html" %}
+{% load admin_list static %}
+
+{% block extrastyle %}
+{{ block.super }}
+
+<style>
+.company-cards{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(420px,1fr));
+  gap:18px;
+  margin-top:18px;
+}
+
+.company-card{
+  background:#fff;
+  border-radius:14px;
+  box-shadow:0 10px 25px rgba(0,0,0,.08);
+  padding:14px;
+  border:1px solid #eef0f3;
+}
+
+.company-title{
+  font-size:16px;
+  font-weight:800;
+}
+
+.company-location{
+  font-size:13px;
+  color:#666;
+  margin-top:4px;
+}
+
+.badge{
+  display:inline-block;
+  padding:4px 10px;
+  font-size:12px;
+  border-radius:20px;
+  background:#eef2ff;
+  margin:6px 5px 0 0;
+}
+
+.card-actions{
+  margin-top:10px;
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+}
+
+.card-actions a{
+  padding:7px 14px;
+  border-radius:20px;
+  font-size:13px;
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  text-decoration:none;
+}
+
+.call-btn{ background:#0f766e; color:#fff; }
+.whatsapp-btn{ background:#25D366; color:#fff; }
+.edit-btn{ border:1px solid #ddd; color:#111; background:#fff; }
+</style>
+
+{% endblock %}
+
+
+{% block content %}
+<div id="content-main">
+
+  {# ✅ Search + Filters keep same #}
+  {% if cl.search_form %}{% search_form cl %}{% endif %}
+  {% if cl.has_filters %}{% admin_list_filter cl %}{% endif %}
+
+  <div class="company-cards">
+    {% for obj in cl.result_list %}
+      <div class="company-card">
+
+        <div class="company-title">
+          <span style="color:#16a34a;">C{{ obj.id|stringformat:"03d" }}</span>
+          — {{ obj.company_name }}
+        </div>
+
+        <div class="company-location">📍 {{ obj.address|default:"-" }}</div>
+        <div class="company-location">{{ obj.locality }} {{ obj.city }}</div>
+
+        <div>
+          <span class="badge">{{ obj.category }}</span>
+          <span class="badge">{{ obj.status }}</span>
+        </div>
+
+        <div class="company-location">💬 {{ obj.description|default:"-" }}</div>
+
+        <hr style="border:none;border-top:1px solid #e5e7eb;margin:10px 0;">
+
+        <div class="company-location">
+          👤 Created: {{ obj.created_by|default:"—" }} |
+          {{ obj.created_at|date:"d M Y, h:i A" }}
+        </div>
+
+        <div class="card-actions">
+
+          {% if obj.contact_no %}
+            <a class="call-btn" href="tel:{{ obj.contact_no }}">📞 {{ obj.contact_no }}</a>
+
+            <a class="whatsapp-btn"
+               href="https://wa.me/{{ obj.contact_no }}?text=Hello%20{{ obj.company_name }}"
+               target="_blank">💬 WhatsApp</a>
+          {% endif %}
+
+          <a class="edit-btn"
+             href="{% url 'admin:business_company_change' obj.id %}">
+             ✏️ Edit
+          </a>
+        </div>
+
+      </div>
+    {% endfor %}
+  </div>
+
+  {# ✅ pagination #}
+  {% block pagination %}{{ block.super }}{% endblock %}
+
+</div>
+{% endblock %}

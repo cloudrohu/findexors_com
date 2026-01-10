@@ -1,6 +1,8 @@
 from django.contrib import admin
 from django.forms.models import BaseInlineFormSet
 from django.core.exceptions import ValidationError
+from django.db import models
+from django.utils.html import mark_safe
 
 from import_export.admin import ImportExportModelAdmin
 from .resources import CompanyResource
@@ -12,13 +14,8 @@ from .models import (
 )
 
 # =====================================================
-# AUTO USER MIXIN
+# ✅ FILTER: Contact Number
 # =====================================================
-from django.db import models
-
-
-from django.contrib import admin
-
 class ContactNumberFilter(admin.SimpleListFilter):
     title = "Contact Number"
     parameter_name = "contact_no_status"
@@ -33,39 +30,39 @@ class ContactNumberFilter(admin.SimpleListFilter):
         if self.value() == "yes":
             return queryset.exclude(contact_no__isnull=True).exclude(contact_no="")
         if self.value() == "no":
-            return queryset.filter(
-                models.Q(contact_no__isnull=True) | models.Q(contact_no="")
-            )
+            return queryset.filter(models.Q(contact_no__isnull=True) | models.Q(contact_no=""))
         return queryset
 
 
+# =====================================================
+# ✅ AUTO USER MIXIN
+# =====================================================
 class AutoUserAdminMixin:
     def save_model(self, request, obj, form, change):
-        if hasattr(obj, "created_by") and not change and not obj.created_by:
+        if hasattr(obj, "created_by") and not change and not getattr(obj, "created_by", None):
             obj.created_by = request.user
         if hasattr(obj, "updated_by"):
             obj.updated_by = request.user
-        if hasattr(obj, "uploaded_by") and not obj.uploaded_by:
+        if hasattr(obj, "uploaded_by") and not getattr(obj, "uploaded_by", None):
             obj.uploaded_by = request.user
         super().save_model(request, obj, form, change)
 
     def save_formset(self, request, form, formset, change):
         instances = formset.save(commit=False)
         for obj in instances:
-            if hasattr(obj, "created_by") and not obj.created_by:
+            if hasattr(obj, "created_by") and not getattr(obj, "created_by", None):
                 obj.created_by = request.user
             if hasattr(obj, "updated_by"):
                 obj.updated_by = request.user
-            if hasattr(obj, "uploaded_by") and not obj.uploaded_by:
+            if hasattr(obj, "uploaded_by") and not getattr(obj, "uploaded_by", None):
                 obj.uploaded_by = request.user
             obj.save()
         formset.save_m2m()
 
 
 # =====================================================
-# FORMSET VALIDATIONS
+# ✅ INLINE FORMSET VALIDATIONS
 # =====================================================
-
 class FollowupInlineFormSet(BaseInlineFormSet):
     def clean(self):
         super().clean()
@@ -93,63 +90,56 @@ class MeetingInlineFormSet(BaseInlineFormSet):
 
 
 # =====================================================
-# INLINES
+# ✅ INLINES
 # =====================================================
-
 class ImagesInline(admin.TabularInline):
     model = Images
     extra = 0
-
 
 class SocialLinkInline(admin.TabularInline):
     model = SocialLink
     extra = 0
 
-
 class FaqInline(admin.TabularInline):
     model = Faq
-    extra = 1
-
+    extra = 0
 
 class CommentInline(admin.StackedInline):
     model = Comment
-    extra = 1
-
+    extra = 0
 
 class VoiceRecordingInline(admin.StackedInline):
     model = VoiceRecording
-    extra = 1
-
+    extra = 0
+    readonly_fields = ("uploaded_at", "uploaded_by")
 
 class VisitInline(admin.StackedInline):
     model = Visit
-    extra = 1
-
+    extra = 0
+    readonly_fields = ("uploaded_at", "uploaded_by", "updated_at")
 
 class FollowupInline(admin.StackedInline):
     model = Followup
     formset = FollowupInlineFormSet
-    extra = 1
+    extra = 0
+    max_num = 1
+    can_delete = True
     exclude = ("created_by", "updated_by", "create_at", "update_at")
-
 
 class MeetingInline(admin.StackedInline):
     model = Meeting
     formset = MeetingInlineFormSet
-    extra = 1
+    extra = 0
+    max_num = 1
+    can_delete = True
     exclude = ("created_by", "updated_by", "create_at", "update_at")
 
 
 # =====================================================
-# COMPANY ADMIN (MAIN)
+# ✅ COMPANY ADMIN (CARD VIEW OPTIMIZED)
 # =====================================================
-
-from django.contrib import admin
-from import_export.admin import ImportExportModelAdmin
-
 @admin.register(Company)
 class CompanyAdmin(AutoUserAdminMixin, ImportExportModelAdmin):
-    # This template is used for the Card View
     change_list_template = "admin/business/company/change_list.html"
     resource_class = CompanyResource
 
@@ -202,224 +192,72 @@ class CompanyAdmin(AutoUserAdminMixin, ImportExportModelAdmin):
 
     list_per_page = 20
 
-    # 👇👇 OPTIMIZATION FOR CARD VIEW TEMPLATE 👇👇
-    # This method is crucial. It pre-fetches related data so the
-    # template doesn't crash or run hundreds of queries.
+    # 👇👇 YEH IMPORTANT HAI: CARD VIEW KE LIYE DATA FAST LOAD KAREGA 👇👇
     def get_queryset(self, request):
         qs = super().get_queryset(request)
         return qs.select_related(
-            'followup',   # OneToOne Relationship (Single object)
-            'meeting',    # OneToOne Relationship (Single object)
+            'followup',   # OneToOne Relationship
+            'meeting',    # OneToOne Relationship
             'category', 
             'city', 
             'locality', 
             'project', 
             'assigned_to'
         ).prefetch_related(
-            'visits',     # ForeignKey (Reverse Relationship - Multiple objects)
-            'comments'    # ForeignKey (Reverse Relationship - Multiple objects)
+            'visits',     # ForeignKey (Reverse)
+            'comments'    # ForeignKey (Reverse)
         )
-# =====================================================
-# OTHER ADMINS
-# =====================================================
 
+
+# =====================================================
+# ✅ OTHER ADMINS
+# =====================================================
 @admin.register(Comment)
 class CommentAdmin(AutoUserAdminMixin, admin.ModelAdmin):
     list_display = ("id", "company", "comment", "created_by", "create_at")
-    readonly_fields = (
-        "created_by",
-        "updated_by",
-        "create_at",
-        "update_at",
-    )
+    search_fields = ("company__company_name", "company__contact_no", "comment")
+    readonly_fields = ("created_by", "updated_by", "create_at", "update_at")
 
 
 @admin.register(VoiceRecording)
 class VoiceRecordingAdmin(AutoUserAdminMixin, admin.ModelAdmin):
     list_display = ("id", "company", "file", "uploaded_by", "uploaded_at")
-    readonly_fields = (
-        "uploaded_by",
-        "uploaded_at",
-    )
+    search_fields = ("company__company_name", "company__contact_no")
+    readonly_fields = ("uploaded_by", "uploaded_at")
 
 
 @admin.register(Visit)
 class VisitAdmin(AutoUserAdminMixin, admin.ModelAdmin):
-    list_display = ("id", "company", "visit_type", "visit_status", "uploaded_by")
-    readonly_fields = (
-        "uploaded_by",
-        "uploaded_at",
-        "updated_at",
-    )
+    list_display = ("id", "company", "visit_type", "visit_status", "uploaded_by", "uploaded_at")
+    search_fields = ("company__company_name", "company__contact_no")
+    list_filter = ("visit_type", "visit_status", "uploaded_at")
+    readonly_fields = ("uploaded_by", "uploaded_at", "updated_at")
 
 
 @admin.register(Followup)
 class FollowupAdmin(AutoUserAdminMixin, admin.ModelAdmin):
-
-    change_list_template = "admin/business/company/followup_card_list.html"
-
-    list_display = (
-        "id",
-        "company",
-        "status",
-        "followup_date",
-        "assigned_to",
-        "created_by",
-    )
-
-    # 🔍 BASIC SEARCH
-    search_fields = (
-        "company__company_name",
-        "company__contact_no",
-    )
-
-    # 🎛 COMPANY-LIKE FILTERS
-    list_filter = (
-        "status",
-        "assigned_to",
-        "company__category",
-        "company__city",
-        "company__locality",
-        "company__project",
-    )
-
-    readonly_fields = (
-        "created_by",
-        "updated_by",
-        "create_at",
-        "update_at",
-    )
-
-    # 🔥 ADVANCED SEARCH (C001 / F001)
-    def get_search_results(self, request, queryset, search_term):
-        queryset, use_distinct = super().get_search_results(
-            request, queryset, search_term
-        )
-
-        if search_term:
-            term = search_term.upper().strip()
-
-            # 👉 COMPANY ID SEARCH (C016)
-            if term.startswith("C"):
-                num = term.replace("C", "").lstrip("0")
-                if num.isdigit():
-                    queryset |= self.model.objects.filter(
-                        company__id=int(num)
-                    )
-
-            # 👉 FOLLOWUP ID SEARCH (F004)
-            if term.startswith("F"):
-                num = term.replace("F", "").lstrip("0")
-                if num.isdigit():
-                    queryset |= self.model.objects.filter(
-                        id=int(num)
-                    )
-
-            # 👉 NUMBER SEARCH (CONTACT)
-            if term.isdigit():
-                queryset |= self.model.objects.filter(
-                    company__contact_no__icontains=term
-                )
-
-        return queryset, use_distinct
-
+    list_display = ("id", "company", "status", "followup_date", "assigned_to", "update_at")
+    search_fields = ("company__company_name", "company__contact_no")
+    list_filter = ("status", "assigned_to")
     readonly_fields = ("created_by", "updated_by", "create_at", "update_at")
-
-
 
 
 @admin.register(Meeting)
 class MeetingAdmin(AutoUserAdminMixin, admin.ModelAdmin):
-
-    change_list_template = "admin/business/company/meeting_card_list.html"
-
-    list_display = (
-        "id",
-        "company",
-        "status",
-        "meeting_date",
-        "assigned_to",
-        "created_by",
-    )
-
-    # 🔍 BASIC SEARCH (name + number)
-    search_fields = (
-        "company__company_name",
-        "company__contact_no",
-    )
-
-    # 🎛 ALL COMPANY-LIKE FILTERS
-    list_filter = (
-        "status",
-        "assigned_to",
-        "company__category",
-        "company__city",
-        "company__locality",
-        "company__project",
-    )
-
-    readonly_fields = (
-        "created_by",
-        "updated_by",
-        "create_at",
-        "update_at",
-    )
-
-    # 🔥 MAGIC SEARCH LOGIC (C001 / M001)
-    def get_search_results(self, request, queryset, search_term):
-        queryset, use_distinct = super().get_search_results(
-            request, queryset, search_term
-        )
-
-        if search_term:
-            term = search_term.upper().strip()
-
-            # 👉 COMPANY ID SEARCH (C016)
-            if term.startswith("C"):
-                num = term.replace("C", "").lstrip("0")
-                if num.isdigit():
-                    queryset |= self.model.objects.filter(
-                        company__id=int(num)
-                    )
-
-            # 👉 MEETING ID SEARCH (M005)
-            if term.startswith("M"):
-                num = term.replace("M", "").lstrip("0")
-                if num.isdigit():
-                    queryset |= self.model.objects.filter(
-                        id=int(num)
-                    )
-
-            # 👉 PURE NUMBER (CONTACT / ID)
-            if term.isdigit():
-                queryset |= self.model.objects.filter(
-                    company__contact_no__icontains=term
-                )
-
-        return queryset, use_distinct
+    list_display = ("id", "company", "status", "meeting_date", "assigned_to", "update_at")
+    search_fields = ("company__company_name", "company__contact_no")
+    list_filter = ("status", "assigned_to")
     readonly_fields = ("created_by", "updated_by", "create_at", "update_at")
-    
-
-
-
 
 
 @admin.register(Approx)
 class ApproxAdmin(AutoUserAdminMixin, admin.ModelAdmin):
     list_display = ("id", "title", "category", "city", "locality")
-    readonly_fields = (
-        "create_at",
-        "update_at",
-    )
 
 
 @admin.register(SocialLink)
 class SocialLinkAdmin(AutoUserAdminMixin, admin.ModelAdmin):
     list_display = ("id", "company", "social_site", "link")
-    readonly_fields = (
-        "create_at",
-        "update_at",
-    )
 
 
 @admin.register(Error)
@@ -435,14 +273,3 @@ class ImagesAdmin(AutoUserAdminMixin, admin.ModelAdmin):
 @admin.register(Faq)
 class FaqAdmin(AutoUserAdminMixin, admin.ModelAdmin):
     list_display = ("id", "company", "questions")
-    readonly_fields = (
-        "create_at",
-        "update_at",
-    )
-
-
-
-
-
-
-

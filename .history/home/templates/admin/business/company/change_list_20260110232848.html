@@ -148,23 +148,22 @@ from django.contrib import admin
 from import_export.admin import ImportExportModelAdmin
 
 @admin.register(Company)
-class CompanyAdmin(AutoUserAdminMixin, ImportExportModelAdmin):
-    # This template is used for the Card View
+class CompanyAdmin(ImportExportModelAdmin, AutoUserAdminMixin):
     change_list_template = "admin/business/company/change_list.html"
     resource_class = CompanyResource
 
     list_display = (
         "id", "company_name", "category", "city", "locality",
-        "project", "contact_no", "status",
-        "is_verified", "is_featured", "assigned_to", "created_at",
+        "address", "project", "contact_no",
+        "status", "is_verified", "is_featured",
+        "assigned_to", "created_at",
     )
 
     search_fields = ("company_name", "contact_no")
 
     list_filter = (
         "status", "category", "city", "locality",
-        "project", "assigned_to",
-        ContactNumberFilter,
+        "project", ContactNumberFilter,
     )
 
     readonly_fields = (
@@ -202,23 +201,6 @@ class CompanyAdmin(AutoUserAdminMixin, ImportExportModelAdmin):
 
     list_per_page = 20
 
-    # 👇👇 OPTIMIZATION FOR CARD VIEW TEMPLATE 👇👇
-    # This method is crucial. It pre-fetches related data so the
-    # template doesn't crash or run hundreds of queries.
-    def get_queryset(self, request):
-        qs = super().get_queryset(request)
-        return qs.select_related(
-            'followup',   # OneToOne Relationship (Single object)
-            'meeting',    # OneToOne Relationship (Single object)
-            'category', 
-            'city', 
-            'locality', 
-            'project', 
-            'assigned_to'
-        ).prefetch_related(
-            'visits',     # ForeignKey (Reverse Relationship - Multiple objects)
-            'comments'    # ForeignKey (Reverse Relationship - Multiple objects)
-        )
 # =====================================================
 # OTHER ADMINS
 # =====================================================

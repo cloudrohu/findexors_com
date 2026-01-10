@@ -149,76 +149,144 @@ from import_export.admin import ImportExportModelAdmin
 
 @admin.register(Company)
 class CompanyAdmin(AutoUserAdminMixin, ImportExportModelAdmin):
-    # This template is used for the Card View
     change_list_template = "admin/business/company/change_list.html"
-    resource_class = CompanyResource
 
+
+    resource_class = CompanyResource
+    """
+    ✅ Search (C016 / phone / name)
+    ✅ Import / Export ready
+    ✅ Audit readonly
+    ✅ Clean fieldsets
+    """
+
+    # =========================
+    # LIST VIEW
+    # =========================
     list_display = (
-        "id", "company_name", "category", "city", "locality",
-        "project", "contact_no", "status",
-        "is_verified", "is_featured", "assigned_to", "created_at",
+        "id",
+        "company_name",
+        "category",
+        "city",
+        "locality",
+        "address",
+        "project",
+        "contact_no",
+        "status",
+        "is_verified",
+        "is_featured",
+        "assigned_to",
+        "created_at",
     )
 
-    search_fields = ("company_name", "contact_no")
+    list_per_page = 20
 
+    # =========================
+    # SEARCH
+    # =========================
+    search_fields = (
+        "company_name",
+        "contact_no",
+    )
+
+    def get_search_results(self, request, queryset, search_term):
+        queryset, use_distinct = super().get_search_results(
+            request, queryset, search_term
+        )
+
+        # 🔥 Allow search like: C016 / c016
+        if search_term:
+            term = search_term.upper().strip()
+
+            if term.startswith("C"):
+                num = term.replace("C", "").lstrip("0")
+                if num.isdigit():
+                    queryset |= self.model.objects.filter(id=int(num))
+
+        return queryset, use_distinct
+
+    # =========================
+    # FILTERS
+    # =========================
     list_filter = (
-        "status", "category", "city", "locality",
-        "project", "assigned_to",
+        "status",
+        "category",
+        "city",
+        "locality",
+        "project",
         ContactNumberFilter,
     )
 
+    # =========================
+    # READONLY (AUDIT SAFE)
+    # =========================
     readonly_fields = (
-        "created_by", "updated_by",
-        "created_at", "updated_at",
-        "logo_preview", "slug",
+        "created_by",
+        "updated_by",
+        "created_at",
+        "updated_at",
+        "logo_preview",
+        "slug",
     )
 
+    # =========================
+    # FORM LAYOUT
+    # =========================
     fieldsets = (
         ("🏢 Company Info", {
             "fields": (
-                "company_name", "contact_no", "email",
-                "category", "city", "locality", "sub_locality",
-                "project", "address", "description",
-                "logo", "logo_preview",
+                "company_name",
+                "contact_no",
+                "email",
+                "category",
+                "city",
+                "locality",
+                "sub_locality",
+                "project",
+                "address",
+                "description",
+                "logo",
+                "logo_preview",
             )
         }),
         ("📊 Status & Assignment", {
             "fields": (
-                "status", "assigned_to",
-                "is_active", "is_verified", "is_featured",
-                "website", "google_map",
+                "status",
+                "assigned_to",
+                "is_active",
+                "is_verified",
+                "is_featured",
+                "website",
+                "google_map",
             )
         }),
         ("🕒 Audit Info", {
-            "fields": ("slug", "created_at", "updated_at")
+            "fields": (
+                "slug",
+                "created_at",
+                "updated_at",
+            )
         }),
     )
 
+    # =========================
+    # INLINE MODELS
+    # =========================
     inlines = [
-        ImagesInline, SocialLinkInline, FaqInline,
-        CommentInline, VoiceRecordingInline, VisitInline,
-        FollowupInline, MeetingInline,
+        ImagesInline,
+        SocialLinkInline,
+        FaqInline,
+        CommentInline,
+        VoiceRecordingInline,
+        VisitInline,
+        FollowupInline,
+        MeetingInline,
     ]
+
 
     list_per_page = 20
 
-    # 👇👇 OPTIMIZATION FOR CARD VIEW TEMPLATE 👇👇
-    # This method is crucial. It pre-fetches related data so the
-    # template doesn't crash or run hundreds of queries.
-    def get_queryset(self, request):
-        qs = super().get_queryset(request)
-        return qs.select_related(
-            'followup',   # OneToOne Relationship (Single object)
-            'meeting',    # OneToOne Relationship (Single object)
-            'category', 
-            'city', 
-            'locality', 
-            'project', 
-            'assigned_to'
-        ).prefetch_related(
-            'visits',     # ForeignKey (Reverse Relationship - Multiple objects)
-            'comments'    # ForeignKey (Reverse Relationship - Multiple objects)
-        )
+
 # =====================================================
 # OTHER ADMINS
 # =====================================================
