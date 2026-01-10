@@ -49,7 +49,6 @@ INSTALLED_APPS = [
     'crm.apps.CrmConfig',
     'user.apps.UserConfig',
     'projects.apps.ProjectsConfig',
-    "realestate",
     # ... (बाकी user apps) ...
     
     # 3. Django के Core Apps को अब नीचे रखें

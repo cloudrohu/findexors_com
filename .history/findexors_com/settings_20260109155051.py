@@ -49,7 +49,6 @@ INSTALLED_APPS = [
     'crm.apps.CrmConfig',
     'user.apps.UserConfig',
     'projects.apps.ProjectsConfig',
-    "realestate",
     # ... (बाकी user apps) ...
     
     # 3. Django के Core Apps को अब नीचे रखें
@@ -65,6 +64,8 @@ INSTALLED_APPS = [
     'mptt',
     'ckeditor',
     'ckeditor_uploader',   
+    'import_export', 
+
     'crispy_forms',
     'crispy_bootstrap5',
 ]

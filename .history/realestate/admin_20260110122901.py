@@ -3,7 +3,6 @@ from django.forms.models import BaseInlineFormSet
 from django.core.exceptions import ValidationError
 
 from import_export.admin import ImportExportModelAdmin
-from .resources import CompanyResource
 
 from .models import (
     Company, Comment, VoiceRecording, Visit,
@@ -150,7 +149,6 @@ from import_export.admin import ImportExportModelAdmin
 @admin.register(Company)
 class CompanyAdmin(AutoUserAdminMixin, ImportExportModelAdmin):
 
-    resource_class = CompanyResource
     """
     ✅ Search (C016 / phone / name)
     ✅ Import / Export ready

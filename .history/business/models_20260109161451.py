@@ -16,58 +16,6 @@ from projects.models import Project  # Project Import
 # ============================================================
 # COMPANY MODEL
 # ============================================================
-
-class GoogleCompany(models.Model):
-    name = models.CharField(max_length=255)
-    name_for_emails = models.CharField(max_length=255, blank=True, null=True)
-
-    category_text = models.CharField(max_length=255, blank=True, null=True)
-    type = models.CharField(max_length=255, blank=True, null=True)
-
-    phone = models.CharField(max_length=50, blank=True, null=True, db_index=True)
-    website = models.URLField(blank=True, null=True)
-
-    address = models.TextField(blank=True, null=True)
-    street = models.CharField(max_length=255, blank=True, null=True)
-
-    city_text = models.CharField(max_length=255, blank=True, null=True)
-    state = models.CharField(max_length=255, blank=True, null=True)
-    postal_code = models.CharField(max_length=50, blank=True, null=True)
-    country = models.CharField(max_length=255, blank=True, null=True)
-
-    latitude = models.DecimalField(max_digits=10, decimal_places=7, blank=True, null=True)
-    longitude = models.DecimalField(max_digits=10, decimal_places=7, blank=True, null=True)
-
-    rating = models.DecimalField(max_digits=3, decimal_places=1, blank=True, null=True)
-    reviews = models.IntegerField(blank=True, null=True)
-
-    place_id = models.CharField(max_length=255, blank=True, null=True, unique=True)
-    google_id = models.CharField(max_length=255, blank=True, null=True)
-    cid = models.CharField(max_length=255, blank=True, null=True)
-
-    business_status = models.CharField(max_length=255, blank=True, null=True)
-    working_hours = models.TextField(blank=True, null=True)
-
-    description = models.TextField(blank=True, null=True)
-    about = models.TextField(blank=True, null=True)
-
-    logo = models.URLField(blank=True, null=True)   # outscraper logo url
-
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        verbose_name_plural = "0. Google Companies"
-        ordering = ["-created_at"]
-
-    def __str__(self):
-        return self.name
-
-
-
-
-
-
 class Company(models.Model):
 
     STATUS_CHOICES = [
@@ -140,40 +88,37 @@ class Company(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+
     class Meta:
         ordering = ["-created_at"]
         verbose_name = "Company"
         verbose_name_plural = "1. Company"
 
-
     def __str__(self):
         return self.company_name
 
-
     def save(self, *args, **kwargs):
-        # ✅ Phone number clean
+        # 👇 CHANGE: Auto Remove Space Logic
         if self.contact_no:
-            self.contact_no = self.contact_no.replace(" ", "").strip()
+            self.contact_no = self.contact_no.replace(" ", "")
 
-        # ✅ First save (to get ID)
-        is_new = self.pk is None
+        # Slug generation logic
+        if not self.slug:
+            self.slug = f"{slugify(self.company_name)}-{self.id}" if self.id else slugify(self.company_name)
+        
         super().save(*args, **kwargs)
-
-        # ✅ Slug generate ONLY once, AFTER ID exists
-        if is_new and not self.slug:
-            self.slug = f"{slugify(self.company_name)}-{self.id}"
-            super().save(update_fields=["slug"])
-
+        
+        # ID update hone ke baad slug fix
+        if not self.slug or str(self.id) not in self.slug:
+             self.slug = f"{slugify(self.company_name)}-{self.id}"
+             super().save(update_fields=["slug"])
 
     def logo_preview(self):
         if self.logo:
-            return mark_safe(
-                f'<img src="{self.logo.url}" width="60" style="border-radius:6px;" />'
-            )
+            return mark_safe(f'<img src="{self.logo.url}" width="60"/>')
         return "No Image"
-
+    
     logo_preview.short_description = "Logo"
-
   
 
 

@@ -3,7 +3,6 @@ from django.forms.models import BaseInlineFormSet
 from django.core.exceptions import ValidationError
 
 from import_export.admin import ImportExportModelAdmin
-from .resources import CompanyResource
 
 from .models import (
     Company, Comment, VoiceRecording, Visit,

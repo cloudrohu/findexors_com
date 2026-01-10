@@ -149,8 +149,6 @@ from import_export.admin import ImportExportModelAdmin
 
 @admin.register(Company)
 class CompanyAdmin(AutoUserAdminMixin, ImportExportModelAdmin):
-
-    resource_class = CompanyResource
     """
     ✅ Search (C016 / phone / name)
     ✅ Import / Export ready

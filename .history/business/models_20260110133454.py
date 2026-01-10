@@ -2,19 +2,17 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.utils.html import mark_safe
 from django.utils.text import slugify
-from ckeditor_uploader.fields import RichTextUploadingField
-from django.db.models import Q
 
-# Utility aur Response app ke imports
 from utility.models import (
     Find_Form, Call_Status, SocialSite, Googlemap_Status,
     City, Locality, Category, Sub_Locality
 )
 from response.models import Staff
-from projects.models import Project  # Project Import
+from projects.models import Project
+
 
 # ============================================================
-# COMPANY MODEL
+# GOOGLE COMPANY MODEL (outscraper)
 # ============================================================
 
 class GoogleCompany(models.Model):
@@ -51,7 +49,7 @@ class GoogleCompany(models.Model):
     description = models.TextField(blank=True, null=True)
     about = models.TextField(blank=True, null=True)
 
-    logo = models.URLField(blank=True, null=True)   # outscraper logo url
+    logo = models.URLField(blank=True, null=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -64,9 +62,9 @@ class GoogleCompany(models.Model):
         return self.name
 
 
-
-
-
+# ============================================================
+# COMPANY MODEL
+# ============================================================
 
 class Company(models.Model):
 
@@ -84,46 +82,38 @@ class Company(models.Model):
     ]
 
     status = models.CharField(max_length=25, choices=STATUS_CHOICES, default="New")
-    assigned_to = models.ForeignKey(Staff, on_delete=models.SET_NULL, null=True, blank=True)
+    assigned_to = models.ForeignKey(
+        Staff,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="realestate_companies_assigned"
+    )
 
     company_name = models.CharField(max_length=150)
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True)
 
-    # 👇 CHANGE: City aur Locality ab Required hain (Mandatory)
     city = models.ForeignKey(City, on_delete=models.CASCADE)
-    locality = models.ForeignKey(Locality, on_delete=models.CASCADE,null=True, blank=True)
-    
-    # Sub-locality aur Project Optional rakh sakte hain
+    locality = models.ForeignKey(Locality, on_delete=models.CASCADE, null=True, blank=True)
+
     sub_locality = models.ForeignKey(Sub_Locality, on_delete=models.SET_NULL, null=True, blank=True)
     project = models.ForeignKey(Project, on_delete=models.SET_NULL, null=True, blank=True)
 
     address = models.CharField(max_length=500, blank=True, null=True)
     description = models.CharField(max_length=500, blank=True, null=True)
 
-    # 👇 CHANGE: unique=True for Number
-    contact_no = models.CharField(
-    max_length=50,
-    unique=True,
-    blank=True,
-    null=True
-)
-    
+    contact_no = models.CharField(max_length=50, unique=True, blank=True, null=True)
+
     email = models.EmailField(blank=True, null=True)
     website = models.URLField(blank=True, null=True)
 
     google_map = models.TextField(blank=True, null=True)
-    rating = models.DecimalField(
-        max_digits=3,
-        decimal_places=1,
-        null=True,
-        blank=True
-    )
 
+    rating = models.DecimalField(max_digits=3, decimal_places=1, null=True, blank=True)
     reviews_count = models.IntegerField(null=True, blank=True)
 
-    business_status_raw = models.CharField( max_length=50,null=True,blank=True)
-    
-    
+    business_status_raw = models.CharField(max_length=50, null=True, blank=True)
+
     googlemap_status = models.ForeignKey(Googlemap_Status, on_delete=models.SET_NULL, null=True, blank=True)
 
     logo = models.ImageField(upload_to="company/logo/", blank=True, null=True)
@@ -134,8 +124,20 @@ class Company(models.Model):
 
     slug = models.SlugField(max_length=500, blank=True, null=True)
 
-    created_by = models.ForeignKey(User, related_name="company_created", on_delete=models.SET_NULL, null=True, blank=True)
-    updated_by = models.ForeignKey(User, related_name="company_updated", on_delete=models.SET_NULL, null=True, blank=True)
+    created_by = models.ForeignKey(
+        User,
+        related_name="realestate_company_created",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True
+    )
+    updated_by = models.ForeignKey(
+        User,
+        related_name="realestate_company_updated",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True
+    )
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -145,25 +147,19 @@ class Company(models.Model):
         verbose_name = "Company"
         verbose_name_plural = "1. Company"
 
-
     def __str__(self):
         return self.company_name
 
-
     def save(self, *args, **kwargs):
-        # ✅ Phone number clean
         if self.contact_no:
             self.contact_no = self.contact_no.replace(" ", "").strip()
 
-        # ✅ First save (to get ID)
         is_new = self.pk is None
         super().save(*args, **kwargs)
 
-        # ✅ Slug generate ONLY once, AFTER ID exists
         if is_new and not self.slug:
             self.slug = f"{slugify(self.company_name)}-{self.id}"
             super().save(update_fields=["slug"])
-
 
     def logo_preview(self):
         if self.logo:
@@ -174,154 +170,91 @@ class Company(models.Model):
 
     logo_preview.short_description = "Logo"
 
-  
-
-
 
 # ============================================================
 # COMMENT MODEL
 # ============================================================
+
 class Comment(models.Model):
-    company = models.ForeignKey(Company, blank=True, null=True, on_delete=models.CASCADE, related_name='comments')
+    company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='realestate_comments')
     comment = models.CharField(max_length=500, null=True, blank=True)
+
     create_at = models.DateTimeField(auto_now_add=True)
     update_at = models.DateTimeField(auto_now=True)
-    created_by = models.ForeignKey(User, related_name='business_comments_created', on_delete=models.SET_NULL, null=True, blank=True)
-    updated_by = models.ForeignKey(User, related_name='business_comments_updated', on_delete=models.SET_NULL, null=True, blank=True)
 
-
+    created_by = models.ForeignKey(
+        User,
+        related_name='realestate_comments_created',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True
+    )
+    updated_by = models.ForeignKey(
+        User,
+        related_name='realestate_comments_updated',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True
+    )
 
     def __str__(self):
-        return f"Comment {self.id} - {self.comment[:25] if self.comment else ''}"
+        return f"Comment {self.id}"
 
 
 # ============================================================
 # VOICE RECORDING MODEL
 # ============================================================
+
 class VoiceRecording(models.Model):
-    company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='voice_recordings')
+    company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='realestate_voice_recordings')
     file = models.FileField(upload_to='call_recordings/')
     uploaded_at = models.DateTimeField(auto_now_add=True)
-    uploaded_by = models.ForeignKey(User, related_name='business_voice_uploaded', on_delete=models.SET_NULL, null=True, blank=True)
 
+    uploaded_by = models.ForeignKey(
+        User,
+        related_name='realestate_voice_uploaded',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True
+    )
 
     def __str__(self):
-        return f"Voice Recording for {self.company} ({self.uploaded_at.strftime('%d-%m-%Y %H:%M')})"
+        return f"Voice Recording {self.id}"
 
 
 # ============================================================
 # VISIT MODEL
 # ============================================================
+
 class Visit(models.Model):
-    VISIT_FOR_CHOICES = [
-        ("Telling Meeting", "Telling Meeting"),
-        ("Door To Door", "Door To Door"),
-        ("Site Visit", "Site Visit"),
-        ("Follow Up", "Follow Up"),
-        ("Negotiation", "Negotiation"),
-    ]
+    company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name="realestate_visits")
 
-    VISIT_TYPE_CHOICES = [
-        ("1st Visit", "1st Visit"), ("2nd Visit", "2nd Visit"), ("3rd Visit", "3rd Visit"),
-        ("4th Visit", "4th Visit"), ("5th Visit", "5th Visit"), ("6th Visit", "6th Visit"),
-        ("7th Visit", "7th Visit"), ("8th Visit", "8th Visit"), ("9th Visit", "9th Visit"),
-        ("10th Visit", "10th Visit"),
-    ]
+    visit_for = models.CharField(max_length=50)
+    visit_type = models.CharField(max_length=50)
+    visit_status = models.CharField(max_length=50)
 
-    VISIT_STATUS_CHOICES = [
-        ("Deal_Close", "Deal Close"), ("Meeting", "Meeting"), ("Follow_Up", "Follow Up"),
-        ("Owner not In Office", "Owner not In Office"), ("Interested", "Interested"),
-        ("Not Interested", "Not Interested"),
-    ]
-
-    company = models.ForeignKey("Company", on_delete=models.CASCADE, related_name="visits")
-    visit_for = models.CharField(max_length=50, choices=VISIT_FOR_CHOICES)
-    visit_type = models.CharField(max_length=50, choices=VISIT_TYPE_CHOICES)
-    visit_status = models.CharField(max_length=50, choices=VISIT_STATUS_CHOICES)
     comment = models.TextField(max_length=1000, blank=True, null=True)
-    uploaded_by = models.ForeignKey(User, related_name="visits_uploaded_by", on_delete=models.SET_NULL, null=True, blank=True)
+
+    uploaded_by = models.ForeignKey(
+        User,
+        related_name="realestate_visits_uploaded_by",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True
+    )
+
     uploaded_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-
     def __str__(self):
-        return f"{self.company.company_name} - {self.visit_type} ({self.visit_status})"
+        return f"{self.company.company_name} - {self.visit_type}"
 
 
 # ============================================================
-# APPROX MODEL
+# FOLLOWUP MODEL (OneToOne)
 # ============================================================
-class Approx(models.Model):
-    category = models.ForeignKey(Category, on_delete=models.CASCADE)
-    city = models.ForeignKey(City, on_delete=models.CASCADE)
-    locality = models.ForeignKey(Locality, on_delete=models.CASCADE)
-    title = models.CharField(max_length=50, unique=True)
-    create_at = models.DateTimeField(auto_now_add=True)
-    update_at = models.DateTimeField(auto_now=True)
 
-    def __str__(self):
-        return self.title
-
-
-# ============================================================
-# SOCIAL LINK MODEL
-# ============================================================
-class SocialLink(models.Model):
-    company = models.ForeignKey(Company, on_delete=models.CASCADE, null=True, blank=True)
-    social_site = models.ForeignKey(SocialSite, on_delete=models.CASCADE, null=True, blank=True)
-    link = models.CharField(max_length=50, unique=True)
-    create_at = models.DateTimeField(auto_now_add=True)
-    update_at = models.DateTimeField(auto_now=True)
-
-    def __str__(self):
-        return self.link
-
-
-# ============================================================
-# ERROR MODEL
-# ============================================================
-class Error(models.Model):
-    company = models.ForeignKey(Company, on_delete=models.CASCADE, null=True, blank=True)
-    title = models.CharField(max_length=500, unique=True)
-    error = models.CharField(max_length=500, unique=True)
-    create_at = models.DateTimeField(auto_now_add=True)
-    update_at = models.DateTimeField(auto_now=True)
-
-    def __str__(self):
-        return self.title
-
-
-# ============================================================
-# IMAGES MODEL
-# ============================================================
-class Images(models.Model):
-    company = models.ForeignKey(Company, on_delete=models.CASCADE)
-    title = models.CharField(max_length=50, blank=True)
-    image = models.ImageField(upload_to='images/', blank=True)
-
-    def __str__(self):
-        return self.title
-
-
-# ============================================================
-# FAQ MODEL
-# ============================================================
-class Faq(models.Model):
-    company = models.ForeignKey(Company, on_delete=models.CASCADE)
-    questions = models.CharField(max_length=500, blank=True)
-    answers = models.TextField(blank=True)
-    create_at = models.DateTimeField(auto_now_add=True)
-    update_at = models.DateTimeField(auto_now=True)
-
-    def __str__(self):
-        return self.questions
-
-
-# ============================================================
-# FOLLOWUP MODEL (FINAL)
-# ============================================================
 class Followup(models.Model):
-
     FOLLOWUP_STATUS_CHOICES = [
         ("New Followup", "New Followup"),
         ("Re Followup", "Re Followup"),
@@ -329,27 +262,14 @@ class Followup(models.Model):
         ("Deal Done", "Deal Done"),
     ]
 
-    company = models.OneToOneField(
-        Company,
-        on_delete=models.CASCADE,
-        related_name="followup"
-    )
+    company = models.OneToOneField(Company, on_delete=models.CASCADE, related_name="realestate_followup")
 
-    status = models.CharField(
-        max_length=25,
-        choices=FOLLOWUP_STATUS_CHOICES,
-        verbose_name="Followup Status"
-    )
-
-    followup_date = models.DateTimeField(
-        blank=True,
-        null=True,
-        verbose_name="Followup Date & Time"
-    )
+    status = models.CharField(max_length=25, choices=FOLLOWUP_STATUS_CHOICES)
+    followup_date = models.DateTimeField(blank=True, null=True)
 
     assigned_to = models.ForeignKey(
         Staff,
-        related_name='business_followup_assigned',
+        related_name='realestate_followup_assigned',
         on_delete=models.SET_NULL,
         null=True,
         blank=True
@@ -362,15 +282,14 @@ class Followup(models.Model):
 
     created_by = models.ForeignKey(
         User,
-        related_name='business_followup_created',
+        related_name='realestate_followup_created',
         on_delete=models.SET_NULL,
         null=True,
         blank=True
     )
-
     updated_by = models.ForeignKey(
         User,
-        related_name='business_followup_updated',
+        related_name='realestate_followup_updated',
         on_delete=models.SET_NULL,
         null=True,
         blank=True
@@ -379,8 +298,12 @@ class Followup(models.Model):
     def __str__(self):
         return f"{self.company} - {self.status}"
 
-class Meeting(models.Model):
 
+# ============================================================
+# MEETING MODEL (OneToOne)
+# ============================================================
+
+class Meeting(models.Model):
     MEETING_STATUS_CHOICES = [
         ("New Meeting", "New Meeting"),
         ("Re Meeting", "Re Meeting"),
@@ -388,27 +311,14 @@ class Meeting(models.Model):
         ("Deal Done", "Deal Done"),
     ]
 
-    company = models.OneToOneField(
-        Company,
-        on_delete=models.CASCADE,
-        related_name="meeting"
-    )
+    company = models.OneToOneField(Company, on_delete=models.CASCADE, related_name="realestate_meeting")
 
-    status = models.CharField(
-        max_length=25,
-        choices=MEETING_STATUS_CHOICES,
-        verbose_name="Meeting Status"
-    )
-
-    meeting_date = models.DateTimeField(
-        blank=True,
-        null=True,
-        verbose_name="Meeting Date & Time"
-    )
+    status = models.CharField(max_length=25, choices=MEETING_STATUS_CHOICES)
+    meeting_date = models.DateTimeField(blank=True, null=True)
 
     assigned_to = models.ForeignKey(
         Staff,
-        related_name='business_meeting_assigned',
+        related_name='realestate_meeting_assigned',
         on_delete=models.SET_NULL,
         null=True,
         blank=True
@@ -421,14 +331,14 @@ class Meeting(models.Model):
 
     created_by = models.ForeignKey(
         User,
-        related_name='business_meeting_created',
+        related_name='realestate_meeting_created',
         on_delete=models.SET_NULL,
         null=True,
         blank=True
     )
     updated_by = models.ForeignKey(
         User,
-        related_name='business_meeting_updated',
+        related_name='realestate_meeting_updated',
         on_delete=models.SET_NULL,
         null=True,
         blank=True
