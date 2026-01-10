@@ -13,8 +13,8 @@ class GoogleCompany(models.Model):
     name = models.CharField(max_length=255)
     name_for_emails = models.CharField(max_length=255, blank=True, null=True)
 
-    category_text = models.TextField(max_length=255, blank=True, null=True)
-    type = models.TextField(max_length=255, blank=True, null=True)
+    category_text = models.CharField(max_length=255, blank=True, null=True)
+    type = models.CharField(max_length=255, blank=True, null=True)
 
     phone = models.CharField(max_length=50, blank=True, null=True, db_index=True)
     website = models.TextField(blank=True, null=True)
@@ -22,10 +22,10 @@ class GoogleCompany(models.Model):
     address = models.TextField(blank=True, null=True)
     street = models.TextField(max_length=255, blank=True, null=True)
 
-    city_text = models.CharField(max_length=255, blank=True, null=True)
-    state = models.CharField(max_length=255, blank=True, null=True)
-    postal_code = models.CharField(max_length=50, blank=True, null=True)
-    country = models.CharField(max_length=255, blank=True, null=True)
+    city_text = models.TextField(max_length=255, blank=True, null=True)
+    state = models.TextField(max_length=255, blank=True, null=True)
+    postal_code = models.TextField(max_length=50, blank=True, null=True)
+    country = models.TextField(max_length=255, blank=True, null=True)
 
     latitude = models.DecimalField(max_digits=10, decimal_places=7, blank=True, null=True)
     longitude = models.DecimalField(max_digits=10, decimal_places=7, blank=True, null=True)
@@ -33,11 +33,11 @@ class GoogleCompany(models.Model):
     rating = models.DecimalField(max_digits=3, decimal_places=1, blank=True, null=True)
     reviews = models.IntegerField(blank=True, null=True)
 
-    place_id = models.CharField(max_length=300, blank=True, null=True, unique=True, db_index=True)
-    google_id = models.CharField(max_length=300, blank=True, null=True, db_index=True)
-    cid = models.CharField(max_length=300, blank=True, null=True)
+    place_id = models.CharField(max_length=255, blank=True, null=True, unique=True, db_index=True)
+    google_id = models.CharField(max_length=255, blank=True, null=True, db_index=True)
+    cid = models.CharField(max_length=255, blank=True, null=True)
 
-    business_status = models.TextField(max_length=255, blank=True, null=True)
+    business_status = models.CharField(max_length=255, blank=True, null=True)
     working_hours = models.TextField(blank=True, null=True)
 
     description = models.TextField(blank=True, null=True)
