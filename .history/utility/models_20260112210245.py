@@ -7,8 +7,7 @@ from django.db.models import Avg, Count
 from django.forms import ModelForm
 from django.urls import reverse
 from django.utils.safestring import mark_safe
-from mptt.models import MPTTModel, TreeForeignKey
-
+from mptt.fields import TreeForeignKey
 from mptt.models import MPTTModel
 from django.utils.text import slugify
 
@@ -56,20 +55,21 @@ class SocialSite(models.Model):
     class Meta:
         verbose_name_plural='3. SocialSite'
 
-
 class City(MPTTModel):
-    name = models.CharField(max_length=150, default="", blank=True)
+    name = models.CharField(max_length=150)
     slug = models.SlugField(max_length=150, unique=True, null=True, blank=True)
-
+    
+    # MPTT Hierarchy Field: Yeh field define karta hai ki kaun kiska parent hai.
     parent = TreeForeignKey(
-        'self',
-        on_delete=models.CASCADE,
-        null=True,
-        blank=True,
+        'self', 
+        on_delete=models.CASCADE, 
+        null=True, 
+        blank=True, 
         related_name='children',
         verbose_name='Parent Location (State/City)'
     )
-
+    
+    # Level Type se aap identify kar sakte hain ki yeh entry kya hai (City, Locality, etc.)
     level_choices = (
         ('STATE', 'State/Province'),
         ('CITY', 'City'),
@@ -79,15 +79,19 @@ class City(MPTTModel):
     level_type = models.CharField(max_length=20, choices=level_choices, default='LOCALITY')
 
     class MPTTMeta:
+        # Hierarchy ko name ke hisaab se sort karega
         order_insertion_by = ['name']
-
+    
     class Meta:
         verbose_name = "Location (City/Locality)"
         verbose_name_plural = "Locations (Cities/Localities)"
 
     def __str__(self):
+        # Admin mein hierarchy path dikhayega (e.g., Delhi / Vasant Kunj)
         full_path = [node.name for node in self.get_ancestors(include_self=True)]
         return ' / '.join(full_path)
+# --- 2. Locality Model (MPTT Child Structure) ---
+
 
 class Locality(MPTTModel):
     STATUS = (
