@@ -1,0 +1,74 @@
+    <!-- ================= IDs ================= -->
+    <div class="meta">
+        🆔 <strong>Place ID:</strong> {{ obj.place_id|default:"—" }} <br>
+        🆔 <strong>Google ID:</strong> {{ obj.google_id|default:"—" }} <br>
+        🆔 <strong>CID:</strong> {{ obj.cid|default:"—" }}
+    </div>
+
+    <hr class="hr">
+
+    <!-- ================= FOLLOWUP (if exists) ================= -->
+    {% if obj.followup %}
+    <div class="meta">
+        📌 <strong>Followup:</strong><br>
+        ✅ <strong>Status:</strong> {{ obj.followup.status|default:"—" }} <br>
+        📅 <strong>Date:</strong> {{ obj.followup.followup_date|date:"d M Y, h:i A"|default:"—" }} <br>
+        👤 <strong>Assigned:</strong> {{ obj.followup.assigned_to|default:"—" }} <br>
+        💬 <strong>Comment:</strong> {{ obj.followup.comment|default:"—" }}
+    </div>
+    <hr class="hr">
+    {% endif %}
+
+    <!-- ================= MEETING (if exists) ================= -->
+    {% if obj.meeting %}
+    <div class="meta">
+        🤝 <strong>Meeting:</strong><br>
+        ✅ <strong>Status:</strong> {{ obj.meeting.status|default:"—" }} <br>
+        📅 <strong>Date:</strong> {{ obj.meeting.meeting_date|date:"d M Y, h:i A"|default:"—" }} <br>
+        👤 <strong>Assigned:</strong> {{ obj.meeting.assigned_to|default:"—" }} <br>
+        💬 <strong>Comment:</strong> {{ obj.meeting.comment|default:"—" }}
+    </div>
+    <hr class="hr">
+    {% endif %}
+
+    <!-- ================= LAST COMMENT (if exists) ================= -->
+    {% with last_comment=obj.comments.last %}
+        {% if last_comment %}
+        <div class="meta">
+            💬 <strong>Last Comment:</strong> {{ last_comment.comment|truncatechars:120 }} <br>
+            👤 <strong>By:</strong> {{ last_comment.created_by|default:"—" }} |
+            🕒 {{ last_comment.create_at|date:"d M Y, h:i A"|default:"—" }}
+        </div>
+        <hr class="hr">
+        {% endif %}
+    {% endwith %}
+
+    <!-- ================= LAST VISIT (if exists) ================= -->
+    {% with last_visit=obj.visits.last %}
+        {% if last_visit %}
+        <div class="meta">
+            🚗 <strong>Last Visit:</strong><br>
+            ✅ <strong>Type:</strong> {{ last_visit.visit_type|default:"—" }} <br>
+            📌 <strong>Status:</strong> {{ last_visit.visit_status|default:"—" }} <br>
+            👤 <strong>By:</strong> {{ last_visit.uploaded_by|default:"—" }} |
+            🕒 {{ last_visit.uploaded_at|date:"d M Y, h:i A"|default:"—" }}
+            {% if last_visit.comment %}
+              <br>💬 <strong>Note:</strong> {{ last_visit.comment|truncatechars:120 }}
+            {% endif %}
+        </div>
+        <hr class="hr">
+        {% endif %}
+    {% endwith %}
+
+    <!-- ================= LAST VOICE RECORDING (if exists) ================= -->
+    {% with last_voice=obj.voice_recordings.last %}
+        {% if last_voice %}
+        <div class="meta">
+            🎤 <strong>Voice Recording:</strong><br>
+            📂 <a href="{{ last_voice.file.url }}" target="_blank">Play / Download</a> <br>
+            👤 <strong>By:</strong> {{ last_voice.uploaded_by|default:"—" }} |
+            🕒 {{ last_voice.uploaded_at|date:"d M Y, h:i A"|default:"—" }}
+        </div>
+        <hr class="hr">
+        {% endif %}
+    {% endwith %}
