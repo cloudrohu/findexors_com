@@ -42,7 +42,7 @@ INSTALLED_APPS = [
     # 2. आपके बाकी Apps
     'adsrepoting.apps.AdsrepotingConfig',
     'home.apps.HomeConfig',
-    'business.apps.BusinessConfig',
+    #'business.apps.BusinessConfig',
     'utility.apps.UtilityConfig',
     'visit.apps.VisitConfig',
     'response.apps.ResponseConfig',

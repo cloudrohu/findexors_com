@@ -121,16 +121,13 @@ class GoogleCompanyAdmin(AutoUserAdminMixin, admin.ModelAdmin):
 
     list_filter = (
         "status",
+
         "category",
         "city",
         "locality",
-        'sub_locality',
+        "sub_locality",
         "project",
-        'postal_code',
-        'business_status',
-        "rating",
-        "reviews",
-        "updated_at",
+        "business_status",
         PhoneFilter,
     )
 

@@ -121,6 +121,7 @@ class GoogleCompanyAdmin(AutoUserAdminMixin, admin.ModelAdmin):
 
     list_filter = (
         "status",
+        "name",
         "category",
         "city",
         "locality",
