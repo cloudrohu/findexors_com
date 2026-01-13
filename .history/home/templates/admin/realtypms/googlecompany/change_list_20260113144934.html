@@ -3,179 +3,227 @@
 
 {% block extrastyle %}
 {{ block.super }}
-
-
 <style>
+/* =========================
+   ✅ PU ADMIN CARD CSS (FINAL)
+   ========================= */
 
-    .cards{
+.cards{
     display:grid;
     grid-template-columns:repeat(auto-fill,minmax(520px,1fr));
     gap:18px;
     margin-top:20px;
 }
 
-/* ✅ Card */
+/* Card */
 .card{
     background:#fff;
-    border-radius:14px;
-    box-shadow:0 10px 25px rgba(0,0,0,.08);
-    padding:14px;
+    border-radius:18px;
+    box-shadow:0 14px 34px rgba(15,23,42,.10);
+    padding:18px;
+    border:1px solid #eef2f7;
     width:100%;
     overflow:hidden;
-    border:1px solid #eef2f7;
 }
 
-/* HEADER */
+/* Header */
 .header{
     display:flex;
-    align-items:center;
-    gap:10px;
+    align-items:flex-start;
+    gap:14px;
 }
 
-/* LOGO / AVATAR */
-.logo{
-    width:44px;
-    height:44px;
-    background:#f3f4f6;
-    border-radius:10px;
+/* Avatar */
+.avatar{
+    width:56px;
+    height:56px;
+    border-radius:999px;
+    background:#eaf2ff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
     overflow:hidden;
+    border:2px solid #e5efff;
     flex:0 0 auto;
 }
-.logo img{
+.avatar img{
     width:100%;
     height:100%;
     object-fit:cover;
 }
 
-.title{
-    font-size:16px;
-    font-weight:800;
-    line-height:1.2;
+/* Title + Top Row */
+.title-wrap{flex:1;}
+.top-row{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    flex-wrap:wrap;
+}
+.main-title{
+    font-size:17px;
+    font-weight:900;
     color:#0f172a;
+    line-height:1.25;
 }
-.small{
+
+/* Subline */
+.subline{
+    margin-top:4px;
     font-size:12px;
-    color:#6b7280;
-    margin-top:2px;
+    color:#64748b;
+    display:flex;
+    gap:12px;
+    flex-wrap:wrap;
 }
 
-/* TEXT */
-.meta{
-    font-size:13px;
-    color:#555;
-    margin-top:5px;
-    word-break:break-word;      /* ✅ Address / website cut fix */
-    overflow-wrap:anywhere;     /* ✅ long text wrap */
-}
-
-/* BADGES */
-.badge{
-    display:inline-block;
-    padding:4px 10px;
-    font-size:12px;
-    border-radius:20px;
-    background:#eef2ff;
-    margin:6px 6px 0 0;
-    white-space:nowrap;
-}
-.green{background:#dcfce7;color:#166534}
-.red{background:#fee2e2;color:#991b1b}
-.blue{background:#dbeafe;color:#1d4ed8}
-.yellow{background:#fef9c3;color:#854d0e}
-.gray{background:#f3f4f6;color:#111827}
-
-/* Divider */
-.hr{
-    border:none;
-    border-top:1px solid #e5e7eb;
-    margin:9px 0;
-}
-
-/* ACTIONS */
-.actions{
+/* Badges */
+.badges{
     margin-top:10px;
     display:flex;
     gap:8px;
     flex-wrap:wrap;
 }
-.actions a{
-    padding:9px 14px;
-    border-radius:999px;
-    font-size:13px;
-    font-weight:800;
+
+.badge{
     display:inline-flex;
     align-items:center;
-    gap:7px;
-    text-decoration:none;
+    gap:6px;
+    padding:6px 12px;
+    font-size:12px;
+    border-radius:999px;
+    font-weight:900;
+    background:#f1f5f9;
+    color:#0f172a;
+    line-height:1;
     white-space:nowrap;
+}
+
+.badge.green{background:#dcfce7;color:#166534;}
+.badge.blue{background:#dbeafe;color:#1d4ed8;}
+.badge.yellow{background:#fef9c3;color:#854d0e;}
+.badge.gray{background:#f3f4f6;color:#111827;}
+.badge.red{background:#fee2e2;color:#991b1b;}
+
+/* Divider */
+.hr{
+    border:none;
+    border-top:1px solid #eaeef5;
+    margin:14px 0;
+}
+
+/* Requirement chips */
+.chips{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-top:10px;
+}
+.chip{
+    padding:6px 12px;
+    border-radius:999px;
+    background:#ffffff;
+    border:1px solid #e5e7eb;
+    font-size:12px;
+    font-weight:900;
+    color:#0f172a;
+}
+
+/* Info list (Assigned/Created/Updated) */
+.info{
+    display:grid;
+    gap:8px;
+}
+.info .line{
+    display:flex;
+    gap:8px;
+    align-items:flex-start;
+    font-size:13px;
+    color:#0f172a;
+}
+.info .line span{
+    color:#334155;
+    font-weight:700;
+}
+
+/* Detail blocks (Meeting / Followup / Comment / Voice) */
+.block{
+    margin-top:12px;
+    padding:12px 14px;
+    border-radius:14px;
+    border:1px solid #eef2f7;
+    background:#fbfdff;
+}
+.block-title{
+    font-weight:900;
+    color:#0f172a;
+    margin-bottom:10px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+}
+.block .row{
+    display:grid;
+    gap:6px;
+    font-size:13px;
+    color:#334155;
+}
+.block .row b{color:#0f172a;}
+
+/* Actions */
+.actions{
+    margin-top:14px;
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+}
+.actions a{
+    padding:10px 16px;
+    border-radius:999px;
+    font-size:13px;
+    font-weight:900;
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    text-decoration:none;
+    border:1px solid transparent;
 }
 .call-btn{background:#0f766e;color:#fff;}
 .whatsapp-btn{background:#25D366;color:#fff;}
-.edit-btn{border:1px solid #ddd;color:#111;background:#fff;}
-.map-btn{background:#111827;color:#fff;}
+.edit-btn{background:#fff;border:1px solid #e5e7eb;color:#0f172a;}
 .actions a i{font-size:15px;}
 
-/* Rating Stars */
-.stars{
-    display:flex;
-    gap:6px;
-    align-items:center;
-    margin-top:5px;
-    flex-wrap:wrap;
-}
-.star-badge{
-    padding:4px 10px;
-    border-radius:20px;
-    background:#fff7ed;
-    color:#9a3412;
-    border:1px solid #fed7aa;
-    font-size:12px;
-    font-weight:800;
-}
-.review-badge{
-    padding:4px 10px;
-    border-radius:20px;
-    background:#f3f4f6;
-    color:#111;
-    font-size:12px;
-    font-weight:800;
-}
-
-/* ✅ MOBILE FIX */
+/* =========================================
+   ✅ MOBILE FIX
+   ========================================= */
 @media (max-width: 640px){
     .cards{
         grid-template-columns:1fr !important;
         gap:14px !important;
         padding:0 6px !important;
     }
-
     .card{
-        width:100% !important;
         padding:14px !important;
         border-radius:16px !important;
     }
-
-    /* ✅ Admin content fit */
     #content{
         padding:10px !important;
     }
-
-    /* ✅ No horizontal scroll */
-    #container, .content, .results{
-        max-width:100% !important;
+    .results, .content, #container{
         overflow-x:hidden !important;
+        max-width:100% !important;
     }
-
-    /* ✅ buttons full width on mobile */
+    .avatar{width:48px;height:48px;}
+    .main-title{font-size:15px !important;}
+    .badge{font-size:11px !important;padding:6px 10px !important;}
     .actions a{
         flex:1;
         min-width:120px;
         justify-content:center;
+        padding:10px 12px;
     }
 }
-
 </style>
-
 <link rel="stylesheet"
  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 {% endblock %}
