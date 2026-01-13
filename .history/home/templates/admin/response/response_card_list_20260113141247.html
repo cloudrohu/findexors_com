@@ -1,0 +1,258 @@
+{% extends "admin/change_list.html" %}
+{% load static %}
+
+{% block extrastyle %}
+{{ block.super }}
+<style>
+.cards{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(460px,1fr));
+    gap:18px;
+    margin-top:20px;
+}
+.card{
+    background:#fff;
+    border-radius:14px;
+    box-shadow:0 10px 25px rgba(0,0,0,.08);
+    padding:14px;
+}
+
+/* HEADER */
+.header{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+.logo{
+    width:44px;height:44px;
+    background:#f3f4f6;
+    border-radius:10px;
+    overflow:hidden;
+    flex:0 0 auto;
+}
+.logo img{width:100%;height:100%;object-fit:cover}
+
+.title{font-size:16px;font-weight:800;line-height:1.2}
+.small{font-size:12px;color:#6b7280;margin-top:2px}
+
+/* TEXT */
+.meta{font-size:13px;color:#555;margin-top:5px}
+
+/* BADGES */
+.badge{
+    display:inline-block;
+    padding:4px 10px;
+    font-size:12px;
+    border-radius:20px;
+    background:#eef2ff;
+    margin:6px 6px 0 0;
+}
+.green{background:#dcfce7;color:#166534}
+.red{background:#fee2e2;color:#991b1b}
+.blue{background:#dbeafe;color:#1d4ed8}
+.yellow{background:#fef9c3;color:#854d0e}
+.gray{background:#f3f4f6;color:#111827}
+
+/* Divider */
+.hr{border:none;border-top:1px solid #e5e7eb;margin:9px 0;}
+
+/* ACTIONS */
+.actions{
+    margin-top:10px;
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+}
+.actions a{
+    padding:7px 14px;
+    border-radius:20px;
+    font-size:13px;
+    display:inline-flex;
+    align-items:center;
+    gap:7px;
+    text-decoration:none;
+    white-space:nowrap;
+}
+.call-btn{background:#0f766e;color:#fff;}
+.whatsapp-btn{background:#25D366;color:#fff;}
+.edit-btn{border:1px solid #ddd;color:#111;}
+.actions a i{font-size:15px;}
+
+/* chips */
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px;}
+.chip{
+    padding:4px 10px;
+    border-radius:999px;
+    background:#f8fafc;
+    border:1px solid #e2e8f0;
+    font-size:12px;
+    font-weight:700;
+    color:#0f172a;
+}
+</style>
+
+<link rel="stylesheet"
+ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+{% endblock %}
+
+
+{% block result_list %}
+<div class="cards">
+
+{% for obj in cl.result_list %}
+<div class="card">
+
+    <!-- ================= HEADER ================= -->
+    <div class="header">
+        <div class="logo" style="display:flex;align-items:center;justify-content:center;">
+            <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="default">
+        </div>
+
+        <div style="flex:1">
+            <div class="title">
+                <span class="badge green">MR{{ obj.id|stringformat:"03d" }}</span>
+                {{ obj.business_name|default:"No Business Name" }}
+            </div>
+
+            <div class="small">
+                {% if obj.contact_persone %}
+                    {{ obj.contact_persone }}
+                {% else %}
+                    —
+                {% endif %}
+                {% if obj.contact_no %}
+                    • {{ obj.contact_no }}
+                {% endif %}
+            </div>
+
+            <!-- Requirement Types -->
+            <div class="chips">
+                {% for rt in obj.requirement_types.all %}
+                    <span class="chip">{{ rt.name }}</span>
+                {% empty %}
+                    <span class="chip">No Requirement</span>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= STATUS ROW ================= -->
+    <div style="margin-top:6px;">
+        <span class="badge blue">{{ obj.status|default:"New" }}</span>
+
+        {% if obj.business_category %}
+            <span class="badge yellow">{{ obj.business_category }}</span>
+        {% endif %}
+
+        {% if obj.city %}
+            <span class="badge gray">📍 {{ obj.city }}</span>
+        {% endif %}
+
+        {% if obj.locality %}
+            <span class="badge gray">🏘 {{ obj.locality }}</span>
+        {% endif %}
+    </div>
+
+    <hr class="hr">
+
+    <!-- ================= DETAILS ================= -->
+    <div class="meta">
+        🧑‍💼 <strong>Assigned:</strong> {{ obj.assigned_to|default:"—" }}
+    </div>
+
+    <div class="meta">
+        🕒 <strong>Created:</strong> {{ obj.create_at|date:"d M Y, h:i A"|default:"—" }}
+    </div>
+
+    <div class="meta">
+        ✏️ <strong>Updated:</strong> {{ obj.update_at|date:"d M Y, h:i A"|default:"—" }}
+    </div>
+
+    <hr class="hr">
+
+    <!-- ================= LAST MEETING ================= -->
+    {% with last_meeting=obj.meetings.last %}
+        {% if last_meeting %}
+        <div class="meta">
+            🤝 <strong>Last Meeting:</strong><br>
+            ✅ <strong>Status:</strong> {{ last_meeting.status|default:"—" }} <br>
+            📅 <strong>Date:</strong> {{ last_meeting.meeting_date|date:"d M Y, h:i A"|default:"—" }} <br>
+            👤 <strong>Assigned:</strong> {{ last_meeting.assigned_to|default:"—" }} <br>
+            💬 <strong>Comment:</strong> {{ last_meeting.comment|default:"—"|truncatechars:120 }}
+        </div>
+        <hr class="hr">
+        {% endif %}
+    {% endwith %}
+
+    <!-- ================= LAST FOLLOWUP ================= -->
+    {% with last_followup=obj.followups.last %}
+        {% if last_followup %}
+        <div class="meta">
+            🔁 <strong>Last Followup:</strong><br>
+            ✅ <strong>Status:</strong> {{ last_followup.status|default:"—" }} <br>
+            📅 <strong>Date:</strong> {{ last_followup.followup_date|date:"d M Y, h:i A"|default:"—" }} <br>
+            👤 <strong>Assigned:</strong> {{ last_followup.assigned_to|default:"—" }} <br>
+            💬 <strong>Comment:</strong> {{ last_followup.comment|default:"—"|truncatechars:120 }}
+        </div>
+        <hr class="hr">
+        {% endif %}
+    {% endwith %}
+
+    <!-- ================= LAST COMMENT ================= -->
+    {% with last_comment=obj.comments.last %}
+        {% if last_comment %}
+        <div class="meta">
+            💬 <strong>Last Comment:</strong> {{ last_comment.comment|truncatechars:140 }} <br>
+            👤 <strong>By:</strong> {{ last_comment.created_by|default:"—" }} |
+            🕒 {{ last_comment.create_at|date:"d M Y, h:i A"|default:"—" }}
+        </div>
+        <hr class="hr">
+        {% endif %}
+    {% endwith %}
+
+    <!-- ================= LAST RECORDING ================= -->
+    {% with last_voice=obj.recordings.last %}
+        {% if last_voice %}
+        <div class="meta">
+            🎤 <strong>Voice Recording:</strong><br>
+            📂 <a href="{{ last_voice.file.url }}" target="_blank">Play / Download</a> <br>
+            👤 <strong>By:</strong> {{ last_voice.uploaded_by|default:"—" }} |
+            🕒 {{ last_voice.uploaded_at|date:"d M Y, h:i A"|default:"—" }}
+        </div>
+        <hr class="hr">
+        {% endif %}
+    {% endwith %}
+
+    <hr class="hr">
+
+    <!-- ================= ACTIONS ================= -->
+    <div class="actions">
+
+        {% if obj.contact_no %}
+        <a class="call-btn" href="tel:{{ obj.contact_no }}">
+            <i class="fas fa-phone"></i>
+            Call
+        </a>
+        {% endif %}
+
+        {% if obj.contact_no %}
+        <a class="whatsapp-btn"
+           href="https://wa.me/91{{ obj.contact_no|cut:'+'|cut:' ' }}?text=Hello%20{{ obj.contact_persone|default:'Sir/Madam' }}"
+           target="_blank">
+            <i class="fab fa-whatsapp"></i>
+            WhatsApp
+        </a>
+        {% endif %}
+
+        <a class="edit-btn" href="{% url 'admin:YOURAPPNAME_response_change' obj.id %}">
+            <i class="fas fa-pen"></i>
+            Edit
+        </a>
+
+    </div>
+
+</div>
+{% endfor %}
+
+</div>
+{% endblock %}

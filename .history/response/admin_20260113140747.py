@@ -241,7 +241,7 @@ class MeetingAdmin(AutoUserAdminMixin, admin.ModelAdmin):
 # =====================================================
 @admin.register(Followup)
 class FollowupAdmin(AutoUserAdminMixin, admin.ModelAdmin):
-    change_list_template = "admin/response/followup_card_list.html"
+    change_list_template = "admin/realtypms/response/followup_card_list.html"
     list_per_page = 25
     ordering = ("-create_at",)
 
@@ -303,7 +303,7 @@ class FollowupAdmin(AutoUserAdminMixin, admin.ModelAdmin):
 # =====================================================
 @admin.register(Comment)
 class CommentAdmin(AutoUserAdminMixin, admin.ModelAdmin):
-    change_list_template = "admin/response/comment_card_list.html"
+    change_list_template = "admin/realtypms/response/comment_card_list.html"
     list_per_page = 25
     ordering = ("-create_at",)
 
@@ -352,7 +352,7 @@ class CommentAdmin(AutoUserAdminMixin, admin.ModelAdmin):
 # =====================================================
 @admin.register(VoiceRecording)
 class VoiceRecordingAdmin(AutoUserAdminMixin, admin.ModelAdmin):
-    change_list_template = "admin/response/voice_card_list.html"
+    change_list_template = "admin/realtypms/response/voice_card_list.html"
     list_per_page = 25
     ordering = ("-uploaded_at",)
 
