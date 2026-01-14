@@ -58,8 +58,8 @@ class GoogleCompany(models.Model):
     STATUS_CHOICES = [
         ("New", "New"),
         ("Meeting", "Meeting"),
-        ("Follow Up", "Follow Up"),
-        ("Not Received", "Not Received"),
+        ("Follow_Up", "Follow Up"),
+        ("Not_received", "Not Received"),
         ("Not Interested", "Not Interested"),
         ("They Will Connect", "They Will Connect"),
         ("Call later", "Call later"),
@@ -67,8 +67,6 @@ class GoogleCompany(models.Model):
         ("Switched Off", "Switched Off"),
         ("Invalid Number", "Invalid Number"),
         ("Send Ditails", "Send Ditails"),
-        ("Deal Done", "Deal Done"),
-
     ]
     status = models.CharField(max_length=25, choices=STATUS_CHOICES, default="New")
 

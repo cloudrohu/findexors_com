@@ -58,8 +58,8 @@ class GoogleCompany(models.Model):
     STATUS_CHOICES = [
         ("New", "New"),
         ("Meeting", "Meeting"),
-        ("Follow Up", "Follow Up"),
-        ("Not Received", "Not Received"),
+        ("Follow_Up", "Follow Up"),
+        ("Not_received", "Not Received"),
         ("Not Interested", "Not Interested"),
         ("They Will Connect", "They Will Connect"),
         ("Call later", "Call later"),
