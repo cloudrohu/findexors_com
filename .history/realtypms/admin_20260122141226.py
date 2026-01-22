@@ -381,7 +381,7 @@ class FollowupAdmin(AutoUserAdminMixin, admin.ModelAdmin):
 class MeetingAdmin(AutoUserAdminMixin, admin.ModelAdmin):
     change_list_template = "admin/realtypms/googlecompany/meeting_card_list.html"
     preserve_filters = True
-    list_per_page = 20
+    list_per_page = 10
 
     list_display = ("id", "company", "status", "meeting_date", "assigned_to", "created_by")
     search_fields = ("company__name", "company__phone")

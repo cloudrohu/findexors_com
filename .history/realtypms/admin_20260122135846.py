@@ -137,7 +137,7 @@ class GoogleCompanyAdmin(AutoUserAdminMixin, admin.ModelAdmin):
 
     ordering = ("-created_at",)
     readonly_fields = ("created_at", "updated_at", "updated_by", "created_by")
-    list_per_page = 20
+    list_per_page = 25
 
     fieldsets = (
         ("🏢 Company Info", {
@@ -198,7 +198,7 @@ class GoogleCompanyAdmin(AutoUserAdminMixin, admin.ModelAdmin):
 @admin.register(Comment)
 class CommentAdmin(AutoUserAdminMixin, admin.ModelAdmin):
     change_list_template = "admin/realtypms/googlecompany/comment_card_list.html"
-    preserve_filters = True
+
     list_display = ("id", "company", "comment", "create_at", "created_by")
     search_fields = ("company__name", "company__phone", "comment")
 
@@ -241,8 +241,6 @@ class CommentAdmin(AutoUserAdminMixin, admin.ModelAdmin):
 @admin.register(VoiceRecording)
 class VoiceRecordingAdmin(AutoUserAdminMixin, admin.ModelAdmin):
     change_list_template = "admin/realtypms/googlecompany/voice_card_list.html"
-    preserve_filters = True
-    list_per_page = 20
 
     list_display = ("id", "company", "file", "uploaded_by", "uploaded_at")
     search_fields = ("company__name", "company__phone")
@@ -286,8 +284,6 @@ class VoiceRecordingAdmin(AutoUserAdminMixin, admin.ModelAdmin):
 @admin.register(Visit)
 class VisitAdmin(AutoUserAdminMixin, admin.ModelAdmin):
     change_list_template = "admin/realtypms/googlecompany/visit_card_list.html"
-    preserve_filters = True
-    list_per_page = 20
 
     list_display = ("id", "company", "visit_type", "visit_status", "uploaded_by", "uploaded_at")
     search_fields = ("company__name", "company__phone")
@@ -333,8 +329,6 @@ class VisitAdmin(AutoUserAdminMixin, admin.ModelAdmin):
 @admin.register(Followup)
 class FollowupAdmin(AutoUserAdminMixin, admin.ModelAdmin):
     change_list_template = "admin/realtypms/googlecompany/followup_card_list.html"
-    preserve_filters = True
-    list_per_page = 20
 
     list_display = ("id", "company", "status", "followup_date", "assigned_to", "update_at")
     search_fields = ("company__name", "company__phone")
@@ -381,7 +375,6 @@ class FollowupAdmin(AutoUserAdminMixin, admin.ModelAdmin):
 class MeetingAdmin(AutoUserAdminMixin, admin.ModelAdmin):
     change_list_template = "admin/realtypms/googlecompany/meeting_card_list.html"
     preserve_filters = True
-    list_per_page = 20
 
     list_display = ("id", "company", "status", "meeting_date", "assigned_to", "created_by")
     search_fields = ("company__name", "company__phone")
