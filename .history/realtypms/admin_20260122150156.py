@@ -85,9 +85,9 @@ class MeetingInline(admin.StackedInline):
 # ✅ GOOGLE COMPANY ADMIN
 # =====================================================
 @admin.register(GoogleCompany)
-#class GoogleCompanyAdmin(ImportExportModelAdmin):
+class GoogleCompanyAdmin(ImportExportModelAdmin):
 
-class GoogleCompanyAdmin(AutoUserAdminMixin, admin.ModelAdmin):
+#class GoogleCompanyAdmin(AutoUserAdminMixin, admin.ModelAdmin):
     resource_class = GoogleCompanyResource
     preserve_filters = True
     change_list_template = "admin/realtypms/googlecompany/change_list.html"
@@ -137,7 +137,7 @@ class GoogleCompanyAdmin(AutoUserAdminMixin, admin.ModelAdmin):
 
     ordering = ("-created_at",)
     readonly_fields = ("created_at", "updated_at", "updated_by", "created_by")
-    list_per_page = 500
+    list_per_page = 1000
 
     fieldsets = (
         ("🏢 Company Info", {

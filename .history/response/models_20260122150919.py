@@ -4,34 +4,36 @@ from django.contrib.auth.models import User
 from django.db import models
 from django.utils import timezone
 from django.utils.text import slugify
-
 from utility.models import Category, City, Locality, RequirementType
 
 
-# ✅ Phone Cleaner (Save Time): last 10 digits only
-def clean_phone_last10(phone: str):
-    """
-    ✅ Keeps field max_length same (16),
-    but when saving returns ONLY last 10 digits.
-    Works with +91, spaces, dashes, etc.
-    """
+# ✅ Phone Cleaner: +91 / 91 / spaces / ::: / multiple numbers safe
+def clean_phone_india(phone: str):
     if not phone:
         return None
 
-    phone = str(phone).strip()
+    phone = str(phone)
 
-    # ✅ keep only digits
+    # ✅ Extract all digit groups
+    digit_groups = re.findall(r"\d+", phone)
+
+    # ✅ Pick first valid Indian mobile-like number
+    for g in digit_groups:
+        if len(g) >= 10:
+            last10 = g[-10:]
+            # Indian mobiles start with 6-9
+            if last10[0] in ["6", "7", "8", "9"]:
+                return last10
+
+    # ✅ fallback: take last 10 digits from all digits
     digits = re.sub(r"\D", "", phone)
-
-    # ✅ return last 10 digits if available
     if len(digits) >= 10:
         return digits[-10:]
-
     return digits
 
 
 # =======================
-#  Staff
+# Staff
 # =======================
 class Staff(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -41,7 +43,7 @@ class Staff(models.Model):
 
 
 # =======================
-#  Response
+# Response
 # =======================
 class Response(models.Model):
     STATUS_CHOICES = [
@@ -63,9 +65,9 @@ class Response(models.Model):
         verbose_name="Response Status"
     )
 
-    # ✅ 16 length allowed in input, but saved as last 10 digits
+    # ✅ Always store only 10 digit number
     contact_no = models.CharField(
-        max_length=16,
+        max_length=10,
         null=True,
         blank=True,
         unique=True,
@@ -82,7 +84,6 @@ class Response(models.Model):
     contact_persone = models.CharField(max_length=500, blank=True, null=True)
 
     business_name = models.CharField(max_length=500, blank=True, null=True)
-
     business_category = models.ForeignKey(
         Category,
         blank=True,
@@ -109,7 +110,6 @@ class Response(models.Model):
         null=True,
         blank=True
     )
-
     updated_by = models.ForeignKey(
         User,
         related_name='responses_updated',
@@ -119,9 +119,9 @@ class Response(models.Model):
     )
 
     def save(self, *args, **kwargs):
-        # ✅ Save only last 10 digits in DB
+        # ✅ contact number: store only last 10 digits
         if self.contact_no:
-            self.contact_no = clean_phone_last10(self.contact_no)
+            self.contact_no = clean_phone_india(self.contact_no)
         super().save(*args, **kwargs)
 
     def __str__(self):
@@ -132,7 +132,7 @@ class Response(models.Model):
 
 
 # =======================
-#  Meeting
+# Meeting
 # =======================
 class Meeting(models.Model):
     MEETING_STATUS_CHOICES = [
@@ -164,7 +164,6 @@ class Meeting(models.Model):
     )
 
     comment = models.CharField(max_length=500, null=True, blank=True)
-
     create_at = models.DateTimeField(auto_now_add=True)
     update_at = models.DateTimeField(auto_now=True)
 
@@ -175,7 +174,6 @@ class Meeting(models.Model):
         null=True,
         blank=True
     )
-
     updated_by = models.ForeignKey(
         User,
         related_name='meeting_updated',
@@ -189,7 +187,7 @@ class Meeting(models.Model):
 
 
 # =======================
-#  Followup
+# Followup
 # =======================
 class Followup(models.Model):
     FOLLOWUP_STATUS_CHOICES = [
@@ -221,7 +219,6 @@ class Followup(models.Model):
     )
 
     comment = models.CharField(max_length=500, null=True, blank=True)
-
     create_at = models.DateTimeField(auto_now_add=True)
     update_at = models.DateTimeField(auto_now=True)
 
@@ -232,7 +229,6 @@ class Followup(models.Model):
         null=True,
         blank=True
     )
-
     updated_by = models.ForeignKey(
         User,
         related_name='followup_updated',
@@ -246,7 +242,7 @@ class Followup(models.Model):
 
 
 # =======================
-#  Comment
+# Comment
 # =======================
 class Comment(models.Model):
     response = models.ForeignKey(
@@ -268,7 +264,6 @@ class Comment(models.Model):
         null=True,
         blank=True
     )
-
     updated_by = models.ForeignKey(
         User,
         related_name='comments_updated',
@@ -282,7 +277,7 @@ class Comment(models.Model):
 
 
 # =======================
-#  Voice Recording
+# Voice Recording
 # =======================
 class VoiceRecording(models.Model):
     response = models.ForeignKey(

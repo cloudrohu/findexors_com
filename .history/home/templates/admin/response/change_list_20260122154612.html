@@ -1,0 +1,124 @@
+{% extends "admin/change_list.html" %}
+{% load static %}
+
+{% block extrastyle %}
+{{ block.super }}
+<style>
+    .cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+        gap: 20px;
+        margin-top: 20px;
+        padding: 10px;
+    }
+    .card {
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        border: 1px solid #edf2f7;
+        transition: transform 0.2s;
+        display: flex;
+        flex-direction: column;
+    }
+    .card:hover { transform: translateY(-3px); }
+    
+    .card-header {
+        padding: 15px;
+        display: flex;
+        gap: 12px;
+        border-bottom: 1px border-bottom: 1px solid #f8fafc;
+    }
+    .avatar-box {
+        width: 50px; height: 50px; border-radius: 10px;
+        background: #f0f7ff; color: #2563eb;
+        display: flex; align-items: center; justify-content: center;
+        font-weight: bold; font-size: 18px;
+    }
+    .main-info { flex: 1; }
+    .biz-name { font-size: 16px; font-weight: 800; color: #1e293b; margin-bottom: 4px; }
+    
+    .badge-row { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 8px; }
+    .custom-badge {
+        padding: 2px 8px; font-size: 11px; font-weight: 700; border-radius: 4px; text-transform: uppercase;
+    }
+    .bg-blue { background: #e0e7ff; color: #4338ca; }
+    .bg-green { background: #dcfce7; color: #15803d; }
+    .bg-gray { background: #f1f5f9; color: #475569; }
+
+    .card-body { padding: 15px; background: #fafbfc; flex-grow: 1; }
+    .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 12.5px; }
+    .label { color: #64748b; font-size: 11px; display: block; }
+
+    .card-footer {
+        padding: 12px;
+        display: flex;
+        gap: 8px;
+        border-top: 1px solid #eee;
+    }
+    .btn-action {
+        flex: 1; text-align: center; padding: 8px; border-radius: 6px;
+        font-size: 13px; font-weight: 700; text-decoration: none;
+        display: flex; align-items: center; justify-content: center; gap: 5px;
+    }
+    .btn-call { background: #0d9488; color: white; }
+    .btn-wa { background: #22c55e; color: white; }
+    .btn-edit { background: #f8fafc; color: #1e293b; border: 1px solid #e2e8f0; }
+
+    @media (max-width: 600px) { .cards { grid-template-columns: 1fr; } }
+</style>
+{% endblock %}
+
+{% block result_list %}
+<div class="cards">
+    {% for obj in cl.result_list %}
+    <div class="card">
+        <div class="card-header">
+            <div class="avatar-box">
+                {{ obj.business_name|slice:":1"|upper }}
+            </div>
+            <div class="main-info">
+                <div class="biz-name">{{ obj.business_name|default:"No Name" }}</div>
+                <div class="badge-row">
+                    <span class="custom-badge bg-blue">MR{{ obj.id|stringformat:"03d" }}</span>
+                    <span class="custom-badge bg-green">{{ obj.status }}</span>
+                    {% if obj.city %}<span class="custom-badge bg-gray">📍 {{ obj.city }}</span>{% endif %}
+                </div>
+                <div style="font-size: 13px; color: #475569;">
+                    <i class="fas fa-user-circle"></i> {{ obj.contact_persone|default:"-" }}
+                </div>
+            </div>
+        </div>
+
+        <div class="card-body">
+            <div class="info-grid">
+                <div><span class="label">ASSIGNED TO</span> <b>{{ obj.assigned_to|default:"Unassigned" }}</b></div>
+                <div><span class="label">CREATED</span> <b>{{ obj.create_at|date:"d M Y" }}</b></div>
+            </div>
+            
+            {% with last_m=obj.meetings.last %}
+            {% if last_m %}
+            <div style="margin-top: 10px; padding-top: 10px; border-top: 1px dashed #cbd5e1;">
+                <span class="label">LAST MEETING ({{ last_m.status }})</span>
+                <div style="font-size: 12px;">{{ last_m.comment|truncatechars:60 }}</div>
+            </div>
+            {% endif %}
+            {% endwith %}
+        </div>
+
+        <div class="card-footer">
+            {% if obj.contact_no %}
+            <a href="tel:{{ obj.contact_no }}" class="btn-action btn-call">
+                <i class="fas fa-phone-alt"></i> Call
+            </a>
+            <a href="https://wa.me/91{{ obj.contact_no }}" target="_blank" class="btn-action btn-wa">
+                <i class="fab fa-whatsapp"></i> WA
+            </a>
+            {% endif %}
+            <a href="{% url 'admin:response_response_change' obj.id %}?_changelist_filters={{ request.GET.urlencode }}" class="btn-action btn-edit">
+                <i class="fas fa-edit"></i> Edit
+            </a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
