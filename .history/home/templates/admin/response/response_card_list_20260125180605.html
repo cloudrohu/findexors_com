@@ -355,12 +355,12 @@
     <!-- ================= ACTIONS ================= -->
     <div class="actions">
         {% if obj.contact_no %}
-        <a class="call-btn" href="tel:+91{{ obj.contact_no }}">
+        <a class="call-btn" href="tel:{{ obj.contact_no }}">
             <i class="fas fa-phone"></i> Call
         </a>
 
         <a class="whatsapp-btn"
-           href="https://wa.me/91{{ obj.contact_no|cut:'+'|cut:' ' }}?text=Hello%20{{ obj.contact_persone|default:'Sir/Madam' }}"
+           href="https://wa.me/{{ obj.contact_no|cut:'+'|cut:' ' }}?text=Hello%20{{ obj.contact_persone|default:'Sir/Madam' }}"
            target="_blank">
             <i class="fab fa-whatsapp"></i> WhatsApp
         </a>
