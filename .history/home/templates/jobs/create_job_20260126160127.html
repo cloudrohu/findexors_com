@@ -1,0 +1,63 @@
+<form method="post">
+{% csrf_token %}
+
+{{ form.non_field_errors }}
+
+<div class="field">{{ form.company.label_tag }}{{ form.company }}</div>
+<div class="field">{{ form.title.label_tag }}{{ form.title }}</div>
+<div class="field">{{ form.category.label_tag }}{{ form.category }}</div>
+
+<div class="row">
+    <div class="field">{{ form.openings.label_tag }}{{ form.openings }}</div>
+    <div class="field">{{ form.job_type.label_tag }}{{ form.job_type }}</div>
+</div>
+
+<div class="field">{{ form.work_location_type.label_tag }}{{ form.work_location_type }}</div>
+
+<div class="row">
+    <div class="field">{{ form.city.label_tag }}{{ form.city }}</div>
+    <div class="field">{{ form.locality.label_tag }}{{ form.locality }}</div>
+</div>
+
+<div class="field">{{ form.gender.label_tag }}{{ form.gender }}</div>
+
+<div class="row">
+    <div class="field">{{ form.min_experience_months.label_tag }}{{ form.min_experience_months }}</div>
+    <div class="field">{{ form.max_experience_months.label_tag }}{{ form.max_experience_months }}</div>
+</div>
+
+<div class="field">{{ form.salary_type.label_tag }}{{ form.salary_type }}</div>
+
+<div class="row">
+    <div class="field">{{ form.salary_min.label_tag }}{{ form.salary_min }}</div>
+    <div class="field">{{ form.salary_max.label_tag }}{{ form.salary_max }}</div>
+</div>
+
+<div class="row">
+    <div class="field">{{ form.start_time.label_tag }}{{ form.start_time }}</div>
+    <div class="field">{{ form.end_time.label_tag }}{{ form.end_time }}</div>
+</div>
+
+<div class="field">{{ form.working_days.label_tag }}{{ form.working_days }}</div>
+
+<div class="field">{{ form.description.label_tag }}{{ form.description }}</div>
+<div class="field">{{ form.requirements.label_tag }}{{ form.requirements }}</div>
+
+<button class="submit">Continue →</button>
+</form>
+
+<script>
+document.getElementById("id_city").addEventListener("change", function(){
+fetch(`/jobs/ajax/load-localities/?city_id=${this.value}`)
+.then(res=>res.json())
+.then(data=>{
+const loc=document.getElementById("id_locality");
+loc.innerHTML="<option value=''>Select locality</option>";
+data.forEach(l=>{
+let o=document.createElement("option");
+o.value=l.id;o.text=l.name;
+loc.appendChild(o);
+});
+});
+});
+</script>

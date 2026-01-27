@@ -1,0 +1,131 @@
+{% extends "admin/change_list.html" %}
+{% load static %}
+
+{% block extrastyle %}
+{{ block.super }}
+<style>
+.cards{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(420px,1fr));
+    gap:18px;
+    margin-top:20px;
+}
+.card{
+    background:#fff;
+    border-radius:18px;
+    padding:18px;
+    border:1px solid #e5e7eb;
+    box-shadow:0 10px 30px rgba(0,0,0,.08);
+}
+.header{
+    display:flex;
+    gap:14px;
+}
+.avatar{
+    width:52px;
+    height:52px;
+    border-radius:999px;
+    background:#e0e7ff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:900;
+    color:#1e40af;
+}
+.title{
+    font-size:16px;
+    font-weight:900;
+}
+.sub{
+    font-size:13px;
+    color:#475569;
+}
+.badge{
+    display:inline-block;
+    padding:6px 12px;
+    border-radius:999px;
+    font-size:12px;
+    font-weight:800;
+}
+.hr{margin:14px 0;border-top:1px solid #e5e7eb;}
+.actions{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+}
+.actions a{
+    padding:8px 14px;
+    border-radius:999px;
+    font-size:13px;
+    font-weight:800;
+    text-decoration:none;
+}
+.call{background:#0f766e;color:#fff;}
+.wa{background:#25D366;color:#fff;}
+.edit{border:1px solid #e5e7eb;color:#111;}
+</style>
+{% endblock %}
+
+{% block result_list %}
+<div class="cards">
+
+{% for obj in cl.result_list %}
+<div class="card">
+
+    <!-- HEADER -->
+    <div class="header">
+        <div class="avatar">
+            {{ obj.applicant.full_name|slice:":1"|upper }}
+        </div>
+        <div>
+            <div class="title">{{ obj.applicant.full_name }}</div>
+            <div class="sub">
+                📌 {{ obj.job.title }} |
+                🏢 {{ obj.job.company }}
+            </div>
+        </div>
+    </div>
+
+    <div class="hr"></div>
+
+    <!-- DETAILS -->
+    <div class="sub">
+        📞 {{ obj.applicant.phone }} <br>
+        🎯 {{ obj.get_interview_type_display }} <br>
+        📅 {{ obj.interview_date }} ⏰ {{ obj.interview_time }} <br>
+        👤 Assigned: {{ obj.assigned_to|default:"—" }}
+    </div>
+
+    <div class="hr"></div>
+
+    <!-- STATUS -->
+    <div>
+        {{ obj.status_badge|safe }}
+    </div>
+
+    <div class="hr"></div>
+
+    <!-- ACTIONS -->
+    <div class="actions">
+
+        {% if obj.applicant.phone %}
+        <a class="call" href="tel:{{ obj.applicant.phone }}">📞 Call</a>
+
+        <a class="wa"
+           target="_blank"
+           href="https://wa.me/91{{ obj.applicant.phone|cut:'+' }}">
+           💬 WhatsApp
+        </a>
+        {% endif %}
+
+        <a class="edit"
+           href="{% url 'admin:jobs_interviewschedule_change' obj.id %}">
+           ✏️ Edit
+        </a>
+    </div>
+
+</div>
+{% endfor %}
+
+</div>
+{% endblock %}

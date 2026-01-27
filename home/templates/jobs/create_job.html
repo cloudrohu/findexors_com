@@ -1,0 +1,151 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Post a New Job</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100 min-h-screen pb-12">
+
+<div class="max-w-5xl mx-auto mt-10 bg-white rounded-3xl shadow-xl overflow-hidden">
+
+    <!-- HEADER -->
+    <div class="bg-indigo-600 px-8 py-6 text-white">
+        <h2 class="text-3xl font-bold">🚀 Create your job post</h2>
+        <p class="text-indigo-100">Fill all required details to publish job</p>
+    </div>
+
+    <form method="post" class="p-8 space-y-10">
+        {% csrf_token %}
+
+        <!-- ERRORS -->
+        {% if form.errors %}
+        <div class="bg-red-50 border-l-4 border-red-500 p-5 rounded-xl">
+            <h3 class="text-red-800 font-bold mb-2">Please correct the following errors:</h3>
+            <ul class="list-disc pl-6 text-red-700 text-sm">
+                {% for field in form %}
+                    {% for error in field.errors %}
+                        <li><strong>{{ field.label }}:</strong> {{ error }}</li>
+                    {% endfor %}
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+
+        <!-- BASIC INFO -->
+        <section>
+            <h3 class="text-xl font-bold border-b pb-2 mb-6">🏢 Basic Information</h3>
+            <div class="grid md:grid-cols-2 gap-6">
+                <div><label class="font-semibold">Company *</label>{{ form.company }}</div>
+                <div><label class="font-semibold">Job Title *</label>{{ form.title }}</div>
+                <div><label class="font-semibold">Category *</label>{{ form.category }}</div>
+                <div><label class="font-semibold">Openings *</label>{{ form.openings }}</div>
+            </div>
+        </section>
+
+        <!-- JOB TYPE -->
+        <section>
+            <h3 class="text-xl font-bold border-b pb-2 mb-6">🕒 Job Type *</h3>
+            <div class="flex gap-4">
+                {% for radio in form.job_type %}
+                <label class="flex items-center gap-2 px-5 py-2 border rounded-full cursor-pointer hover:bg-indigo-50">
+                    {{ radio.tag }} {{ radio.choice_label }}
+                </label>
+                {% endfor %}
+            </div>
+        </section>
+
+        <!-- WORK LOCATION -->
+        <section>
+            <h3 class="text-xl font-bold border-b pb-2 mb-6">📍 Work Location *</h3>
+            <div class="flex gap-4">
+                {% for radio in form.work_location_type %}
+                <label class="flex items-center gap-2 px-5 py-2 border rounded-full cursor-pointer hover:bg-indigo-50">
+                    {{ radio.tag }} {{ radio.choice_label }}
+                </label>
+                {% endfor %}
+            </div>
+        </section>
+
+        <!-- LOCATION -->
+        <section>
+            <h3 class="text-xl font-bold border-b pb-2 mb-6">🌍 Location</h3>
+            <div class="grid md:grid-cols-2 gap-6">
+                <div><label class="font-semibold">City *</label>{{ form.city }}</div>
+                <div><label class="font-semibold">Locality *</label>{{ form.locality }}</div>
+            </div>
+        </section>
+
+        <!-- GENDER -->
+        <section>
+            <h3 class="text-xl font-bold border-b pb-2 mb-6">👤 Gender *</h3>
+            <div class="flex gap-4">
+                {% for radio in form.gender %}
+                <label class="flex items-center gap-2 px-5 py-2 border rounded-full cursor-pointer hover:bg-indigo-50">
+                    {{ radio.tag }} {{ radio.choice_label }}
+                </label>
+                {% endfor %}
+            </div>
+        </section>
+
+        <!-- EXPERIENCE -->
+        <section>
+            <h3 class="text-xl font-bold border-b pb-2 mb-6">📈 Experience *</h3>
+            <div class="grid md:grid-cols-2 gap-6">
+                <div><label class="font-semibold">Min Experience (months)</label>{{ form.min_experience_months }}</div>
+                <div><label class="font-semibold">Max Experience (months)</label>{{ form.max_experience_months }}</div>
+            </div>
+        </section>
+
+        <!-- SALARY -->
+        <section>
+            <h3 class="text-xl font-bold border-b pb-2 mb-6">💰 Salary</h3>
+            <div class="grid md:grid-cols-3 gap-6">
+                <div><label class="font-semibold">Salary Type *</label>{{ form.salary_type }}</div>
+                <div><label class="font-semibold">Min Salary *</label>{{ form.salary_min }}</div>
+                <div><label class="font-semibold">Max Salary *</label>{{ form.salary_max }}</div>
+            </div>
+        </section>
+
+        <!-- DESCRIPTION -->
+        <section>
+            <h3 class="text-xl font-bold border-b pb-2 mb-6">📝 Job Description *</h3>
+            {{ form.description }}
+        </section>
+
+        <!-- REQUIREMENTS -->
+        <section>
+            <h3 class="text-xl font-bold border-b pb-2 mb-6">📌 Requirements</h3>
+            {{ form.requirements }}
+        </section>
+
+        <!-- SUBMIT -->
+        <div class="flex justify-end pt-6">
+            <button class="bg-indigo-600 hover:bg-indigo-700 text-white px-12 py-4 rounded-2xl font-bold shadow-lg">
+                Publish Job →
+            </button>
+        </div>
+    </form>
+</div>
+
+<script>
+document.getElementById("id_city")?.addEventListener("change", function(){
+    fetch(`/jobs/ajax/load-localities/?city_id=${this.value}`)
+    .then(res => res.json())
+    .then(data => {
+        const loc = document.getElementById("id_locality");
+        loc.innerHTML = "<option value=''>Select locality</option>";
+        data.forEach(i => {
+            const opt = document.createElement("option");
+            opt.value = i.id;
+            opt.textContent = i.name;
+            loc.appendChild(opt);
+        });
+    });
+});
+</script>
+
+</body>
+</html>

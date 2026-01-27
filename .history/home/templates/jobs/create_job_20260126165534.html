@@ -1,0 +1,144 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Create Job</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-50">
+
+<div class="max-w-5xl mx-auto my-10 bg-white rounded-2xl shadow-lg p-8">
+
+    <h2 class="text-2xl font-bold mb-6 flex items-center gap-2">
+        📝 Create your job post in 2 minutes
+    </h2>
+
+    {% if form.errors %}
+    <div class="bg-red-50 text-red-700 p-4 rounded-lg mb-6">
+        <b>Please fix errors:</b>
+        <ul class="list-disc pl-5">
+        {% for field in form %}
+            {% for error in field.errors %}
+                <li>{{ field.label }} : {{ error }}</li>
+            {% endfor %}
+        {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+
+
+<form method="post" class="space-y-8">
+    {% csrf_token %}
+
+    <div>
+        <label class="font-semibold">Company *</label>
+        {{ form.company }}
+    </div>
+
+    <div>
+        <label class="font-semibold">Job Title *</label>
+        {{ form.title }}
+    </div>
+
+    <div>
+        <label class="font-semibold">Job Category *</label>
+        {{ form.category }}
+    </div>
+
+    <div class="grid grid-cols-2 gap-6">
+        <div>
+            <label class="font-semibold">Openings *</label>
+            {{ form.openings }}
+        </div>
+        <div>
+            <label class="font-semibold">Job Type *</label>
+            {{ form.job_type }}
+        </div>
+    </div>
+
+    <div>
+        <label class="font-semibold">Work Location *</label>
+        <div class="flex gap-4 mt-2">
+            {% for radio in form.work_location_type %}
+                <label class="flex items-center gap-2 px-4 py-2 border rounded-full cursor-pointer">
+                    {{ radio.tag }} {{ radio.choice_label }}
+                </label>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="grid grid-cols-2 gap-6">
+        <div>
+            <label class="font-semibold">City *</label>
+            {{ form.city }}
+        </div>
+        <div>
+            <label class="font-semibold">Locality *</label>
+            {{ form.locality }}
+        </div>
+    </div>
+
+    <div>
+        <label class="font-semibold">Gender *</label>
+        <div class="flex gap-4 mt-2">
+            {% for radio in form.gender %}
+                <label class="flex items-center gap-2 px-4 py-2 border rounded-full cursor-pointer">
+                    {{ radio.tag }} {{ radio.choice_label }}
+                </label>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="grid grid-cols-2 gap-6">
+        <div>{{ form.min_experience_months.label_tag }}{{ form.min_experience_months }}</div>
+        <div>{{ form.max_experience_months.label_tag }}{{ form.max_experience_months }}</div>
+    </div>
+
+    <div>{{ form.salary_type.label_tag }}{{ form.salary_type }}</div>
+
+    <div class="grid grid-cols-2 gap-6">
+        <div>{{ form.salary_min.label_tag }}{{ form.salary_min }}</div>
+        <div>{{ form.salary_max.label_tag }}{{ form.salary_max }}</div>
+    </div>
+
+    <div class="grid grid-cols-2 gap-6">
+        <div>{{ form.start_time.label_tag }}{{ form.start_time }}</div>
+        <div>{{ form.end_time.label_tag }}{{ form.end_time }}</div>
+    </div>
+
+    <div>{{ form.working_days.label_tag }}{{ form.working_days }}</div>
+
+    <div>{{ form.description.label_tag }}{{ form.description }}</div>
+    <div>{{ form.requirements.label_tag }}{{ form.requirements }}</div>
+
+    <div class="flex justify-end">
+        <button class="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3 rounded-xl font-semibold">
+            Continue →
+        </button>
+    </div>
+</form>
+
+
+</div>
+
+<script>
+document.getElementById("id_city").addEventListener("change", function(){
+    fetch(`/jobs/ajax/load-localities/?city_id=${this.value}`)
+    .then(res => res.json())
+    .then(data => {
+        const loc = document.getElementById("id_locality");
+        loc.innerHTML = "<option value=''>Select locality</option>";
+        data.forEach(l => {
+            const o = document.createElement("option");
+            o.value = l.id;
+            o.textContent = l.name;
+            loc.appendChild(o);
+        });
+    });
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,159 @@
+{% extends "admin/change_list.html" %}
+{% load static %}
+
+{% block extrastyle %}
+{{ block.super }}
+<style>
+.cards{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(520px,1fr));
+    gap:18px;
+    margin-top:20px;
+}
+.card{
+    background:#fff;
+    border-radius:18px;
+    padding:18px;
+    border:1px solid #e5e7eb;
+    box-shadow:0 14px 34px rgba(15,23,42,.08);
+}
+.header{
+    display:flex;
+    gap:14px;
+}
+.avatar{
+    width:56px;height:56px;
+    border-radius:50%;
+    background:#e0e7ff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:900;
+    color:#1e40af;
+    font-size:18px;
+}
+.title{
+    font-weight:900;
+    font-size:16px;
+    color:#0f172a;
+}
+.sub{
+    font-size:13px;
+    color:#64748b;
+    margin-top:2px;
+}
+.badges{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    margin-top:8px;
+}
+.badge{
+    padding:6px 12px;
+    border-radius:999px;
+    font-size:12px;
+    font-weight:900;
+}
+.green{background:#dcfce7;color:#166534;}
+.blue{background:#dbeafe;color:#1d4ed8;}
+.yellow{background:#fef9c3;color:#854d0e;}
+.gray{background:#f1f5f9;color:#334155;}
+.red{background:#fee2e2;color:#991b1b;}
+
+.hr{border-top:1px solid #e5e7eb;margin:14px 0;}
+
+.actions{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+}
+.actions a{
+    padding:10px 16px;
+    border-radius:999px;
+    font-weight:900;
+    font-size:13px;
+    text-decoration:none;
+}
+.call{background:#0f766e;color:#fff;}
+.whatsapp{background:#25D366;color:#fff;}
+.edit{border:1px solid #e5e7eb;color:#0f172a;}
+</style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+{% endblock %}
+
+{% block result_list %}
+<div class="cards">
+{% for obj in cl.result_list %}
+<div class="card">
+
+    <!-- HEADER -->
+    <div class="header">
+        <div class="avatar">{{ obj.full_name|slice:":1"|upper }}</div>
+
+        <div>
+            <div class="title">{{ obj.full_name }}</div>
+            <div class="sub">
+                📞 {{ obj.phone }} |
+                ✉ {{ obj.email|default:"—" }}
+            </div>
+
+            <div class="badges">
+                <span class="badge blue">{{ obj.job.title }}</span>
+                <span class="badge gray">{{ obj.job.company }}</span>
+
+                {% if obj.status == "applied" %}
+                    <span class="badge yellow">New</span>
+                {% elif obj.status == "interview" %}
+                    <span class="badge blue">Interview</span>
+                {% elif obj.status == "selected" %}
+                    <span class="badge green">Selected</span>
+                {% elif obj.status == "rejected" %}
+                    <span class="badge red">Rejected</span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <hr class="hr">
+
+    <!-- DETAILS -->
+    <div class="sub">
+        📍 {{ obj.city }} {{ obj.locality }} <br>
+        💼 Exp: {{ obj.experience_months }} months <br>
+        💰 Expected: ₹{{ obj.expected_salary|default:"—" }} <br>
+        🗓 Applied: {{ obj.applied_at|date:"d M Y" }}
+    </div>
+
+    {% if obj.interview %}
+    <hr class="hr">
+    <div class="sub">
+        🎤 Interview: {{ obj.interview.interview_type }} <br>
+        📅 {{ obj.interview.interview_date }} {{ obj.interview.interview_time }} <br>
+        👤 {{ obj.interview.assigned_to|default:"—" }}
+    </div>
+    {% endif %}
+
+    <hr class="hr">
+
+    <!-- ACTIONS -->
+    <div class="actions">
+        <a class="call" href="tel:{{ obj.phone }}">
+            <i class="fa fa-phone"></i> Call
+        </a>
+
+        <a class="whatsapp"
+           target="_blank"
+           href="https://wa.me/91{{ obj.phone|cut:'+'|cut:' ' }}">
+            <i class="fab fa-whatsapp"></i> WhatsApp
+        </a>
+
+        <a class="edit"
+           href="{% url 'admin:jobs_jobapplicant_change' obj.id %}">
+            <i class="fa fa-pen"></i> Open
+        </a>
+    </div>
+
+</div>
+{% endfor %}
+</div>
+{% endblock %}

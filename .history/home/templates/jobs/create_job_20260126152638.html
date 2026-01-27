@@ -1,0 +1,153 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Create Job</title>
+    <style>
+        body{
+            font-family: Inter, sans-serif;
+            background:#f8fafc;
+        }
+        .container{
+            max-width:900px;
+            margin:30px auto;
+            background:#fff;
+            padding:30px;
+            border-radius:14px;
+            box-shadow:0 10px 30px rgba(0,0,0,.08);
+        }
+        h2{
+            margin-bottom:20px;
+        }
+        .field{
+            margin-bottom:18px;
+        }
+        label{
+            font-weight:600;
+            display:block;
+            margin-bottom:6px;
+        }
+        input, select, textarea{
+            width:100%;
+            padding:10px 12px;
+            border-radius:8px;
+            border:1px solid #d1d5db;
+            font-size:14px;
+        }
+        .row{
+            display:grid;
+            grid-template-columns:1fr 1fr;
+            gap:16px;
+        }
+        .submit{
+            margin-top:30px;
+            background:#2563eb;
+            color:#fff;
+            padding:12px 20px;
+            border:none;
+            border-radius:10px;
+            font-size:16px;
+            font-weight:700;
+            cursor:pointer;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+    <h2>📝 Create your job post in 2 minutes</h2>
+
+    <form method="post">
+        {% csrf_token %}
+
+        <!-- Company -->
+        <div class="field">
+            <label>Company *</label>
+            {{ form.company }}
+        </div>
+
+        <!-- Job title -->
+        <div class="field">
+            <label>Job Title *</label>
+            {{ form.title }}
+        </div>
+
+        <!-- Category -->
+        <div class="field">
+            <label>Job Category *</label>
+            {{ form.category }}
+        </div>
+
+        <!-- Openings + Job Type -->
+        <div class="row">
+            <div class="field">
+                <label>Number of Openings *</label>
+                {{ form.openings }}
+            </div>
+            <div class="field">
+                <label>Job Type *</label>
+                {{ form.job_type }}
+            </div>
+        </div>
+
+        <!-- Location -->
+        <div class="row">
+            <div class="field">
+                <label>City *</label>
+                {{ form.city }}
+            </div>
+            <div class="field">
+                <label>Locality *</label>
+                {{ form.locality }}
+            </div>
+        </div>
+
+        <!-- Experience -->
+        <div class="row">
+            <div class="field">
+                <label>Min Experience (months)</label>
+                {{ form.min_experience_months }}
+            </div>
+            <div class="field">
+                <label>Max Experience (months)</label>
+                {{ form.max_experience_months }}
+            </div>
+        </div>
+
+        <!-- ✅ SALARY TYPE (MISSING FIX) -->
+        <div class="field">
+            <label>Salary Type *</label>
+            {{ form.salary_type }}
+        </div>
+
+        <!-- Salary range -->
+        <div class="row">
+            <div class="field">
+                <label>Salary Min *</label>
+                {{ form.salary_min }}
+            </div>
+            <div class="field">
+                <label>Salary Max *</label>
+                {{ form.salary_max }}
+            </div>
+        </div>
+
+        <!-- Description -->
+        <div class="field">
+            <label>Job Description *</label>
+            {{ form.description }}
+        </div>
+
+        <!-- Requirements -->
+        <div class="field">
+            <label>Requirements</label>
+            {{ form.requirements }}
+        </div>
+
+        <button class="submit">Continue →</button>
+    </form>
+</div>
+
+</body>
+</html>

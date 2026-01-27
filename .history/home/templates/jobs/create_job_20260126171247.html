@@ -1,0 +1,87 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Post a New Job</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .form-input-style { @apply w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-white mt-1; }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen pb-10">
+
+<div class="max-w-4xl mx-auto mt-10 bg-white rounded-3xl shadow-xl overflow-hidden">
+    <div class="bg-indigo-600 p-8 text-white">
+        <h2 class="text-3xl font-bold flex items-center gap-3">🚀 Post a New Job</h2>
+        <p class="text-indigo-100 mt-1">Fill in the details to find your perfect candidate.</p>
+    </div>
+
+    <form method="post" class="p-8 space-y-10">
+        {% csrf_token %}
+
+        {% if form.errors %}
+        <div class="bg-red-50 border-l-4 border-red-500 p-6 rounded-xl">
+            <h3 class="text-red-800 font-bold text-lg mb-2">Please correct the following errors:</h3>
+            <ul class="text-red-700 text-sm list-disc pl-5">
+                {% for field in form %}{% for error in field.errors %}
+                    <li><strong>{{ field.label }}:</strong> {{ error }}</li>
+                {% endfor %}{% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+
+        <section>
+            <h3 class="text-xl font-bold text-gray-800 border-b pb-2 mb-6 flex items-center gap-2">🏢 Basic Information</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div><label class="font-semibold text-gray-600">Company</label>{{ form.company }}</div>
+                <div><label class="font-semibold text-gray-600">Job Title</label>{{ form.title }}</div>
+                <div><label class="font-semibold text-gray-600">Category</label>{{ form.category }}</div>
+                <div><label class="font-semibold text-gray-600">Number of Openings</label>{{ form.openings }}</div>
+            </div>
+        </section>
+
+        <section>
+            <h3 class="text-xl font-bold text-gray-800 border-b pb-2 mb-6 flex items-center gap-2">📍 Location</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div><label class="font-semibold text-gray-600">City</label>{{ form.city }}</div>
+                <div><label class="font-semibold text-gray-600">Locality</label>{{ form.locality }}</div>
+            </div>
+        </section>
+
+        <section>
+            <h3 class="text-xl font-bold text-gray-800 border-b pb-2 mb-6 flex items-center gap-2">💰 Salary & Type</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div><label class="font-semibold text-gray-600">Salary Type</label>{{ form.salary_type }}</div>
+                <div><label class="font-semibold text-gray-600">Min Salary</label>{{ form.salary_min }}</div>
+                <div><label class="font-semibold text-gray-600">Max Salary</label>{{ form.salary_max }}</div>
+            </div>
+        </section>
+
+        <div class="flex justify-end pt-6">
+            <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white px-12 py-4 rounded-2xl font-bold text-lg shadow-lg transition-transform active:scale-95">
+                Publish Job Listing →
+            </button>
+        </div>
+    </form>
+</div>
+
+<script>
+    // AJAX for Locality
+    document.getElementById("id_city")?.addEventListener("change", function(){
+        fetch(`/jobs/ajax/load-localities/?city_id=${this.value}`)
+        .then(res => res.json())
+        .then(data => {
+            let locSelect = document.getElementById("id_locality");
+            locSelect.innerHTML = '<option value="">Select locality</option>';
+            data.forEach(item => {
+                let opt = document.createElement("option");
+                opt.value = item.id;
+                opt.textContent = item.name;
+                locSelect.appendChild(opt);
+            });
+        });
+    });
+</script>
+</body>
+</html>
