@@ -40,7 +40,6 @@ class JobInline(admin.TabularInline):
         "salary_max",
         "status",
         "openings",
-        'description',
     )
 
     # 🔒 Auto-set values

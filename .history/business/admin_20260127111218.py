@@ -34,13 +34,11 @@ class JobInline(admin.TabularInline):
         "work_location_type",
         "city",
         "locality",
-        "category",
         "salary_type",
         "salary_min",
         "salary_max",
         "status",
         "openings",
-        'description',
     )
 
     # 🔒 Auto-set values
