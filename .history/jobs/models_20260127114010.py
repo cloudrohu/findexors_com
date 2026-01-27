@@ -46,16 +46,14 @@ class Job(models.Model):
         ("closed", "Closed"),
     ]
     Job_Category = [
-        ("Sales / Pre-Sales", "Sales / Pre-Sales"),
-        ("Telesales", "Telesales"),
-        ("Field Sales", "Field Sales"),
-        ("Customer Suppor", "Customer Suppor"),
+        ("draft", "Draft"),
+        ("active", "Active"),
+        ("closed", "Closed"),
     ]
 
     company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name="jobs")
     title = models.ForeignKey(JobTitle, on_delete=models.SET_NULL, null=True)
-    category = models.CharField(max_length=20, choices=Job_Category)
-
+    category = models.ForeignKey(JobCategory, on_delete=models.SET_NULL, null=True)
     industry = models.ForeignKey(JobIndustry, on_delete=models.SET_NULL, null=True, blank=True)
 
     slug = models.SlugField(max_length=255, unique=True, blank=True)

@@ -46,10 +46,9 @@ class Job(models.Model):
         ("closed", "Closed"),
     ]
     Job_Category = [
-        ("Sales / Pre-Sales", "Sales / Pre-Sales"),
-        ("Telesales", "Telesales"),
-        ("Field Sales", "Field Sales"),
-        ("Customer Suppor", "Customer Suppor"),
+        ("draft", "Draft"),
+        ("active", "Active"),
+        ("closed", "Closed"),
     ]
 
     company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name="jobs")
