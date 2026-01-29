@@ -102,9 +102,6 @@ class Job(models.Model):
 
     def __str__(self):
         return f"{self.title} | {self.company}"
-from django.db import models
-from django.utils import timezone
-
 
 class JobApplicant(models.Model):
 
@@ -132,95 +129,32 @@ class JobApplicant(models.Model):
         ("60_days", "60 Days"),
     ]
 
-    # 🔹 Relations
-    job = models.ForeignKey(
-        Job,
-        on_delete=models.CASCADE,
-        related_name="applications"
-    )
+    job = models.ForeignKey(Job, on_delete=models.CASCADE, related_name="applications")
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
 
-    user = models.ForeignKey(
-        User,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True
-    )
-
-    city = models.ForeignKey(
-        City,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True
-    )
-
-    locality = models.ForeignKey(
-        Locality,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True
-    )
-
-    # 🔹 Basic info
     full_name = models.CharField(max_length=150)
     phone = models.CharField(max_length=15)
-    email = models.EmailField(blank=True, null=True)
+    email = models.EmailField(null=True, blank=True)
+    city = models.ForeignKey(City, on_delete=models.SET_NULL, null=True,null=True, blank=True)
+    locality = models.ForeignKey(Locality, on_delete=models.SET_NULL, null=True,null=True, blank=True)
 
-    resume = models.FileField(
-        upload_to="resumes/",
-        blank=True,
-        null=True
-    )
+    resume = models.FileField(upload_to="resumes/", blank=True, null=True)
 
-    # 🔹 Career info
     experience_months = models.PositiveIntegerField(default=0)
+    current_company = models.CharField(max_length=150, blank=True)
+    current_salary = models.PositiveIntegerField(blank=True, null=True)
+    expected_salary = models.PositiveIntegerField(blank=True, null=True)
+    notice_period = models.CharField(max_length=20, choices=NOTICE_PERIOD_CHOICES, blank=True)
 
-    current_company = models.CharField(
-        max_length=150,
-        blank=True,
-        null=True
-    )
+    expected_joining_date = models.DateField(blank=True, null=True)
 
-    current_salary = models.PositiveIntegerField(
-        blank=True,
-        null=True
-    )
+    cover_letter = models.TextField(blank=True)
+    internal_notes = models.TextField(blank=True)
 
-    expected_salary = models.PositiveIntegerField(
-        blank=True,
-        null=True
-    )
-
-    notice_period = models.CharField(
-        max_length=20,
-        choices=NOTICE_PERIOD_CHOICES,
-        blank=True,
-        null=True
-    )
-
-    expected_joining_date = models.DateField(
-        blank=True,
-        null=True
-    )
-
-    # 🔹 Notes
-    cover_letter = models.TextField(blank=True, null=True)
-    internal_notes = models.TextField(blank=True, null=True)
-
-    # 🔹 Tracking
-    apply_source = models.CharField(
-        max_length=20,
-        choices=APPLY_SOURCE_CHOICES,
-        default="website"
-    )
-
+    apply_source = models.CharField(max_length=20, choices=APPLY_SOURCE_CHOICES, default="website")
     allow_whatsapp = models.BooleanField(default=True)
 
-    status = models.CharField(
-        max_length=20,
-        choices=APPLICATION_STATUS,
-        default="applied"
-    )
-
+    status = models.CharField(max_length=20, choices=APPLICATION_STATUS, default="applied")
     applied_at = models.DateTimeField(default=timezone.now)
     status_updated_at = models.DateTimeField(auto_now=True)
 
