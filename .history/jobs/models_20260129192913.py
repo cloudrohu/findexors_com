@@ -237,6 +237,7 @@ class JobApplicant(models.Model):
 
     def __str__(self):
         return f"{self.full_name} → {self.job}"
+    
 class InterviewSchedule(models.Model):
 
     INTERVIEW_TYPE_CHOICES = [
@@ -258,9 +259,6 @@ class InterviewSchedule(models.Model):
         ("follow_up", "Follow Up Required"),
     ]
 
-    # ==========================
-    # RELATIONS
-    # ==========================
     applicant = models.OneToOneField(
         JobApplicant,
         on_delete=models.CASCADE,
@@ -281,30 +279,13 @@ class InterviewSchedule(models.Model):
         related_name="interviews"
     )
 
-    # ==========================
-    # INTERVIEW CORE
-    # ==========================
     scheduled_datetime = models.DateTimeField()
-
-    interview_type = models.CharField(
-        max_length=20,
-        choices=INTERVIEW_TYPE_CHOICES
-    )
-
     duration_minutes = models.PositiveIntegerField(default=30)
-
     rescheduled_from = models.DateTimeField(blank=True, null=True)
 
-    # ==========================
-    # MEETING
-    # ==========================
     meeting_link = models.URLField(blank=True, null=True)
-
     location = models.CharField(max_length=255, blank=True, null=True)
 
-    # ==========================
-    # STATUS & NOTES
-    # ==========================
     status = models.CharField(
         max_length=20,
         choices=INTERVIEW_STATUS_CHOICES,
@@ -312,12 +293,8 @@ class InterviewSchedule(models.Model):
     )
 
     remarks = models.TextField(blank=True, null=True)
-
     internal_feedback = models.TextField(blank=True, null=True)
 
-    # ==========================
-    # CRM TRACKING
-    # ==========================
     whatsapp_sent = models.BooleanField(default=False)
     reminder_sent = models.BooleanField(default=False)
     confirmation_received = models.BooleanField(default=False)
@@ -325,15 +302,9 @@ class InterviewSchedule(models.Model):
     last_contacted_at = models.DateTimeField(blank=True, null=True)
     next_followup_at = models.DateTimeField(blank=True, null=True)
 
-    # ==========================
-    # META
-    # ==========================
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    # ==========================
-    # AUTO JOB SYNC
-    # ==========================
     def save(self, *args, **kwargs):
         if self.applicant and not self.job_id:
             self.job = self.applicant.job

@@ -101,33 +101,6 @@ class JobApplicantAdmin(admin.ModelAdmin):
         "job__title__name",
     )
 
-    def get_search_results(self, request, queryset, search_term):
-        queryset, use_distinct = super().get_search_results(request, queryset, search_term)
-
-        if search_term:
-            term = search_term.upper().strip()
-
-            if term.startswith("JA"):
-                num = term.replace("JA", "").lstrip("0")
-                if num.isdigit():
-                    queryset |= self.model.objects.filter(id=int(num))
-
-            if term.startswith("J"):
-                num = term.replace("J", "").lstrip("0")
-                if num.isdigit():
-                    queryset |= self.model.objects.filter(job__id=int(num))
-
-            if term.startswith("I"):
-                num = term.replace("I", "").lstrip("0")
-                if num.isdigit():
-                    queryset |= self.model.objects.filter(interview__id=int(num))
-
-            if term.isdigit():
-                queryset |= self.model.objects.filter(phone__icontains=term)
-
-        return queryset, use_distinct
-
-
     readonly_fields = ("applied_at", "status_updated_at")
 
     inlines = [InterviewInline]

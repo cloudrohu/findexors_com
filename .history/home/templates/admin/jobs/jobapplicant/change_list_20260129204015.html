@@ -3,9 +3,6 @@
 
 {% block extrastyle %}
 {{ block.super }}
-
-
-
 <style>
 
 .cards{
@@ -15,8 +12,6 @@
     margin-top:20px;
 }
 
-/* ================= CARD ================= */
-
 .card{
     background:#fff;
     border-radius:18px;
@@ -25,12 +20,9 @@
     box-shadow:0 14px 34px rgba(15,23,42,.08);
 }
 
-/* ================= HEADER ================= */
-
 .header{
     display:flex;
     gap:14px;
-    align-items:flex-start;
 }
 
 .avatar{
@@ -44,7 +36,6 @@
     font-weight:900;
     color:#1e40af;
     font-size:18px;
-    flex-shrink:0;
 }
 
 .title{
@@ -59,8 +50,6 @@
     margin-top:2px;
 }
 
-/* ================= BADGES ================= */
-
 .badges{
     display:flex;
     gap:8px;
@@ -68,18 +57,11 @@
     margin-top:8px;
 }
 
-.badge,
-.id-badge{
+.badge{
     padding:6px 12px;
     border-radius:999px;
     font-size:12px;
     font-weight:900;
-    white-space:nowrap;
-}
-
-.id-badge{
-    background:#111827;
-    color:white;
 }
 
 .blue{background:#dbeafe;color:#1d4ed8;}
@@ -93,8 +75,6 @@
     margin:14px 0;
 }
 
-/* ================= ACTIONS ================= */
-
 .actions{
     display:flex;
     gap:10px;
@@ -107,70 +87,22 @@
     font-weight:900;
     font-size:13px;
     text-decoration:none;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    gap:6px;
 }
 
 .call{background:#0f766e;color:#fff;}
 .whatsapp{background:#25D366;color:#fff;}
-.edit{border:1px solid #e5e7eb;color:#0f172a;background:#fff;}
+.edit{border:1px solid #e5e7eb;color:#0f172a;}
 
-/* ==================================================
-   ✅ MOBILE FIX (IMPORTANT PART)
-   ================================================== */
-
-@media (max-width: 640px){
-
-    .cards{
-        grid-template-columns:1fr !important;
-        gap:14px;
-        padding:0 6px;
-    }
-
-    .card{
-        padding:14px;
-        border-radius:16px;
-    }
-
-    .header{
-        flex-direction:row;
-        align-items:center;
-    }
-
-    .title{
-        font-size:15px;
-    }
-
-    .sub{
-        font-size:12px;
-    }
-
-    .badge,
-    .id-badge{
-        font-size:11px;
-        padding:5px 10px;
-    }
-
-    /* 🔥 Buttons full width on mobile */
-    .actions a{
-        flex:1;
-        min-width:120px;
-    }
-
-    /* 🚫 Remove horizontal scroll from admin */
-    #content,
-    .content,
-    .results,
-    #container{
-        max-width:100% !important;
-        overflow-x:hidden !important;
-    }
+.id-badge{
+    background:#111827;
+    color:white;
+    padding:4px 10px;
+    border-radius:999px;
+    font-size:11px;
+    font-weight:900;
 }
 
 </style>
-
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 {% endblock %}

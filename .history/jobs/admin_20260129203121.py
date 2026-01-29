@@ -4,24 +4,43 @@ from .models import Job, JobApplicant, InterviewSchedule
 from django.utils.html import format_html
 
 
+# =====================================================
+# INTERVIEW INLINE (ONE TO ONE)
+# =====================================================
 class InterviewInline(admin.StackedInline):
     model = InterviewSchedule
     extra = 0
     max_num = 1
-    can_delete = True
+    can_delete = False
+    show_change_link = True
 
-    readonly_fields = ("created_at", "updated_at", "job")
+    exclude = ("job",)  # 🔒 job hidden (auto set)
 
-    fields = (
-        "scheduled_datetime",
-        "duration_minutes",
-        "assigned_to",
-        "status",
-        "remarks",
-        "whatsapp_sent",
-        "reminder_sent",
-        "confirmation_received",
+    fieldsets = (
+        ("📞 Interview Details", {
+            "fields": (
+                "interview_type",
+                ("interview_date", "interview_time"),
+                "duration_minutes",
+                "assigned_to",
+            )
+        }),
+        ("📍 Meeting Info", {
+            "fields": (
+                "meeting_link",
+                "location",
+            )
+        }),
+        ("📝 Status & Notes", {
+            "fields": (
+                "status",
+                "remarks",
+                ("whatsapp_sent", "reminder_sent"),
+            )
+        }),
     )
+
+    readonly_fields = ("created_at", "updated_at")
 
 
 # =====================================================
@@ -78,55 +97,30 @@ class JobAdmin(admin.ModelAdmin):
         return obj.title.name if obj.title else "-"
     job_title.short_description = "Job Title"
 
+
+# =====================================================
+# JOB APPLICANT ADMIN (IMPORT / EXPORT READY)
+# =====================================================
 @admin.register(JobApplicant)
 class JobApplicantAdmin(admin.ModelAdmin):
 
+#class JobApplicantAdmin(ImportExportModelAdmin):
     change_list_template = "admin/jobs/jobapplicant/change_list.html"
 
     list_display = (
-        "id",
-        "full_name",
-        "job",
-        "phone",
-        "status",
-        "applied_at",
+        "full_name", "job", "phone",
+        "apply_source", "status", "applied_at",
     )
 
-    list_filter = ("status", "apply_source", "job", "city")
+    list_filter = (
+        "status", "apply_source",
+        "job", "city",
+    )
 
     search_fields = (
-        "full_name",
-        "phone",
-        "email",
-        "job__title__name",
+        "full_name", "phone",
+        "email", "job__title__name",
     )
-
-    def get_search_results(self, request, queryset, search_term):
-        queryset, use_distinct = super().get_search_results(request, queryset, search_term)
-
-        if search_term:
-            term = search_term.upper().strip()
-
-            if term.startswith("JA"):
-                num = term.replace("JA", "").lstrip("0")
-                if num.isdigit():
-                    queryset |= self.model.objects.filter(id=int(num))
-
-            if term.startswith("J"):
-                num = term.replace("J", "").lstrip("0")
-                if num.isdigit():
-                    queryset |= self.model.objects.filter(job__id=int(num))
-
-            if term.startswith("I"):
-                num = term.replace("I", "").lstrip("0")
-                if num.isdigit():
-                    queryset |= self.model.objects.filter(interview__id=int(num))
-
-            if term.isdigit():
-                queryset |= self.model.objects.filter(phone__icontains=term)
-
-        return queryset, use_distinct
-
 
     readonly_fields = ("applied_at", "status_updated_at")
 
