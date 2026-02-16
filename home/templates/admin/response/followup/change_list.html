@@ -1,0 +1,35 @@
+{% extends "admin/change_list.html" %}
+{% block result_list %}
+
+<div class="cards">
+
+{% for obj in cl.result_list %}
+<div class="card">
+
+    <div class="title">
+        Followup {{ obj.id }}
+    </div>
+
+    <div class="meta">
+        📞 {{ obj.response.contact_no|default:"—" }} <br>
+        📅 {{ obj.followup_date|date:"d M Y, h:i A" }} <br>
+        👤 {{ obj.assigned_to|default:"—" }}
+    </div>
+
+    <div class="meta">
+        Status:
+        <strong>{{ obj.get_status_display }}</strong>
+    </div>
+
+    <div class="actions">
+        <a class="open"
+           href="{% url 'admin:response_followup_change' obj.id %}">
+           Open
+        </a>
+    </div>
+
+</div>
+{% endfor %}
+</div>
+
+{% endblock %}

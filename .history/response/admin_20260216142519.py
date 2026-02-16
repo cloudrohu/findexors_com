@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.db import models
 from django.utils.html import format_html
+from rangefilter.filters import DateRangeFilter
 
 from .models import (
     Staff,
@@ -30,11 +31,11 @@ class AutoUserAdminMixin:
 
 
 # =====================================================
-# 🔹 MAGIC SEARCH MIXIN
+# 🔹 COMMON MAGIC SEARCH MIXIN
 # =====================================================
 
 class MagicSearchMixin:
-    prefix_map = {}
+    prefix_map = {}  # {"MR": "response__id", "MT": "id"}
 
     def get_search_results(self, request, queryset, search_term):
         queryset, use_distinct = super().get_search_results(request, queryset, search_term)
@@ -60,7 +61,7 @@ class MagicSearchMixin:
 
 
 # =====================================================
-# 🔹 RESPONSE ADMIN (CARD VIEW READY)
+# 🔹 RESPONSE ADMIN
 # =====================================================
 
 @admin.register(Response)
@@ -77,6 +78,7 @@ class ResponseAdmin(AutoUserAdminMixin, MagicSearchMixin, admin.ModelAdmin):
         "status",
         "lead_source",
         "contact_no",
+        "whatsapp_status",
         "business_name",
         "business_category",
         "city",
@@ -102,15 +104,14 @@ class ResponseAdmin(AutoUserAdminMixin, MagicSearchMixin, admin.ModelAdmin):
         "city",
         "locality",
         "is_converted",
+        "whatsapp_welcome_sent",
+        "whatsapp_followup_1_sent",
+        "whatsapp_followup_2_sent",
+        ("create_at", DateRangeFilter),
+        ("update_at", DateRangeFilter),
     )
 
-    readonly_fields = (
-        "created_by",
-        "updated_by",
-        "create_at",
-        "update_at",
-        "converted_at",
-    )
+    readonly_fields = ("created_by", "updated_by", "create_at", "update_at", "converted_at")
 
     date_hierarchy = "create_at"
 
@@ -140,6 +141,12 @@ class ResponseAdmin(AutoUserAdminMixin, MagicSearchMixin, admin.ModelAdmin):
     def mr_id(self, obj):
         return f"MR{str(obj.id).zfill(3)}"
     mr_id.short_description = "Response ID"
+
+    def whatsapp_status(self, obj):
+        if obj.whatsapp_welcome_sent:
+            return format_html("<span style='color:green;font-weight:700;'>Sent</span>")
+        return format_html("<span style='color:red;font-weight:700;'>Not Sent</span>")
+    whatsapp_status.short_description = "WhatsApp"
 
 
 # =====================================================
@@ -176,18 +183,14 @@ class MeetingAdmin(AutoUserAdminMixin, MagicSearchMixin, admin.ModelAdmin):
     list_filter = (
         "status",
         "assigned_to",
-        "meeting_date",
-        "response__city",
-        "response__locality",
-        "response__business_category",
+        ("meeting_date", DateRangeFilter),
+        ("create_at", DateRangeFilter),
+        ("response__city", admin.RelatedOnlyFieldListFilter),
+        ("response__locality", admin.RelatedOnlyFieldListFilter),
+        ("response__business_category", admin.RelatedOnlyFieldListFilter),
     )
 
-    readonly_fields = (
-        "created_by",
-        "updated_by",
-        "create_at",
-        "update_at",
-    )
+    readonly_fields = ("created_by", "updated_by", "create_at", "update_at")
 
     def mt_id(self, obj):
         return f"MT{str(obj.id).zfill(3)}"
@@ -228,18 +231,14 @@ class FollowupAdmin(AutoUserAdminMixin, MagicSearchMixin, admin.ModelAdmin):
     list_filter = (
         "status",
         "assigned_to",
-        "followup_date",
-        "response__city",
-        "response__locality",
-        "response__business_category",
+        ("followup_date", DateRangeFilter),
+        ("create_at", DateRangeFilter),
+        ("response__city", admin.RelatedOnlyFieldListFilter),
+        ("response__locality", admin.RelatedOnlyFieldListFilter),
+        ("response__business_category", admin.RelatedOnlyFieldListFilter),
     )
 
-    readonly_fields = (
-        "created_by",
-        "updated_by",
-        "create_at",
-        "update_at",
-    )
+    readonly_fields = ("created_by", "updated_by", "create_at", "update_at")
 
     def fu_id(self, obj):
         return f"FU{str(obj.id).zfill(3)}"
@@ -262,12 +261,7 @@ class CommentAdmin(AutoUserAdminMixin, MagicSearchMixin, admin.ModelAdmin):
         "MR": "response__id",
     }
 
-    list_display = (
-        "cm_id",
-        "response",
-        "create_at",
-        "created_by",
-    )
+    list_display = ("cm_id", "response", "create_at", "created_by")
 
     search_fields = (
         "response__contact_no",
@@ -276,18 +270,13 @@ class CommentAdmin(AutoUserAdminMixin, MagicSearchMixin, admin.ModelAdmin):
     )
 
     list_filter = (
-        "response__status",
-        "response__business_category",
-        "response__city",
-        "response__locality",
+        ("create_at", DateRangeFilter),
+        ("response__status", admin.RelatedOnlyFieldListFilter),
+        ("response__business_category", admin.RelatedOnlyFieldListFilter),
+        ("response__city", admin.RelatedOnlyFieldListFilter),
     )
 
-    readonly_fields = (
-        "create_at",
-        "update_at",
-        "created_by",
-        "updated_by",
-    )
+    readonly_fields = ("create_at", "update_at", "created_by", "updated_by")
 
     def cm_id(self, obj):
         return f"CM{str(obj.id).zfill(3)}"
@@ -310,12 +299,7 @@ class VoiceRecordingAdmin(AutoUserAdminMixin, MagicSearchMixin, admin.ModelAdmin
         "MR": "response__id",
     }
 
-    list_display = (
-        "vr_id",
-        "response",
-        "uploaded_by",
-        "uploaded_at",
-    )
+    list_display = ("vr_id", "response", "uploaded_by", "uploaded_at")
 
     search_fields = (
         "response__contact_no",
@@ -323,16 +307,13 @@ class VoiceRecordingAdmin(AutoUserAdminMixin, MagicSearchMixin, admin.ModelAdmin
     )
 
     list_filter = (
-        "response__status",
-        "response__business_category",
-        "response__city",
-        "response__locality",
+        ("uploaded_at", DateRangeFilter),
+        ("response__status", admin.RelatedOnlyFieldListFilter),
+        ("response__business_category", admin.RelatedOnlyFieldListFilter),
+        ("response__city", admin.RelatedOnlyFieldListFilter),
     )
 
-    readonly_fields = (
-        "uploaded_at",
-        "uploaded_by",
-    )
+    readonly_fields = ("uploaded_at", "uploaded_by")
 
     def vr_id(self, obj):
         return f"VR{str(obj.id).zfill(3)}"
@@ -346,8 +327,4 @@ class VoiceRecordingAdmin(AutoUserAdminMixin, MagicSearchMixin, admin.ModelAdmin
 @admin.register(Staff)
 class StaffAdmin(admin.ModelAdmin):
     list_display = ("id", "user")
-    search_fields = (
-        "user__username",
-        "user__first_name",
-        "user__last_name",
-    )
+    search_fields = ("user__username", "user__first_name", "user__last_name")

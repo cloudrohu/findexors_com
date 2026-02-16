@@ -1,0 +1,383 @@
+{% extends "admin/change_list.html" %}
+{% load static %}
+
+{% block extrastyle %}
+{{ block.super }}
+<style>
+/* =========================
+   ✅ PU ADMIN CARD CSS (FINAL)
+   ========================= */
+
+.cards{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(520px,1fr));
+    gap:18px;
+    margin-top:20px;
+}
+
+/* Card */
+.card{
+    background:#fff;
+    border-radius:18px;
+    box-shadow:0 14px 34px rgba(15,23,42,.10);
+    padding:18px;
+    border:1px solid #eef2f7;
+    width:100%;
+    overflow:hidden;
+}
+
+/* Header */
+.header{
+    display:flex;
+    align-items:flex-start;
+    gap:14px;
+}
+
+/* Avatar */
+.avatar{
+    width:56px;
+    height:56px;
+    border-radius:999px;
+    background:#eaf2ff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    overflow:hidden;
+    border:2px solid #e5efff;
+    flex:0 0 auto;
+}
+.avatar img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+}
+
+/* Title + Top Row */
+.title-wrap{flex:1;}
+.top-row{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    flex-wrap:wrap;
+}
+.main-title{
+    font-size:17px;
+    font-weight:900;
+    color:#0f172a;
+    line-height:1.25;
+}
+
+/* Subline */
+.subline{
+    margin-top:4px;
+    font-size:12px;
+    color:#64748b;
+    display:flex;
+    gap:12px;
+    flex-wrap:wrap;
+}
+
+/* Badges */
+.badges{
+    margin-top:10px;
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+}
+
+.badge{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    padding:6px 12px;
+    font-size:12px;
+    border-radius:999px;
+    font-weight:900;
+    background:#f1f5f9;
+    color:#0f172a;
+    line-height:1;
+    white-space:nowrap;
+}
+
+.badge.green{background:#dcfce7;color:#166534;}
+.badge.blue{background:#dbeafe;color:#1d4ed8;}
+.badge.yellow{background:#fef9c3;color:#854d0e;}
+.badge.gray{background:#f3f4f6;color:#111827;}
+.badge.red{background:#fee2e2;color:#991b1b;}
+
+/* Divider */
+.hr{
+    border:none;
+    border-top:1px solid #eaeef5;
+    margin:14px 0;
+}
+
+/* Requirement chips */
+.chips{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-top:10px;
+}
+.chip{
+    padding:6px 12px;
+    border-radius:999px;
+    background:#ffffff;
+    border:1px solid #e5e7eb;
+    font-size:12px;
+    font-weight:900;
+    color:#0f172a;
+}
+
+/* Info list (Assigned/Created/Updated) */
+.info{
+    display:grid;
+    gap:8px;
+}
+.info .line{
+    display:flex;
+    gap:8px;
+    align-items:flex-start;
+    font-size:13px;
+    color:#0f172a;
+}
+.info .line span{
+    color:#334155;
+    font-weight:700;
+}
+
+/* Detail blocks (Meeting / Followup / Comment / Voice) */
+.block{
+    margin-top:12px;
+    padding:12px 14px;
+    border-radius:14px;
+    border:1px solid #eef2f7;
+    background:#fbfdff;
+}
+.block-title{
+    font-weight:900;
+    color:#0f172a;
+    margin-bottom:10px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+}
+.block .row{
+    display:grid;
+    gap:6px;
+    font-size:13px;
+    color:#334155;
+}
+.block .row b{color:#0f172a;}
+
+/* Actions */
+.actions{
+    margin-top:14px;
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+}
+.actions a{
+    padding:10px 16px;
+    border-radius:999px;
+    font-size:13px;
+    font-weight:900;
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    text-decoration:none;
+    border:1px solid transparent;
+}
+.call-btn{background:#0f766e;color:#fff;}
+.whatsapp-btn{background:#25D366;color:#fff;}
+.edit-btn{background:#fff;border:1px solid #e5e7eb;color:#0f172a;}
+.actions a i{font-size:15px;}
+
+/* =========================================
+   ✅ MOBILE FIX
+   ========================================= */
+@media (max-width: 640px){
+    .cards{
+        grid-template-columns:1fr !important;
+        gap:14px !important;
+        padding:0 6px !important;
+    }
+    .card{
+        padding:14px !important;
+        border-radius:16px !important;
+    }
+    #content{
+        padding:10px !important;
+    }
+    .results, .content, #container{
+        overflow-x:hidden !important;
+        max-width:100% !important;
+    }
+    .avatar{width:48px;height:48px;}
+    .main-title{font-size:15px !important;}
+    .badge{font-size:11px !important;padding:6px 10px !important;}
+    .actions a{
+        flex:1;
+        min-width:120px;
+        justify-content:center;
+        padding:10px 12px;
+    }
+}
+</style>
+
+<link rel="stylesheet"
+ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+{% endblock %}
+
+
+{% block result_list %}
+<div class="cards">
+
+{% for obj in cl.result_list %}
+<div class="card">
+
+    <!-- ================= HEADER ================= -->
+    <div class="header">
+        <div class="avatar">
+            <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="avatar">
+        </div>
+
+        <div class="title-wrap">
+            <div class="top-row">
+                <span class="badge green">MR{{ obj.id|stringformat:"03d" }}</span>
+                <div class="main-title">{{ obj.business_name|default:"No Business Name" }}</div>
+            </div>
+
+            <div class="subline">
+                <span>👤 {{ obj.contact_persone|default:"—" }}</span>
+                <span>📞 {{ obj.contact_no|default:"—" }}</span>
+            </div>
+
+            <!-- Requirement Types -->
+            <div class="chips">
+                {% for rt in obj.requirement_types.all %}
+                    <span class="chip">{{ rt.name }}</span>
+                {% empty %}
+                    <span class="chip">No Requirement</span>
+                {% endfor %}
+            </div>
+
+            <!-- Status badges -->
+            <div class="badges">
+                <span class="badge blue">{{ obj.status|default:"New" }}</span>
+
+                {% if obj.business_category %}
+                    <span class="badge yellow">{{ obj.business_category }}</span>
+                {% endif %}
+
+                {% if obj.city %}
+                    <span class="badge gray">📍 {{ obj.city }}</span>
+                {% endif %}
+
+                {% if obj.locality %}
+                    <span class="badge gray">🏘 {{ obj.locality }}</span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <hr class="hr">
+
+    <!-- ================= BASIC INFO ================= -->
+    <div class="info">
+        <div class="line">🧑‍💼 <span><b>Assigned:</b> {{ obj.assigned_to|default:"—" }}</span></div>
+        <div class="line">🕒 <span><b>Created:</b> {{ obj.create_at|date:"d M Y, h:i A"|default:"—" }}</span></div>
+        <div class="line">✏️ <span><b>Updated:</b> {{ obj.update_at|date:"d M Y, h:i A"|default:"—" }}</span></div>
+    </div>
+
+    <hr class="hr">
+
+    <!-- ================= LAST MEETING ================= -->
+    {% with last_meeting=obj.meetings.last %}
+    {% if last_meeting %}
+    <div class="block">
+        <div class="block-title">🤝 Last Meeting</div>
+        <div class="row">
+            <div>✅ <b>Status:</b> {{ last_meeting.status|default:"—" }}</div>
+            <div>📅 <b>Date:</b> {{ last_meeting.meeting_date|date:"d M Y, h:i A"|default:"—" }}</div>
+            <div>👤 <b>Assigned:</b> {{ last_meeting.assigned_to|default:"—" }}</div>
+            <div>💬 <b>Comment:</b> {{ last_meeting.comment|default:"—"|truncatechars:180 }}</div>
+        </div>
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    <!-- ================= LAST FOLLOWUP ================= -->
+    {% with last_followup=obj.followups.last %}
+    {% if last_followup %}
+    <div class="block">
+        <div class="block-title">🔁 Last Followup</div>
+        <div class="row">
+            <div>✅ <b>Status:</b> {{ last_followup.status|default:"—" }}</div>
+            <div>📅 <b>Date:</b> {{ last_followup.followup_date|date:"d M Y, h:i A"|default:"—" }}</div>
+            <div>👤 <b>Assigned:</b> {{ last_followup.assigned_to|default:"—" }}</div>
+            <div>💬 <b>Comment:</b> {{ last_followup.comment|default:"—"|truncatechars:180 }}</div>
+        </div>
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    <!-- ================= LAST COMMENT ================= -->
+    {% with last_comment=obj.comments.last %}
+    {% if last_comment %}
+    <div class="block">
+        <div class="block-title">💬 Last Comment</div>
+        <div class="row">
+            <div>📝 <b>Text:</b> {{ last_comment.comment|truncatechars:220 }}</div>
+            <div>👤 <b>By:</b> {{ last_comment.created_by|default:"—" }}</div>
+            <div>🕒 <b>Time:</b> {{ last_comment.create_at|date:"d M Y, h:i A"|default:"—" }}</div>
+        </div>
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    <!-- ================= LAST RECORDING ================= -->
+    {% with last_voice=obj.recordings.last %}
+    {% if last_voice %}
+    <div class="block">
+        <div class="block-title">🎤 Voice Recording</div>
+        <div class="row">
+            <div>📂 <b>File:</b> <a href="{{ last_voice.file.url }}" target="_blank">Play / Download</a></div>
+            <div>👤 <b>By:</b> {{ last_voice.uploaded_by|default:"—" }}</div>
+            <div>🕒 <b>Time:</b> {{ last_voice.uploaded_at|date:"d M Y, h:i A"|default:"—" }}</div>
+        </div>
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    <hr class="hr">
+
+<!-- ================= ACTIONS ================= -->
+<div class="actions">
+    {% if obj.contact_no %}
+
+    <a class="call-btn" href="tel:+91{{ obj.contact_no }}">
+        <i class="fas fa-phone"></i> Call
+    </a>
+
+    <a class="whatsapp-btn"
+       href="https://wa.me/91{{ obj.contact_no }}?text=Hello%20👋%20{{ obj.contact_persone|default:'Sir/Madam' }}%2C%0A%0A✅%20We%20have%20received%20your%20response%20from%20our%20online%20advertisement.%0A%0AThank%20you%20for%20contacting%20*Google%20Findexor%20-%20Digital%20Marketing%20Experts*%20🚀%0A%0AWe%20help%20businesses%20grow%20with%3A%0A✅%20Professional%20Website%20Development%0A✅%20Google%2C%20Facebook%20%26%20Instagram%20Ads%0A✅%20SEO%20%26%20High-Quality%20Lead%20Generation%0A%0A🎁%203%20Months%20FREE%20Trial%0A❌%20No%20Advance%20Charges%0A💰%20Affordable%20Plans%0A%0APlease%20reply%20with%3A%0A1️⃣%20Business%20Type%0A2️⃣%20City%0A3️⃣%20Requirement%20(Website%20%2F%20Ads%20%2F%20Both)%0A%0AOur%20expert%20will%20guide%20you%20shortly%20📞"
+       target="_blank">
+        <i class="fab fa-whatsapp"></i> WhatsApp
+    </a>
+
+    {% endif %}
+
+    <a class="edit-btn" href="{% url 'admin:response_response_change' obj.id %}">
+        <i class="fas fa-pen"></i> Edit
+    </a>
+</div>
+
+
+
+
+</div>
+{% endfor %}
+
+</div>
+{% endblock %}
