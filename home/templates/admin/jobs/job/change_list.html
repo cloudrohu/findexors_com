@@ -1,0 +1,197 @@
+{% extends "admin/change_list.html" %}
+{% load static %}
+
+{% block result_list %}
+
+<style>
+
+.cards{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(520px,1fr));
+    gap:18px;
+    margin-top:20px;
+}
+
+.card{
+    background:#fff;
+    border-radius:18px;
+    padding:18px;
+    border:1px solid #e5e7eb;
+    box-shadow:0 14px 34px rgba(15,23,42,.08);
+}
+
+.header{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:10px;
+}
+
+.title{
+    font-weight:900;
+    font-size:17px;
+    color:#0f172a;
+}
+
+.meta{
+    font-size:13px;
+    color:#64748b;
+    margin-top:6px;
+}
+
+.badges{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-top:10px;
+}
+
+.badge{
+    padding:6px 12px;
+    border-radius:999px;
+    font-size:12px;
+    font-weight:900;
+    white-space:nowrap;
+}
+
+.gray{background:#f1f5f9;color:#334155;}
+.blue{background:#dbeafe;color:#1d4ed8;}
+.green{background:#dcfce7;color:#166534;}
+.red{background:#fee2e2;color:#991b1b;}
+.yellow{background:#fef9c3;color:#854d0e;}
+
+.hr{
+    border-top:1px solid #e5e7eb;
+    margin:14px 0;
+}
+
+.actions{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+}
+
+.actions a{
+    padding:10px 16px;
+    border-radius:999px;
+    font-weight:900;
+    font-size:13px;
+    text-decoration:none;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:6px;
+}
+
+.open-btn{
+    border:1px solid #e5e7eb;
+    background:#fff;
+    color:#0f172a;
+}
+
+.app-btn{
+    background:#0f766e;
+    color:#fff;
+}
+
+@media (max-width:640px){
+    .cards{grid-template-columns:1fr !important;}
+    .actions a{flex:1;}
+}
+
+</style>
+
+<div class="cards">
+
+{% for obj in cl.result_list %}
+<div class="card">
+
+    <!-- HEADER -->
+    <div class="header">
+        <div>
+            <div class="title">
+                {{ obj.title|default:"No Title" }}
+            </div>
+
+            <div class="meta">
+                🏢 {{ obj.company|default:"—" }}
+            </div>
+        </div>
+
+        <span class="badge gray">
+            JOB{{ obj.id|stringformat:"03d" }}
+        </span>
+    </div>
+
+    <!-- BADGES -->
+    <div class="badges">
+
+        <span class="badge blue">
+            {{ obj.job_type|capfirst }}
+        </span>
+
+        <span class="badge gray">
+            {{ obj.work_location_type|capfirst }}
+        </span>
+
+        <span class="badge gray">
+            {{ obj.city|default:"—" }}
+        </span>
+
+        <span class="badge gray">
+            {{ obj.locality|default:"—" }}
+        </span>
+
+        {% if obj.status == "active" %}
+            <span class="badge green">Active</span>
+        {% elif obj.status == "draft" %}
+            <span class="badge yellow">Draft</span>
+        {% elif obj.status == "closed" %}
+            <span class="badge red">Closed</span>
+        {% endif %}
+
+    </div>
+
+    <hr class="hr">
+
+    <!-- DETAILS -->
+    <div class="meta">
+        💰 Salary:
+        ₹{{ obj.salary_min|default:"0" }} - ₹{{ obj.salary_max|default:"0" }} <br>
+
+        🎯 Experience:
+        {{ obj.min_experience_months|default:"0" }} - 
+        {{ obj.max_experience_months|default:"0" }} months <br>
+
+        👥 Openings:
+        {{ obj.openings|default:"1" }} <br>
+
+        📅 Created:
+        {{ obj.created_at|date:"d M Y" }}
+    </div>
+
+    <hr class="hr">
+
+    <!-- ACTIONS -->
+    <div class="actions">
+
+        <a class="open-btn"
+           href="{% url 'admin:jobs_job_change' obj.id %}">
+           ✏️ Open
+        </a>
+
+        <a class="app-btn"
+           href="{% url 'admin:jobs_jobapplicant_changelist' %}?job__id__exact={{ obj.id }}">
+           👥 Applicants ({{ obj.applications.count }})
+        </a>
+
+    </div>
+
+</div>
+{% empty %}
+<p>No jobs found.</p>
+{% endfor %}
+
+</div>
+
+{% endblock %}

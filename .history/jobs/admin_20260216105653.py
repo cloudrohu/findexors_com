@@ -1,10 +1,9 @@
 from django.contrib import admin
+from import_export.admin import ImportExportModelAdmin
 from .models import Job, JobApplicant, InterviewSchedule
+from django.utils.html import format_html
 
 
-# =====================================================
-# INTERVIEW INLINE
-# =====================================================
 class InterviewInline(admin.StackedInline):
     model = InterviewSchedule
     extra = 0
@@ -13,31 +12,15 @@ class InterviewInline(admin.StackedInline):
 
     readonly_fields = ("created_at", "updated_at", "job")
 
-    fieldsets = (
-        ("Interview Details", {
-            "fields": (
-                "scheduled_datetime",
-                "interview_type",
-                "duration_minutes",
-                "rescheduled_from",
-            )
-        }),
-        ("Assignment", {
-            "fields": (
-                "assigned_to",
-                "status",
-            )
-        }),
-        ("Tracking", {
-            "fields": (
-                "whatsapp_sent",
-                "reminder_sent",
-                "confirmation_received",
-            )
-        }),
-        ("Meta", {
-            "fields": ("created_at", "updated_at"),
-        }),
+    fields = (
+        "scheduled_datetime",
+        "duration_minutes",
+        "assigned_to",
+        "status",
+        "remarks",
+        "whatsapp_sent",
+        "reminder_sent",
+        "confirmation_received",
     )
 
 
@@ -48,22 +31,18 @@ class JobApplicantInline(admin.TabularInline):
     model = JobApplicant
     extra = 0
     show_change_link = True
-    readonly_fields = ("applied_at",)
 
     fields = (
         "full_name",
         "phone",
-        "city",
-        "experience_months",
         "status",
         "apply_source",
         "applied_at",
     )
 
+    readonly_fields = ("applied_at",)
 
-# =====================================================
-# JOB ADMIN
-# =====================================================
+
 @admin.register(Job)
 class JobAdmin(admin.ModelAdmin):
 
@@ -77,28 +56,20 @@ class JobAdmin(admin.ModelAdmin):
         "work_location_type",
         "city",
         "locality",
-        "gender",
-        "salary_type",
         "salary_min",
         "salary_max",
-        "openings",
         "status",
         "created_at",
     )
 
     list_filter = (
         "status",
-        "company",
-        "category",
-        "industry",
         "job_type",
         "work_location_type",
-        "gender",
-        "salary_type",
         "city",
-        "locality",
-        "working_days",
-        "created_at",
+        "company",
+        "industry",
+        "category",
     )
 
     search_fields = (
@@ -106,25 +77,6 @@ class JobAdmin(admin.ModelAdmin):
         "company__company_name",
         "city__name",
         "locality__name",
-    )
-
-    autocomplete_fields = (
-        "company",
-        "title",
-        "industry",
-        "city",
-        "locality",
-        "working_days",
-        "created_by",
-        "updated_by",
-    )
-
-    list_select_related = (
-        "company",
-        "title",
-        "industry",
-        "city",
-        "locality",
     )
 
     filter_horizontal = (
@@ -137,10 +89,8 @@ class JobAdmin(admin.ModelAdmin):
 
     readonly_fields = ("slug", "created_at", "updated_at")
 
-    date_hierarchy = "created_at"
-
     fieldsets = (
-        ("Basic Info", {
+        ("Basic Information", {
             "fields": (
                 "company",
                 "title",
@@ -151,7 +101,8 @@ class JobAdmin(admin.ModelAdmin):
                 "status",
             )
         }),
-        ("Location & Type", {
+
+        ("Job Type & Location", {
             "fields": (
                 "job_type",
                 "work_location_type",
@@ -162,6 +113,7 @@ class JobAdmin(admin.ModelAdmin):
                 "end_time",
             )
         }),
+
         ("Experience & Salary", {
             "fields": (
                 "gender",
@@ -172,7 +124,8 @@ class JobAdmin(admin.ModelAdmin):
                 "salary_max",
             )
         }),
-        ("Requirements", {
+
+        ("Skills & Requirements", {
             "fields": (
                 "skills",
                 "benefits",
@@ -183,6 +136,7 @@ class JobAdmin(admin.ModelAdmin):
                 "requirements",
             )
         }),
+
         ("Meta", {
             "fields": (
                 "created_by",
@@ -195,10 +149,6 @@ class JobAdmin(admin.ModelAdmin):
 
     inlines = [JobApplicantInline]
 
-
-# =====================================================
-# JOB APPLICANT ADMIN
-# =====================================================
 @admin.register(JobApplicant)
 class JobApplicantAdmin(admin.ModelAdmin):
 
@@ -209,62 +159,19 @@ class JobApplicantAdmin(admin.ModelAdmin):
         "full_name",
         "job",
         "phone",
-        "city",
-        "locality",
-        "experience_months",
-        "current_salary",
-        "expected_salary",
-        "notice_period",
-        "apply_source",
-        "allow_whatsapp",
         "status",
         "applied_at",
     )
 
-    list_filter = (
-        "status",
-        "apply_source",
-        "job",
-        "city",
-        "locality",
-        "notice_period",
-        "allow_whatsapp",
-        "applied_at",
-        "status_updated_at",
-    )
+    list_filter = ("status", "apply_source", "job", "city")
 
     search_fields = (
         "full_name",
         "phone",
         "email",
-        "current_company",
         "job__title__name",
     )
 
-    autocomplete_fields = (
-        "job",
-        "city",
-        "locality",
-        "user",
-    )
-
-    list_select_related = (
-        "job",
-        "city",
-        "locality",
-        "user",
-    )
-
-    readonly_fields = (
-        "applied_at",
-        "status_updated_at",
-    )
-
-    date_hierarchy = "applied_at"
-
-    inlines = [InterviewInline]
-
-    # 🔥 SMART SEARCH
     def get_search_results(self, request, queryset, search_term):
         queryset, use_distinct = super().get_search_results(request, queryset, search_term)
 
@@ -276,10 +183,15 @@ class JobApplicantAdmin(admin.ModelAdmin):
                 if num.isdigit():
                     queryset |= self.model.objects.filter(id=int(num))
 
-            if term.startswith("JOB"):
-                num = term.replace("JOB", "").lstrip("0")
+            if term.startswith("J"):
+                num = term.replace("J", "").lstrip("0")
                 if num.isdigit():
                     queryset |= self.model.objects.filter(job__id=int(num))
+
+            if term.startswith("I"):
+                num = term.replace("I", "").lstrip("0")
+                if num.isdigit():
+                    queryset |= self.model.objects.filter(interview__id=int(num))
 
             if term.isdigit():
                 queryset |= self.model.objects.filter(phone__icontains=term)
@@ -287,9 +199,10 @@ class JobApplicantAdmin(admin.ModelAdmin):
         return queryset, use_distinct
 
 
-# =====================================================
-# INTERVIEW ADMIN
-# =====================================================
+    readonly_fields = ("applied_at", "status_updated_at")
+
+    inlines = [InterviewInline]
+
 @admin.register(InterviewSchedule)
 class InterviewScheduleAdmin(admin.ModelAdmin):
 
@@ -301,24 +214,9 @@ class InterviewScheduleAdmin(admin.ModelAdmin):
         "id",
         "applicant",
         "job",
-        "interview_type",
         "scheduled_datetime",
         "assigned_to",
         "status",
-        "whatsapp_sent",
-        "confirmation_received",
-    )
-
-    list_filter = (
-        "status",
-        "interview_type",
-        "assigned_to",
-        "job",
-        "whatsapp_sent",
-        "reminder_sent",
-        "confirmation_received",
-        "scheduled_datetime",
-        "created_at",
     )
 
     search_fields = (
@@ -327,49 +225,27 @@ class InterviewScheduleAdmin(admin.ModelAdmin):
         "job__title__name",
     )
 
-    autocomplete_fields = (
-        "applicant",
+    list_filter = (
+        "status",
         "assigned_to",
-    )
-
-    list_select_related = (
-        "applicant",
         "job",
-        "assigned_to",
     )
 
-    readonly_fields = (
-        "job",
-        "created_at",
-        "updated_at",
-    )
-
+    readonly_fields = ("job", "created_at", "updated_at")
     date_hierarchy = "scheduled_datetime"
     ordering = ("-scheduled_datetime",)
 
     fieldsets = (
-        ("Candidate & Assignment", {
-            "fields": (
-                "applicant",
-                "job",
-                "assigned_to",
-            )
+        ("Candidate & Job", {
+            "fields": ("applicant", "job", "assigned_to")
         }),
-        ("Schedule Details", {
-            "fields": (
-                "scheduled_datetime",
-                "interview_type",
-                "duration_minutes",
-                "rescheduled_from",
-            )
+        ("Schedule", {
+            "fields": ("scheduled_datetime", "duration_minutes")
         }),
-        ("Meeting Info", {
-            "fields": (
-                "meeting_link",
-                "location",
-            )
+        ("Meeting", {
+            "fields": ("meeting_link", "location")
         }),
-        ("Status & CRM", {
+        ("Status", {
             "fields": (
                 "status",
                 "remarks",
@@ -377,8 +253,6 @@ class InterviewScheduleAdmin(admin.ModelAdmin):
                 "whatsapp_sent",
                 "reminder_sent",
                 "confirmation_received",
-                "last_contacted_at",
-                "next_followup_at",
             )
         }),
         ("Meta", {
@@ -386,29 +260,37 @@ class InterviewScheduleAdmin(admin.ModelAdmin):
         }),
     )
 
-    # 🔥 MAGIC SEARCH
+    # 🔥 REALTYPMS STYLE MAGIC SEARCH
     def get_search_results(self, request, queryset, search_term):
-        queryset, use_distinct = super().get_search_results(request, queryset, search_term)
+        queryset, use_distinct = super().get_search_results(
+            request, queryset, search_term
+        )
 
         if search_term:
             term = search_term.upper().strip()
 
+            # 👉 Interview ID (INT012)
             if term.startswith("INT"):
                 num = term.replace("INT", "").lstrip("0")
                 if num.isdigit():
                     queryset |= self.model.objects.filter(id=int(num))
 
+            # 👉 Applicant ID (APP045)
             if term.startswith("APP"):
                 num = term.replace("APP", "").lstrip("0")
                 if num.isdigit():
                     queryset |= self.model.objects.filter(applicant__id=int(num))
 
+            # 👉 Job ID (JOB099)
             if term.startswith("JOB"):
                 num = term.replace("JOB", "").lstrip("0")
                 if num.isdigit():
                     queryset |= self.model.objects.filter(job__id=int(num))
 
+            # 👉 Phone quick search
             if term.isdigit():
-                queryset |= self.model.objects.filter(applicant__phone__icontains=term)
+                queryset |= self.model.objects.filter(
+                    applicant__phone__icontains=term
+                )
 
         return queryset, use_distinct
