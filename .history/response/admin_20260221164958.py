@@ -164,14 +164,6 @@ class ResponseAdmin(AutoUserAdminMixin, MagicSearchMixin, admin.ModelAdmin):
     readonly_fields = ("create_at", "update_at", "created_by", "updated_by")
 
     fieldsets = (
-        ("Business Details", {
-            "fields": (
-                "business_name",
-                "business_category",
-                "contact_persone",
-                "contact_no",
-            )
-        }),
         ("Lead Information", {
             "fields": (
                 "status",
@@ -180,7 +172,14 @@ class ResponseAdmin(AutoUserAdminMixin, MagicSearchMixin, admin.ModelAdmin):
                 "is_converted",
             )
         }),
-        
+        ("Business Details", {
+            "fields": (
+                "business_name",
+                "business_category",
+                "contact_persone",
+                "contact_no",
+            )
+        }),
         ("Location Details", {
             "fields": (
                 "city",

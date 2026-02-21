@@ -99,11 +99,11 @@ class VoiceRecordingInline(admin.TabularInline):
     show_change_link = True
 
 
-from django.utils.html import format_html
-from django.contrib import admin
-
 # =====================================================
-# 🔹 RESPONSE ADMIN (PRO VERSION)
+# 🔹 RESPONSE ADMIN
+# =====================================================
+# =====================================================
+# 🔹 RESPONSE ADMIN
 # =====================================================
 
 @admin.register(Response)
@@ -111,7 +111,7 @@ class ResponseAdmin(AutoUserAdminMixin, MagicSearchMixin, admin.ModelAdmin):
 
     prefix_map = {"MR": "id"}
 
-    # ✅ INLINE SECTION
+    # ✅ INLINE ADD HERE
     inlines = [
         MeetingInline,
         FollowupInline,
@@ -121,18 +121,19 @@ class ResponseAdmin(AutoUserAdminMixin, MagicSearchMixin, admin.ModelAdmin):
 
     list_display = (
         "mr_id",
-        "colored_status",
+        "status",
         "lead_source",
         "contact_no",
         "contact_persone",
         "business_name",
+        "business_category",
         "city",
+        "locality",
         "assigned_to",
-        "converted_badge",
+        "is_converted",
         "create_at",
+        "update_at",
     )
-
-    list_display_links = ("mr_id", "contact_persone", "business_name")
 
     search_fields = (
         "contact_no",
@@ -161,85 +162,9 @@ class ResponseAdmin(AutoUserAdminMixin, MagicSearchMixin, admin.ModelAdmin):
         "locality",
     )
 
-    readonly_fields = ("create_at", "update_at", "created_by", "updated_by")
-
-    fieldsets = (
-        ("Business Details", {
-            "fields": (
-                "business_name",
-                "business_category",
-                "contact_persone",
-                "contact_no",
-            )
-        }),
-        ("Lead Information", {
-            "fields": (
-                "status",
-                "lead_source",
-                "assigned_to",
-                "is_converted",
-            )
-        }),
-        
-        ("Location Details", {
-            "fields": (
-                "city",
-                "locality",
-            )
-        }),
-        ("System Information", {
-            "fields": (
-                "created_by",
-                "updated_by",
-                "create_at",
-                "update_at",
-            ),
-            "classes": ("collapse",),
-        }),
-    )
-
-    # ==============================
-    # 🔹 Custom Display Methods
-    # ==============================
-
     def mr_id(self, obj):
-        return format_html(
-            "<b style='color:#2563eb;'>MR{}</b>",
-            str(obj.id).zfill(3)
-        )
+        return f"MR{str(obj.id).zfill(3)}"
     mr_id.short_description = "Response ID"
-
-    def converted_badge(self, obj):
-        if obj.is_converted:
-            return format_html(
-                "<span style='color:white;background:green;padding:4px 8px;border-radius:6px;'>Converted</span>"
-            )
-        return format_html(
-            "<span style='color:white;background:red;padding:4px 8px;border-radius:6px;'>Pending</span>"
-        )
-    converted_badge.short_description = "Conversion"
-
-    def colored_status(self, obj):
-        color = "gray"
-
-        if obj.status == "new":
-            color = "#2563eb"
-        elif obj.status == "followup":
-            color = "#f59e0b"
-        elif obj.status == "closed":
-            color = "#16a34a"
-        elif obj.status == "rejected":
-            color = "#dc2626"
-
-        return format_html(
-            "<b style='color:{};'>{}</b>",
-            color,
-            obj.status.upper()
-        )
-
-    colored_status.short_description = "Status"
-
-
 @admin.register(Meeting)
 class MeetingAdmin(AutoUserAdminMixin, MagicSearchMixin, admin.ModelAdmin):
 
