@@ -53,6 +53,10 @@
     border-left-color: #dc2626 !important;
 }
 
+.today {
+    border-left-color: #2563eb !important;
+}
+
 .done {
     border-left-color: #16a34a !important;
 }
@@ -122,41 +126,47 @@
 .edit { color:#2563eb; }
 </style>
 
-{% now "UTC" as now %}
+{% now "Y-m-d H:i:s" as current_time %}
 
-<!-- ================= DASHBOARD ================= -->
-
+<!-- ================= DASHBOARD STATS ================= -->
 <div class="dashboard">
-
     <div class="stat-box">
         <h3>Total Meetings</h3>
         <div class="number">{{ cl.result_list|length }}</div>
     </div>
 
     <div class="stat-box">
-        <h3>Deal Done</h3>
+        <h3>New</h3>
         <div class="number">
-            {% for obj in cl.result_list %}
-                {% if obj.status == "Deal Done" %}1{% endif %}
-            {% endfor %}
+            {{ cl.result_list|dictsort:"status"|length }}
         </div>
     </div>
 
+    <div class="stat-box">
+        <h3>Today</h3>
+        <div class="number">
+            {% for obj in cl.result_list %}
+                {% if obj.meeting_date|date:"Y-m-d" == current_time|date:"Y-m-d" %}
+                    1
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
 </div>
 
 <!-- ================= CARDS ================= -->
-
 <div class="cards">
 
 {% for obj in cl.result_list %}
 
+{% now "Y-m-d H:i:s" as now_time %}
+
+{% with obj.meeting_date|date:"Y-m-d H:i:s" as meet_time %}
+{% with meet_time < now_time and obj.status != "Deal Done" as is_overdue %}
+
 <div class="crm-card
-{% if obj.meeting_date and obj.meeting_date < now and obj.status != "Deal Done" %}
-    overdue
-{% endif %}
-{% if obj.status == "Deal Done" %}
-    done
-{% endif %}
+    {% if is_overdue %} overdue {% endif %}
+    {% if obj.status == "Deal Done" %} done {% endif %}
 ">
 
     <div class="top">
@@ -194,7 +204,6 @@
     <div class="divider"></div>
 
     <div class="actions">
-        {% if obj.response.contact_no %}
         <a href="tel:{{ obj.response.contact_no }}" class="btn call">Call</a>
 
         <a href="https://wa.me/91{{ obj.response.contact_no }}"
@@ -202,7 +211,6 @@
            class="btn whatsapp">
            WhatsApp
         </a>
-        {% endif %}
 
         <a href="{% url 'admin:response_meeting_change' obj.id %}"
            class="btn edit">
@@ -212,7 +220,10 @@
 
 </div>
 
+{% endwith %}
+{% endwith %}
 {% endfor %}
+
 </div>
 
 {% endblock %}

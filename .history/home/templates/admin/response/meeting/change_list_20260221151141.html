@@ -1,0 +1,191 @@
+{% extends "admin/change_list.html" %}
+{% block result_list %}
+
+<style>
+.cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(480px, 1fr));
+    gap: 22px;
+}
+
+.crm-card {
+    background: #ffffff;
+    border-radius: 18px;
+    padding: 22px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.06);
+    transition: 0.3s ease;
+}
+
+.crm-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 28px rgba(0,0,0,0.09);
+}
+
+.top-section {
+    display: flex;
+    gap: 16px;
+}
+
+.avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: #eef2ff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+}
+
+.main-info {
+    flex: 1;
+}
+
+.badge-id {
+    background: #dcfce7;
+    color: #166534;
+    font-size: 12px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-weight: 600;
+}
+
+.name {
+    font-size: 17px;
+    font-weight: 600;
+    margin-top: 4px;
+}
+
+.meta-line {
+    font-size: 14px;
+    color: #6b7280;
+    margin-top: 4px;
+}
+
+.chip {
+    display: inline-block;
+    padding: 5px 12px;
+    font-size: 12px;
+    border-radius: 20px;
+    background: #f3f4f6;
+    margin-top: 8px;
+}
+
+.status-chip {
+    display: inline-block;
+    padding: 5px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    margin-top: 8px;
+}
+
+.status-new { background:#dbeafe; color:#1e40af; }
+.status-re { background:#fef3c7; color:#92400e; }
+.status-cancel { background:#fee2e2; color:#991b1b; }
+.status-done { background:#dcfce7; color:#166534; }
+
+.divider {
+    height: 1px;
+    background: #e5e7eb;
+    margin: 18px 0;
+}
+
+.meeting-box {
+    background: #f9fafb;
+    border-radius: 14px;
+    padding: 14px 16px;
+    font-size: 14px;
+}
+
+.meeting-box strong {
+    display: block;
+    margin-bottom: 6px;
+}
+
+.actions {
+    margin-top: 18px;
+    display: flex;
+    gap: 12px;
+}
+
+.btn {
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.call { background:#0f766e; color:white; }
+.whatsapp { background:#22c55e; color:white; }
+.edit { color:#2563eb; }
+</style>
+
+<div class="cards">
+
+{% for obj in cl.result_list %}
+<div class="crm-card">
+
+    <div class="top-section">
+        <div class="avatar">👤</div>
+
+        <div class="main-info">
+            <span class="badge-id">
+                MT{{ obj.id|stringformat:"03d" }}
+            </span>
+
+            <div class="name">
+                {{ obj.response.business_name|default:"No Business Name" }}
+            </div>
+
+            <div class="meta-line">
+                📞 {{ obj.response.contact_no|default:"—" }}
+            </div>
+
+            <div class="chip">
+                {{ obj.response.requirement_types.all|join:", "|default:"No Requirement" }}
+            </div>
+
+            {% if obj.status == "New Meeting" %}
+                <div class="status-chip status-new">New</div>
+            {% elif obj.status == "Re Meeting" %}
+                <div class="status-chip status-re">Re Meeting</div>
+            {% elif obj.status == "Cancelled" %}
+                <div class="status-chip status-cancel">Cancelled</div>
+            {% elif obj.status == "Deal Done" %}
+                <div class="status-chip status-done">Deal Done</div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="meeting-box">
+        <strong>📅 Meeting Details</strong>
+        Date: {{ obj.meeting_date|date:"d M Y, h:i A" }} <br>
+        Assigned: {{ obj.assigned_to|default:"—" }} <br>
+        Comment: {{ obj.comment|default:"—" }}
+    </div>
+
+    <div class="actions">
+        <a href="tel:{{ obj.response.contact_no }}" class="btn call">📞 Call</a>
+
+        <a href="https://wa.me/91{{ obj.response.contact_no }}"
+           target="_blank"
+           class="btn whatsapp">
+           💬 WhatsApp
+        </a>
+
+        <a href="{% url 'admin:response_meeting_change' obj.id %}"
+           class="btn edit">
+           ✏ Edit
+        </a>
+    </div>
+
+</div>
+{% endfor %}
+
+</div>
+
+{% endblock %}

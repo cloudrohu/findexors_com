@@ -1,4 +1,7 @@
 from django.contrib import admin
+from django.db.models import Q
+from django.utils.html import format_html
+
 from .models import (
     Staff,
     Response,
@@ -38,6 +41,7 @@ class AutoUserAdminMixin:
                 obj.uploaded_by = request.user
 
             obj.save()
+
         formset.save_m2m()
 
 
@@ -72,31 +76,35 @@ class MagicSearchMixin:
 
 
 # =====================================================
-# 🔹 INLINE CLASSES
+# 🔹 INLINE CLASSES (FOR RESPONSE)
 # =====================================================
 
 class MeetingInline(admin.TabularInline):
     model = Meeting
     extra = 0
     show_change_link = True
+    readonly_fields = ("created_by", "updated_by", "create_at", "update_at")
 
 
 class FollowupInline(admin.TabularInline):
     model = Followup
     extra = 0
     show_change_link = True
+    readonly_fields = ("created_by", "updated_by", "create_at", "update_at")
 
 
 class CommentInline(admin.TabularInline):
     model = Comment
     extra = 0
     show_change_link = True
+    readonly_fields = ("created_by", "updated_by", "create_at", "update_at")
 
 
 class VoiceRecordingInline(admin.TabularInline):
     model = VoiceRecording
     extra = 0
     show_change_link = True
+    readonly_fields = ("uploaded_by", "uploaded_at")
 
 
 # =====================================================
@@ -106,6 +114,15 @@ class VoiceRecordingInline(admin.TabularInline):
 @admin.register(Response)
 class ResponseAdmin(AutoUserAdminMixin, MagicSearchMixin, admin.ModelAdmin):
 
+    inlines = [
+        MeetingInline,
+        FollowupInline,
+        CommentInline,
+        VoiceRecordingInline,
+    ]
+
+    list_per_page = 25
+    ordering = ("-create_at",)
     prefix_map = {"MR": "id"}
 
     list_display = (
@@ -113,21 +130,18 @@ class ResponseAdmin(AutoUserAdminMixin, MagicSearchMixin, admin.ModelAdmin):
         "status",
         "lead_source",
         "contact_no",
-        "contact_persone",
         "business_name",
-        "business_category",
-        "city",
-        "locality",
         "assigned_to",
         "is_converted",
         "create_at",
-        "update_at",
     )
 
     search_fields = (
         "contact_no",
-        "contact_persone",
         "business_name",
+        "contact_persone",
+        "city__name",
+        "locality__name",
     )
 
     list_filter = (
@@ -138,28 +152,55 @@ class ResponseAdmin(AutoUserAdminMixin, MagicSearchMixin, admin.ModelAdmin):
         "city",
         "locality",
         "is_converted",
-        "create_at",
     )
 
-    ordering = ("-create_at",)
+    readonly_fields = (
+        "created_by",
+        "updated_by",
+        "create_at",
+        "update_at",
+        "converted_at",
+    )
+
     date_hierarchy = "create_at"
 
-    list_select_related = (
-        "assigned_to",
-        "business_category",
-        "city",
-        "locality",
+    fieldsets = (
+        ("Contact Info", {
+            "fields": ("status", "assigned_to", "contact_no", "contact_persone")
+        }),
+        ("Business Details", {
+            "fields": ("business_name", "business_category", "requirement_types", "city", "locality")
+        }),
+        ("Lead Tracking", {
+            "fields": (
+                "lead_source",
+                "whatsapp_welcome_sent",
+                "whatsapp_followup_1_sent",
+                "whatsapp_followup_2_sent",
+            )
+        }),
+        ("Conversion", {
+            "fields": ("is_converted", "converted_at")
+        }),
+        ("Audit Info", {
+            "fields": ("create_at", "update_at", "created_by", "updated_by")
+        }),
     )
 
     def mr_id(self, obj):
         return f"MR{str(obj.id).zfill(3)}"
     mr_id.short_description = "Response ID"
+
+
 # =====================================================
 # 🔹 MEETING ADMIN
 # =====================================================
 
 @admin.register(Meeting)
 class MeetingAdmin(AutoUserAdminMixin, MagicSearchMixin, admin.ModelAdmin):
+
+    list_per_page = 25
+    ordering = ("-meeting_date",)
 
     prefix_map = {"MT": "id", "MR": "response__id"}
 
@@ -170,7 +211,6 @@ class MeetingAdmin(AutoUserAdminMixin, MagicSearchMixin, admin.ModelAdmin):
         "meeting_date",
         "assigned_to",
         "create_at",
-        "update_at",
     )
 
     search_fields = (
@@ -183,25 +223,29 @@ class MeetingAdmin(AutoUserAdminMixin, MagicSearchMixin, admin.ModelAdmin):
         "status",
         "assigned_to",
         "meeting_date",
-        "response__status",
-        "response__lead_source",
-        "response__city",
-        "response__locality",
     )
 
-    ordering = ("-meeting_date",)
-
-    list_select_related = ("response", "assigned_to")
+    readonly_fields = (
+        "created_by",
+        "updated_by",
+        "create_at",
+        "update_at",
+    )
 
     def mt_id(self, obj):
         return f"MT{str(obj.id).zfill(3)}"
     mt_id.short_description = "Meeting ID"
 
+
 # =====================================================
 # 🔹 FOLLOWUP ADMIN
 # =====================================================
+
 @admin.register(Followup)
 class FollowupAdmin(AutoUserAdminMixin, MagicSearchMixin, admin.ModelAdmin):
+
+    list_per_page = 25
+    ordering = ("-followup_date",)
 
     prefix_map = {"FU": "id", "MR": "response__id"}
 
@@ -212,7 +256,6 @@ class FollowupAdmin(AutoUserAdminMixin, MagicSearchMixin, admin.ModelAdmin):
         "followup_date",
         "assigned_to",
         "create_at",
-        "update_at",
     )
 
     search_fields = (
@@ -225,34 +268,35 @@ class FollowupAdmin(AutoUserAdminMixin, MagicSearchMixin, admin.ModelAdmin):
         "status",
         "assigned_to",
         "followup_date",
-        "response__status",
-        "response__lead_source",
-        "response__city",
-        "response__locality",
     )
 
-    ordering = ("-followup_date",)
-
-    list_select_related = ("response", "assigned_to")
+    readonly_fields = (
+        "created_by",
+        "updated_by",
+        "create_at",
+        "update_at",
+    )
 
     def fu_id(self, obj):
         return f"FU{str(obj.id).zfill(3)}"
     fu_id.short_description = "Followup ID"
+
+
 # =====================================================
 # 🔹 COMMENT ADMIN
 # =====================================================
+
 @admin.register(Comment)
 class CommentAdmin(AutoUserAdminMixin, MagicSearchMixin, admin.ModelAdmin):
 
+    ordering = ("-create_at",)
     prefix_map = {"CM": "id", "MR": "response__id"}
 
     list_display = (
         "cm_id",
         "response",
-        "comment",
-        "created_by",
         "create_at",
-        "update_at",
+        "created_by",
     )
 
     search_fields = (
@@ -261,22 +305,18 @@ class CommentAdmin(AutoUserAdminMixin, MagicSearchMixin, admin.ModelAdmin):
         "comment",
     )
 
-    list_filter = (
-        "response__status",
-        "response__lead_source",
-        "response__city",
-        "response__locality",
+    readonly_fields = (
         "create_at",
+        "update_at",
+        "created_by",
+        "updated_by",
     )
-
-    ordering = ("-create_at",)
-
-    list_select_related = ("response",)
 
     def cm_id(self, obj):
         return f"CM{str(obj.id).zfill(3)}"
-
     cm_id.short_description = "Comment ID"
+
+
 # =====================================================
 # 🔹 VOICE RECORDING ADMIN
 # =====================================================
@@ -284,12 +324,12 @@ class CommentAdmin(AutoUserAdminMixin, MagicSearchMixin, admin.ModelAdmin):
 @admin.register(VoiceRecording)
 class VoiceRecordingAdmin(AutoUserAdminMixin, MagicSearchMixin, admin.ModelAdmin):
 
+    ordering = ("-uploaded_at",)
     prefix_map = {"VR": "id", "MR": "response__id"}
 
     list_display = (
         "vr_id",
         "response",
-        "note",
         "uploaded_by",
         "uploaded_at",
     )
@@ -297,25 +337,19 @@ class VoiceRecordingAdmin(AutoUserAdminMixin, MagicSearchMixin, admin.ModelAdmin
     search_fields = (
         "response__contact_no",
         "response__business_name",
-        "note",
     )
 
-    list_filter = (
-        "response__status",
-        "response__lead_source",
-        "response__city",
-        "response__locality",
+    readonly_fields = (
         "uploaded_at",
+        "uploaded_by",
     )
-
-    ordering = ("-uploaded_at",)
-
-    list_select_related = ("response",)
 
     def vr_id(self, obj):
         return f"VR{str(obj.id).zfill(3)}"
+    vr_id.short_description = "Recording ID"
 
-    vr_id.short_description = "Recording ID"# =====================================================
+
+# =====================================================
 # 🔹 STAFF ADMIN
 # =====================================================
 

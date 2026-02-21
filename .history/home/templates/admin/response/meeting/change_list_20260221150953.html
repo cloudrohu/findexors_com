@@ -1,0 +1,129 @@
+{% extends "admin/change_list.html" %}
+{% block result_list %}
+
+<style>
+.cards {
+    display: grid;
+    gap: 18px;
+}
+
+.card {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 18px 20px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+    transition: all 0.2s ease;
+    border-left: 5px solid #e5e7eb;
+}
+
+.card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 22px rgba(0,0,0,0.08);
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #111827;
+}
+
+.meta {
+    font-size: 14px;
+    color: #4b5563;
+    margin-top: 6px;
+    line-height: 1.6;
+}
+
+.badge {
+    padding: 4px 10px;
+    font-size: 12px;
+    font-weight: 600;
+    border-radius: 30px;
+    display: inline-block;
+}
+
+.badge-new {
+    background: #e0f2fe;
+    color: #0369a1;
+}
+
+.badge-re {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.badge-cancel {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.badge-done {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.actions {
+    margin-top: 12px;
+}
+
+.open {
+    text-decoration: none;
+    background: #2563eb;
+    color: white;
+    padding: 6px 14px;
+    font-size: 13px;
+    border-radius: 6px;
+    transition: 0.2s;
+}
+
+.open:hover {
+    background: #1e40af;
+}
+</style>
+
+<div class="cards">
+
+{% for obj in cl.result_list %}
+<div class="card">
+
+    <div class="card-header">
+        <div class="title">
+            MT{{ obj.id|stringformat:"03d" }}
+        </div>
+
+        {% if obj.status == "New Meeting" %}
+            <span class="badge badge-new">New</span>
+        {% elif obj.status == "Re Meeting" %}
+            <span class="badge badge-re">Re-Meeting</span>
+        {% elif obj.status == "Cancelled" %}
+            <span class="badge badge-cancel">Cancelled</span>
+        {% elif obj.status == "Deal Done" %}
+            <span class="badge badge-done">Deal Done</span>
+        {% endif %}
+    </div>
+
+    <div class="meta">
+        📞 <strong>{{ obj.response.contact_no|default:"—" }}</strong><br>
+        📅 {{ obj.meeting_date|date:"d M Y, h:i A" }}<br>
+        👤 {{ obj.assigned_to|default:"—" }}
+    </div>
+
+    <div class="actions">
+        <a class="open"
+           href="{% url 'admin:response_meeting_change' obj.id %}">
+           Open Details
+        </a>
+    </div>
+
+</div>
+{% endfor %}
+
+</div>
+
+{% endblock %}

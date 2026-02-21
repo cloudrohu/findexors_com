@@ -1,0 +1,214 @@
+{% extends "admin/change_list.html" %}
+{% load static %}
+
+{% block extrastyle %}
+{{ block.super }}
+<style>
+    /* 1. RESET & LAYOUT FIXES */
+    #content { padding: 10px !important; }
+    .object-tools { margin-bottom: 10px !important; }
+    
+    /* Force remove horizontal scroll */
+    body, #content, #content-main {
+        overflow-x: hidden !important;
+        width: 100% !important;
+        box-sizing: border-box;
+    }
+
+    /* 2. GRID SYSTEM */
+    .cards-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 16px;
+        padding: 5px;
+    }
+
+    @media (max-width: 480px) {
+        .cards-container {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    /* 3. CARD STYLING */
+    .custom-card {
+        background: #ffffff;
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        display: flex;
+        flex-direction: column;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .custom-card:hover {
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    }
+
+    /* 4. CARD HEADER */
+    .card-header {
+        padding: 16px;
+        display: flex;
+        gap: 12px;
+        border-bottom: 1px solid #f1f5f9;
+    }
+
+    .avatar-circle {
+        width: 45px;
+        height: 45px;
+        background: #f1f5f9;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .header-info { flex: 1; min-width: 0; }
+    
+    .biz-name {
+        font-size: 16px;
+        font-weight: 700;
+        color: #1e293b;
+        margin: 0 0 4px 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .contact-info {
+        font-size: 13px;
+        color: #64748b;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    /* 5. BADGES */
+    .badge-row {
+        padding: 8px 16px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        background: #f8fafc;
+    }
+
+    .ui-badge {
+        font-size: 11px;
+        font-weight: 600;
+        padding: 2px 8px;
+        border-radius: 6px;
+        text-transform: uppercase;
+    }
+    .bg-id { background: #e0f2fe; color: #0369a1; }
+    .bg-status { background: #fef3c7; color: #92400e; }
+    .bg-loc { background: #f1f5f9; color: #475569; }
+
+    /* 6. CARD BODY */
+    .card-body {
+        padding: 16px;
+        font-size: 13px;
+        color: #334155;
+        flex-grow: 1;
+    }
+
+    .info-item {
+        display: flex;
+        margin-bottom: 8px;
+        gap: 8px;
+    }
+    .info-item i { width: 16px; color: #94a3b8; margin-top: 2px; }
+    .info-label { font-weight: 600; color: #475569; min-width: 75px; }
+
+    /* 7. ACTIONS */
+    .card-footer {
+        padding: 12px;
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 8px;
+        border-top: 1px solid #f1f5f9;
+    }
+
+    .btn-action {
+        text-align: center;
+        padding: 8px 4px;
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 600;
+        text-decoration: none !important;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+    }
+
+    .btn-call { background: #0d9488; color: white !important; }
+    .btn-wa { background: #22c55e; color: white !important; }
+    .btn-edit { background: #f1f5f9; color: #1e293b !important; border: 1px solid #e2e8f0; }
+
+</style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+{% endblock %}
+
+{% block result_list %}
+<div class="cards-container">
+    {% for obj in cl.result_list %}
+    <div class="custom-card">
+        <div class="card-header">
+            <div class="avatar-circle">
+                <i class="fas fa-user-tie" style="color:#64748b; font-size: 20px;"></i>
+            </div>
+            <div class="header-info">
+                <h3 class="biz-name">{{ obj.response.business_name|default:"No Business Name" }}</h3>
+                <div class="contact-info">
+                    <span><i class="fas fa-user"></i> {{ obj.response.contact_persone|default:"—" }}</span>
+                    <span><i class="fas fa-phone"></i> {{ obj.response.contact_no|default:"—" }}</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="badge-row">
+            <span class="ui-badge bg-id">MR-{{ obj.response.id|stringformat:"03d" }}</span>
+            <span class="ui-badge bg-status">{{ obj.status }}</span>
+            {% if obj.response.city %}
+            <span class="ui-badge bg-loc"><i class="fas fa-map-marker-alt"></i> {{ obj.response.city }}</span>
+            {% endif %}
+        </div>
+
+        <div class="card-body">
+            <div class="info-item">
+                <i class="fas fa-user-check"></i>
+                <span class="info-label">Assigned:</span>
+                <span>{{ obj.assigned_to|default:"—" }}</span>
+            </div>
+            <div class="info-item">
+                <i class="fas fa-calendar-alt"></i>
+                <span class="info-label">Followup:</span>
+                <span>{{ obj.followup_date|date:"d M Y, h:i A"|default:"—" }}</span>
+            </div>
+            <div class="info-item">
+                <i class="fas fa-comment-dots"></i>
+                <span class="info-label">Comment:</span>
+                <span style="font-style: italic; color:#64748b;">"{{ obj.comment|default:"No Comment" }}"</span>
+            </div>
+        </div>
+
+        <div class="card-footer">
+            {% if obj.response.contact_no %}
+            <a href="tel:{{ obj.response.contact_no }}" class="btn-action btn-call">
+                <i class="fas fa-phone-alt"></i> Call
+            </a>
+            <a href="https://wa.me/91{{ obj.response.contact_no }}?text=Hello" target="_blank" class="btn-action btn-wa">
+                <i class="fab fa-whatsapp"></i> Chat
+            </a>
+            {% else %}
+            <span style="grid-column: span 2; color: #94a3b8; font-size: 11px; align-self: center;">No Number</span>
+            {% endif %}
+            
+            <a href="{% url 'admin:response_followup_change' obj.id %}" class="btn-action btn-edit">
+                <i class="fas fa-edit"></i> Edit
+            </a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

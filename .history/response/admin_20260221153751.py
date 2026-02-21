@@ -241,6 +241,7 @@ class FollowupAdmin(AutoUserAdminMixin, MagicSearchMixin, admin.ModelAdmin):
 # =====================================================
 # 🔹 COMMENT ADMIN
 # =====================================================
+
 @admin.register(Comment)
 class CommentAdmin(AutoUserAdminMixin, MagicSearchMixin, admin.ModelAdmin):
 
@@ -272,11 +273,6 @@ class CommentAdmin(AutoUserAdminMixin, MagicSearchMixin, admin.ModelAdmin):
     ordering = ("-create_at",)
 
     list_select_related = ("response",)
-
-    def cm_id(self, obj):
-        return f"CM{str(obj.id).zfill(3)}"
-
-    cm_id.short_description = "Comment ID"
 # =====================================================
 # 🔹 VOICE RECORDING ADMIN
 # =====================================================
@@ -289,7 +285,6 @@ class VoiceRecordingAdmin(AutoUserAdminMixin, MagicSearchMixin, admin.ModelAdmin
     list_display = (
         "vr_id",
         "response",
-        "note",
         "uploaded_by",
         "uploaded_at",
     )
@@ -297,25 +292,17 @@ class VoiceRecordingAdmin(AutoUserAdminMixin, MagicSearchMixin, admin.ModelAdmin
     search_fields = (
         "response__contact_no",
         "response__business_name",
-        "note",
-    )
-
-    list_filter = (
-        "response__status",
-        "response__lead_source",
-        "response__city",
-        "response__locality",
-        "uploaded_at",
     )
 
     ordering = ("-uploaded_at",)
 
-    list_select_related = ("response",)
-
     def vr_id(self, obj):
         return f"VR{str(obj.id).zfill(3)}"
 
-    vr_id.short_description = "Recording ID"# =====================================================
+    vr_id.short_description = "Recording ID"
+
+
+# =====================================================
 # 🔹 STAFF ADMIN
 # =====================================================
 

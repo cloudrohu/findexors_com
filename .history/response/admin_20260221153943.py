@@ -280,7 +280,6 @@ class CommentAdmin(AutoUserAdminMixin, MagicSearchMixin, admin.ModelAdmin):
 # =====================================================
 # 🔹 VOICE RECORDING ADMIN
 # =====================================================
-
 @admin.register(VoiceRecording)
 class VoiceRecordingAdmin(AutoUserAdminMixin, MagicSearchMixin, admin.ModelAdmin):
 
@@ -311,11 +310,7 @@ class VoiceRecordingAdmin(AutoUserAdminMixin, MagicSearchMixin, admin.ModelAdmin
     ordering = ("-uploaded_at",)
 
     list_select_related = ("response",)
-
-    def vr_id(self, obj):
-        return f"VR{str(obj.id).zfill(3)}"
-
-    vr_id.short_description = "Recording ID"# =====================================================
+# =====================================================
 # 🔹 STAFF ADMIN
 # =====================================================
 
