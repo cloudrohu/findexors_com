@@ -112,7 +112,7 @@ class CommentInline(admin.TabularInline):
 
 class VoiceRecordingInline(admin.TabularInline):
     model = VoiceRecording
-    extra = 1
+    extra = 0
     show_change_link = True
 
     readonly_fields = (

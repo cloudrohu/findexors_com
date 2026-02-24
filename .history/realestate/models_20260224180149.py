@@ -38,58 +38,19 @@ def clean_phone_india(phone: str):
         return digits[-10:]
     return digits
 
+
 class GoogleCompany(models.Model):
     name = models.CharField(max_length=255)
     name_for_emails = models.CharField(max_length=255, blank=True, null=True)
 
-    # ===========================
-    # 🔥 FIXED FOREIGN KEYS
-    # ===========================
+    # ✅ FK mapping (optional for import safety)
+    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True)
+    city = models.ForeignKey(City, on_delete=models.SET_NULL, null=True, blank=True)
+    locality = models.ForeignKey(Locality, on_delete=models.SET_NULL, null=True, blank=True)
+    sub_locality = models.ForeignKey(Sub_Locality, on_delete=models.SET_NULL, null=True, blank=True)
+    project = models.ForeignKey(Project, on_delete=models.SET_NULL, null=True, blank=True)
 
-    category = models.ForeignKey(
-        Category,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name="%(app_label)s_googlecompanies"
-    )
-
-    city = models.ForeignKey(
-        City,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name="%(app_label)s_googlecompanies"
-    )
-
-    locality = models.ForeignKey(
-        Locality,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name="%(app_label)s_googlecompanies"
-    )
-
-    sub_locality = models.ForeignKey(
-        Sub_Locality,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name="%(app_label)s_googlecompanies"
-    )
-
-    project = models.ForeignKey(
-        Project,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name="%(app_label)s_googlecompanies"
-    )
-
-    # ===========================
-    # ORIGINAL FIELDS
-    # ===========================
-
+    # ✅ original text fields (Outscraper)
     category_text = models.CharField(max_length=550, blank=True, null=True, db_index=True)
     type = models.CharField(max_length=550, blank=True, null=True, db_index=True)
 
@@ -136,14 +97,12 @@ class GoogleCompany(models.Model):
         ("Send Ditails", "Send Ditails"),
         ("Deal Done", "Deal Done"),
     ]
-
     status = models.CharField(max_length=25, choices=STATUS_CHOICES, default="New")
 
     assigned_to = models.ForeignKey(
         Staff,
         on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
+        null=True, blank=True,
         related_name="realestate_googlecompany_assigned"
     )
 
@@ -157,16 +116,13 @@ class GoogleCompany(models.Model):
         User,
         related_name="realestate_googlecompany_created",
         on_delete=models.SET_NULL,
-        null=True,
-        blank=True
+        null=True, blank=True
     )
-
     updated_by = models.ForeignKey(
         User,
         related_name="realestate_googlecompany_updated",
         on_delete=models.SET_NULL,
-        null=True,
-        blank=True
+        null=True, blank=True
     )
 
     created_at = models.DateTimeField(auto_now_add=True)
@@ -178,6 +134,28 @@ class GoogleCompany(models.Model):
 
     def __str__(self):
         return f"{self.name} ({self.city_text})"
+
+    def save(self, *args, **kwargs):
+        # ✅ Phone: store only last 10 digits
+        if self.phone:
+            self.phone = clean_phone_india(self.phone)
+
+        super().save(*args, **kwargs)
+
+        # ✅ stable slug
+        expected_slug = f"{slugify(self.name)}-{self.id}"
+        if self.slug != expected_slug:
+            self.slug = expected_slug
+            super().save(update_fields=["slug"])
+
+    def logo_preview(self):
+        if self.logo:
+            return mark_safe(f'<a href="{self.logo}" target="_blank">View Logo</a>')
+        return "No Logo"
+
+    logo_preview.short_description = "Logo"
+
+
 # ============================================================
 # COMMENT MODEL
 # ============================================================

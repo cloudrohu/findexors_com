@@ -231,12 +231,10 @@ class Meeting(models.Model):
 
     class Meta:
         ordering = ["-meeting_date"]
-
-
-
-
+# =======================
+#  Followup
+# =======================
 class Followup(models.Model):
-
     FOLLOWUP_STATUS_CHOICES = [
         ("New Followup", "New Followup"),
         ("Re Followup", "Re Followup"),
@@ -247,28 +245,32 @@ class Followup(models.Model):
     response = models.ForeignKey(
         Response,
         on_delete=models.CASCADE,
-        related_name="followups"
+        related_name='followups'
     )
 
-    status = models.CharField(max_length=25, choices=FOLLOWUP_STATUS_CHOICES)
+    status = models.CharField(
+        max_length=25,
+        choices=FOLLOWUP_STATUS_CHOICES,
+        verbose_name="Followup Status"
+    )
 
-    followup_date = models.DateTimeField(blank=True, null=True)
+    followup_date = models.DateTimeField(blank=True, null=True, verbose_name="Followup Date & Time")
 
     assigned_to = models.ForeignKey(
-        "response.Staff",
+        Staff,
         on_delete=models.SET_NULL,
         null=True,
         blank=True
     )
 
-    comment = models.CharField(max_length=500, blank=True, null=True)
+    comment = models.CharField(max_length=500, null=True, blank=True)
 
     create_at = models.DateTimeField(auto_now_add=True)
     update_at = models.DateTimeField(auto_now=True)
 
     created_by = models.ForeignKey(
         User,
-        related_name="followup_created",
+        related_name='followup_created',
         on_delete=models.SET_NULL,
         null=True,
         blank=True
@@ -276,21 +278,15 @@ class Followup(models.Model):
 
     updated_by = models.ForeignKey(
         User,
-        related_name="followup_updated",
+        related_name='followup_updated',
         on_delete=models.SET_NULL,
         null=True,
         blank=True
     )
 
-    def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
+    def __str__(self):
+        return f"Followup {self.id} - {self.status}"
 
-        if self.status == "Deal Done":
-            self.response.is_converted = True
-            self.response.save()
-
-    class Meta:
-        ordering = ["-followup_date"]
 
 # =======================
 #  Comment

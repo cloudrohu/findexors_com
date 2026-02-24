@@ -89,7 +89,7 @@ class MeetingInline(admin.TabularInline):
 
 class FollowupInline(admin.TabularInline):
     model = Followup
-    extra = 1
+    extra = 0
     show_change_link = True
 
     readonly_fields = (
@@ -114,11 +114,6 @@ class VoiceRecordingInline(admin.TabularInline):
     model = VoiceRecording
     extra = 1
     show_change_link = True
-
-    readonly_fields = (
-        "uploaded_at",
-        "uploaded_by",
-    )
 
 
 from django.utils.html import format_html

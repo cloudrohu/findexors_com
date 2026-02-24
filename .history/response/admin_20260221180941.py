@@ -115,11 +115,6 @@ class VoiceRecordingInline(admin.TabularInline):
     extra = 1
     show_change_link = True
 
-    readonly_fields = (
-        "uploaded_at",
-        "uploaded_by",
-    )
-
 
 from django.utils.html import format_html
 from django.contrib import admin

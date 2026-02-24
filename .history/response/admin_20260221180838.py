@@ -77,7 +77,7 @@ class MagicSearchMixin:
 
 class MeetingInline(admin.TabularInline):
     model = Meeting
-    extra = 1
+    extra = 0
     show_change_link = True
 
     readonly_fields = (
@@ -86,39 +86,24 @@ class MeetingInline(admin.TabularInline):
         "created_by",
         "updated_by",
     )
+
 
 class FollowupInline(admin.TabularInline):
     model = Followup
     extra = 1
     show_change_link = True
 
-    readonly_fields = (
-        "create_at",
-        "update_at",
-        "created_by",
-        "updated_by",
-    )
+
 class CommentInline(admin.TabularInline):
     model = Comment
     extra = 1
     show_change_link = True
 
-    readonly_fields = (
-        "create_at",
-        "update_at",
-        "created_by",
-        "updated_by",
-    )
 
 class VoiceRecordingInline(admin.TabularInline):
     model = VoiceRecording
     extra = 1
     show_change_link = True
-
-    readonly_fields = (
-        "uploaded_at",
-        "uploaded_by",
-    )
 
 
 from django.utils.html import format_html

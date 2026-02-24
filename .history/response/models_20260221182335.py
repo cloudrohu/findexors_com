@@ -232,9 +232,6 @@ class Meeting(models.Model):
     class Meta:
         ordering = ["-meeting_date"]
 
-
-
-
 class Followup(models.Model):
 
     FOLLOWUP_STATUS_CHOICES = [

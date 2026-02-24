@@ -167,7 +167,6 @@ class Response(models.Model):
             models.Index(fields=["status"]),
         ]
 
-
 class Meeting(models.Model):
 
     MEETING_STATUS_CHOICES = [
@@ -177,10 +176,10 @@ class Meeting(models.Model):
         ("Deal Done", "Deal Done"),
     ]
 
-    response = models.ForeignKey(
+    response = models.OneToOneField(
         Response,
         on_delete=models.CASCADE,
-        related_name="meetings"
+        related_name="meeting"
     )
 
     status = models.CharField(
@@ -218,23 +217,8 @@ class Meeting(models.Model):
         blank=True
     )
 
-    def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
-
-        # If deal done → auto convert lead
-        if self.status == "Deal Done":
-            self.response.is_converted = True
-            self.response.save()
-
     def __str__(self):
-        return f"Meeting {self.id} - {self.status}"
-
-    class Meta:
-        ordering = ["-meeting_date"]
-
-
-
-
+        return f"Meeting - {self.response}"
 class Followup(models.Model):
 
     FOLLOWUP_STATUS_CHOICES = [

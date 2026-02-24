@@ -40,8 +40,10 @@ class Staff(models.Model):
         return self.user.get_full_name() or self.user.username
 
 
+# =======================
+#  Response
+# =======================
 class Response(models.Model):
-
     STATUS_CHOICES = [
         ("New", "New"),
         ("Meeting", "Meeting"),
@@ -53,6 +55,10 @@ class Response(models.Model):
         ("Fake_lead", "Fake Lead"),
         ("Deal_close", "Deal Close"),
     ]
+
+# =======================
+#  Response (UPDATED PART ONLY)
+# =======================
 
     LEAD_SOURCE_CHOICES = [
         ("instagram", "Instagram Ads"),
@@ -71,22 +77,24 @@ class Response(models.Model):
         db_index=True
     )
 
-    # WhatsApp Tracking
+    # WhatsApp Automation Flags
     whatsapp_welcome_sent = models.BooleanField(default=False)
     whatsapp_followup_1_sent = models.BooleanField(default=False)
     whatsapp_followup_2_sent = models.BooleanField(default=False)
 
-    # Conversion Tracking
+    # Sales Tracking
     is_converted = models.BooleanField(default=False)
     converted_at = models.DateTimeField(blank=True, null=True)
+
 
     status = models.CharField(
         max_length=25,
         choices=STATUS_CHOICES,
         default="New",
-        db_index=True
+        verbose_name="Response Status"
     )
 
+    # ✅ 16 length allowed in input, but saved as last 10 digits
     contact_no = models.CharField(
         max_length=16,
         null=True,
@@ -96,38 +104,38 @@ class Response(models.Model):
     )
 
     assigned_to = models.ForeignKey(
-        "response.Staff",
+        Staff,
         on_delete=models.SET_NULL,
         null=True,
-        blank=True,
-        related_name="assigned_responses"
+        blank=True
     )
 
     contact_persone = models.CharField(max_length=500, blank=True, null=True)
+
     business_name = models.CharField(max_length=500, blank=True, null=True)
 
     business_category = models.ForeignKey(
         Category,
         blank=True,
         null=True,
-        on_delete=models.SET_NULL
+        on_delete=models.CASCADE
     )
 
     requirement_types = models.ManyToManyField(
         RequirementType,
         blank=True,
-        related_name="responses"
+        related_name='responses'
     )
 
-    city = models.ForeignKey(City, blank=True, null=True, on_delete=models.SET_NULL)
-    locality = models.ForeignKey(Locality, blank=True, null=True, on_delete=models.SET_NULL)
+    city = models.ForeignKey(City, blank=True, null=True, on_delete=models.CASCADE)
+    locality = models.ForeignKey(Locality, blank=True, null=True, on_delete=models.CASCADE)
 
     create_at = models.DateTimeField(auto_now_add=True)
     update_at = models.DateTimeField(auto_now=True)
 
     created_by = models.ForeignKey(
         User,
-        related_name="responses_created",
+        related_name='responses_created',
         on_delete=models.SET_NULL,
         null=True,
         blank=True
@@ -135,41 +143,29 @@ class Response(models.Model):
 
     updated_by = models.ForeignKey(
         User,
-        related_name="responses_updated",
+        related_name='responses_updated',
         on_delete=models.SET_NULL,
         null=True,
         blank=True
     )
 
     def save(self, *args, **kwargs):
-
-        # Phone clean
+        # ✅ Save only last 10 digits in DB
         if self.contact_no:
             self.contact_no = clean_phone_last10(self.contact_no)
-
-        # Auto conversion timestamp
-        if self.is_converted and not self.converted_at:
-            self.converted_at = timezone.now()
-
-        if not self.is_converted:
-            self.converted_at = None
-
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"MR{str(self.id).zfill(3)} - {self.contact_no or 'No Number'}"
+        return f"MR{str(self.id).zfill(3)} -- {self.contact_no or 'No Number'}"
 
     class Meta:
-        ordering = ["-create_at"]
-        verbose_name_plural = "0. Responses"
-        indexes = [
-            models.Index(fields=["contact_no"]),
-            models.Index(fields=["status"]),
-        ]
+        verbose_name_plural = '0. Responses'
 
 
+# =======================
+#  Meeting
+# =======================
 class Meeting(models.Model):
-
     MEETING_STATUS_CHOICES = [
         ("New Meeting", "New Meeting"),
         ("Re Meeting", "Re Meeting"),
@@ -180,31 +176,32 @@ class Meeting(models.Model):
     response = models.ForeignKey(
         Response,
         on_delete=models.CASCADE,
-        related_name="meetings"
+        related_name='meetings'
     )
 
     status = models.CharField(
         max_length=25,
-        choices=MEETING_STATUS_CHOICES
+        choices=MEETING_STATUS_CHOICES,
+        verbose_name="Meeting Status"
     )
 
-    meeting_date = models.DateTimeField(blank=True, null=True)
+    meeting_date = models.DateTimeField(blank=True, null=True, verbose_name="Meeting Date & Time")
 
     assigned_to = models.ForeignKey(
-        "response.Staff",
+        Staff,
         on_delete=models.SET_NULL,
         null=True,
         blank=True
     )
 
-    comment = models.CharField(max_length=500, blank=True, null=True)
+    comment = models.CharField(max_length=500, null=True, blank=True)
 
     create_at = models.DateTimeField(auto_now_add=True)
     update_at = models.DateTimeField(auto_now=True)
 
     created_by = models.ForeignKey(
         User,
-        related_name="meeting_created",
+        related_name='meeting_created',
         on_delete=models.SET_NULL,
         null=True,
         blank=True
@@ -212,31 +209,20 @@ class Meeting(models.Model):
 
     updated_by = models.ForeignKey(
         User,
-        related_name="meeting_updated",
+        related_name='meeting_updated',
         on_delete=models.SET_NULL,
         null=True,
         blank=True
     )
 
-    def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
-
-        # If deal done → auto convert lead
-        if self.status == "Deal Done":
-            self.response.is_converted = True
-            self.response.save()
-
     def __str__(self):
         return f"Meeting {self.id} - {self.status}"
 
-    class Meta:
-        ordering = ["-meeting_date"]
 
-
-
-
+# =======================
+#  Followup
+# =======================
 class Followup(models.Model):
-
     FOLLOWUP_STATUS_CHOICES = [
         ("New Followup", "New Followup"),
         ("Re Followup", "Re Followup"),
@@ -247,28 +233,32 @@ class Followup(models.Model):
     response = models.ForeignKey(
         Response,
         on_delete=models.CASCADE,
-        related_name="followups"
+        related_name='followups'
     )
 
-    status = models.CharField(max_length=25, choices=FOLLOWUP_STATUS_CHOICES)
+    status = models.CharField(
+        max_length=25,
+        choices=FOLLOWUP_STATUS_CHOICES,
+        verbose_name="Followup Status"
+    )
 
-    followup_date = models.DateTimeField(blank=True, null=True)
+    followup_date = models.DateTimeField(blank=True, null=True, verbose_name="Followup Date & Time")
 
     assigned_to = models.ForeignKey(
-        "response.Staff",
+        Staff,
         on_delete=models.SET_NULL,
         null=True,
         blank=True
     )
 
-    comment = models.CharField(max_length=500, blank=True, null=True)
+    comment = models.CharField(max_length=500, null=True, blank=True)
 
     create_at = models.DateTimeField(auto_now_add=True)
     update_at = models.DateTimeField(auto_now=True)
 
     created_by = models.ForeignKey(
         User,
-        related_name="followup_created",
+        related_name='followup_created',
         on_delete=models.SET_NULL,
         null=True,
         blank=True
@@ -276,21 +266,15 @@ class Followup(models.Model):
 
     updated_by = models.ForeignKey(
         User,
-        related_name="followup_updated",
+        related_name='followup_updated',
         on_delete=models.SET_NULL,
         null=True,
         blank=True
     )
 
-    def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
+    def __str__(self):
+        return f"Followup {self.id} - {self.status}"
 
-        if self.status == "Deal Done":
-            self.response.is_converted = True
-            self.response.save()
-
-    class Meta:
-        ordering = ["-followup_date"]
 
 # =======================
 #  Comment
