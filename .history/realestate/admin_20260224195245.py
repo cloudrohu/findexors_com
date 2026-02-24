@@ -84,13 +84,13 @@ class MeetingInline(admin.StackedInline):
 # =====================================================
 # ✅ GOOGLE COMPANY ADMIN
 # =====================================================
-@admin.register(GoogleCompany)
-#class GoogleCompanyAdmin(ImportExportModelAdmin):
+#@admin.register(GoogleCompany)
+class GoogleCompanyAdmin(ImportExportModelAdmin):
 
 class GoogleCompanyAdmin(AutoUserAdminMixin, admin.ModelAdmin):
     resource_class = GoogleCompanyResource
     preserve_filters = True
-    change_list_template = "admin/realestate/googlecompany/change_list.html"
+    change_list_template = "admin/realtypms/googlecompany/change_list.html"
 
     def changelist_view(self, request, extra_context=None):
         print("✅✅✅ GOOGLE COMPANY CARD TEMPLATE CALLED ✅✅✅")
@@ -197,7 +197,7 @@ class GoogleCompanyAdmin(AutoUserAdminMixin, admin.ModelAdmin):
 # =====================================================
 @admin.register(Comment)
 class CommentAdmin(AutoUserAdminMixin, admin.ModelAdmin):
-    change_list_template = "admin/realestate/googlecompany/comment_card_list.html"
+    change_list_template = "admin/realtypms/googlecompany/comment_card_list.html"
     preserve_filters = True
     list_display = ("id", "company", "comment", "create_at", "created_by")
     search_fields = ("company__name", "company__phone", "comment")
@@ -240,7 +240,7 @@ class CommentAdmin(AutoUserAdminMixin, admin.ModelAdmin):
 # =====================================================
 @admin.register(VoiceRecording)
 class VoiceRecordingAdmin(AutoUserAdminMixin, admin.ModelAdmin):
-    change_list_template = "admin/realestate/googlecompany/voice_card_list.html"
+    change_list_template = "admin/realtypms/googlecompany/voice_card_list.html"
     preserve_filters = True
     list_per_page = 20
 
@@ -285,7 +285,7 @@ class VoiceRecordingAdmin(AutoUserAdminMixin, admin.ModelAdmin):
 # =====================================================
 @admin.register(Visit)
 class VisitAdmin(AutoUserAdminMixin, admin.ModelAdmin):
-    change_list_template = "admin/realestate/googlecompany/visit_card_list.html"
+    change_list_template = "admin/realtypms/googlecompany/visit_card_list.html"
     preserve_filters = True
     list_per_page = 20
 
@@ -332,7 +332,7 @@ class VisitAdmin(AutoUserAdminMixin, admin.ModelAdmin):
 # =====================================================
 @admin.register(Followup)
 class FollowupAdmin(AutoUserAdminMixin, admin.ModelAdmin):
-    change_list_template = "admin/realestate/googlecompany/followup_card_list.html"
+    change_list_template = "admin/realtypms/googlecompany/followup_card_list.html"
     preserve_filters = True
     list_per_page = 20
 
@@ -379,7 +379,7 @@ class FollowupAdmin(AutoUserAdminMixin, admin.ModelAdmin):
 # =====================================================
 @admin.register(Meeting)
 class MeetingAdmin(AutoUserAdminMixin, admin.ModelAdmin):
-    change_list_template = "admin/realestate/googlecompany/meeting_card_list.html"
+    change_list_template = "admin/realtypms/googlecompany/meeting_card_list.html"
     preserve_filters = True
     list_per_page = 20
 
