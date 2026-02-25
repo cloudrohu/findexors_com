@@ -101,16 +101,17 @@ class Job(models.Model):
             super().save(update_fields=["slug"])
 
     def __str__(self):
-        company_name = str(self.company) if self.company else "No Company"
-        city_name = str(self.city) if self.city else "No City"
-        locality_name = str(self.locality) if self.locality else ""
+    company_name = self.company.company_name if self.company else "No Company"
+    city_name = self.city.name if self.city else "No City"
+    locality_name = self.locality.name if self.locality else ""
 
-        return (
-            f"{self.title} | {company_name} | "
-            f"{city_name}, {locality_name} | "
-            f"{self.get_job_type_display()} | "
-            f"₹{self.salary_min} - ₹{self.salary_max}"
-        )
+    return (
+        f"{self.title} | {company_name} | "
+        f"{city_name}, {locality_name} | "
+        f"{self.get_job_type_display()} | "
+        f"₹{self.salary_min} - ₹{self.salary_max}"
+    )
+
 
 
 class JobApplicant(models.Model):
