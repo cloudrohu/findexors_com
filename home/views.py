@@ -25,8 +25,6 @@ def get_sub_localities(request):
     sub_localities = Sub_Locality.objects.filter(locality_id=locality_id).values("id", "title")
     return JsonResponse(list(sub_localities), safe=False)
 
-
-
 # 🏢 Edit Company Meeting (Business)
 @login_required
 def edit_company_meeting(request, pk):
@@ -270,27 +268,14 @@ class IndexView(TemplateView):
         if category_id:
             companies = companies.filter(category_id=category_id)
 
-        # ======================
-        # CONTEXT (TEMPLATE DATA)
-        # ======================
         context.update({
 
-            # 🔍 Search Filters
-            "cities": City.objects.all(),
+            "cities": City.objects.filter(level_type="CITY",is_top_cities=True).order_by("name"),
 
-            # ✅ ONLY FEATURED CATEGORIES (with icon)
-            "categories": Category.objects.filter(
-                is_featured=True,
-                parent__isnull=True   # optional but recommended (main categories only)
-            ),
+            "categories": Category.objects.filter(is_featured=True,parent__isnull=True),
 
-            # ⭐ Featured Companies
-            "featured_companies": Company.objects.filter(
-                is_active=True,
-                is_featured=True
-            )[:6],
+            "featured_companies": Company.objects.filter(is_active=True,is_featured=True)[:6],
 
-            # 🔎 Search Result
             "companies": companies,
             "search_query": query,
             "selected_city": city_id,
@@ -369,3 +354,14 @@ def ajax_search_suggestions(request):
             })
 
     return JsonResponse(results, safe=False)
+
+
+def search_city(request):
+    q = request.GET.get("q", "").strip()
+
+    cities = City.objects.filter(
+        level_type="CITY",
+        name__icontains=q
+    ).values("id", "name")[:20]
+
+    return JsonResponse(list(cities), safe=False)

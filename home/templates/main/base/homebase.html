@@ -26,53 +26,57 @@
 
 <body class="bg-gray-50 text-gray-800">
 
-<header class="bg-white shadow sticky top-0 z-50">
+<!-- Header Start Here -->
+<header class="hidden lg:block bg-white shadow-md sticky top-0 z-50">
     <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-
-        <!-- LOGO -->
-        <a href="/" class="text-2xl font-bold text-indigo-600">
-            Findexors
-        </a>
-
-        <!-- DESKTOP NAV -->
-        <nav class="hidden md:flex items-center gap-6 font-medium">
-            <a href="/" class="hover:text-indigo-600">Home</a>
-            <a href="#" class="hover:text-indigo-600">Categories</a>
-            <a href="#" class="hover:text-indigo-600">Businesses</a>
-
-            <!-- ✅ CREATE JOB LINK -->
-            <a href="{% url 'jobs:create' %}"
-               class="hover:text-indigo-600 font-semibold">
-                Create Job
-            </a>
-
-            <a href="#" class="hover:text-indigo-600">Contact</a>
-        </nav>
-
-        <!-- RIGHT CTA -->
-        <div class="flex items-center gap-3">
-
-            <!-- CREATE JOB BUTTON (Desktop) -->
-            <a href="{% url 'jobs:create' %}"
-               class="hidden md:inline-flex bg-indigo-600 text-white px-5 py-2 rounded-lg font-semibold hover:bg-indigo-700 transition">
-                + Create Job
-            </a>
-
-            <!-- ADD BUSINESS -->
-            <a href="#"
-               class="hidden md:inline-flex border border-indigo-600 text-indigo-600 px-5 py-2 rounded-lg font-semibold hover:bg-indigo-50 transition">
-                Add Business
-            </a>
-
-            <!-- MOBILE CREATE JOB -->
-            <a href="{% url 'jobs:create' %}"
-               class="md:hidden bg-indigo-600 text-white px-4 py-2 rounded-lg font-semibold">
-                + Job
-            </a>
+        <div>
+            <h2 class="text-2xl font-bold text-blue-600">Findexors</h2>
         </div>
 
+        <div class="flex items-center bg-gray-100 rounded-md overflow-hidden w-[40%]">
+        
+
+            <div class="relative w-[180px]">
+
+                    <button id="cityToggle"
+                        class="w-full flex items-center justify-between bg-gray-100 px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-200">
+
+                        <span id="selectedCityName">Select City</span>
+                        <i id="cityArrow" class="fa-solid fa-chevron-down text-xs ml-2 transition-transform"></i>
+
+                    </button>
+
+                    <div id="cityDropdown"
+                        class="absolute left-0 top-12 w-full bg-white shadow-xl rounded-md hidden z-50">
+
+                        <ul class="max-h-[220px] overflow-y-auto text-sm">
+
+                            {% for city in cities %}
+                            <li class="city-option px-4 py-2 hover:bg-gray-100 cursor-pointer">
+                                {{ city.name }}
+                            </li>
+                            {% endfor %}
+
+                        </ul>
+                    </div>
+
+             </div>
+
+            <div class="h-6 w-px bg-gray-300"></div>
+            <input type="text" placeholder="Search businesses..." class="bg-transparent px-4 py-2 flex-1 focus:outline-none text-sm"/>
+            <button class="bg-blue-600 text-white px-6 py-2 hover:bg-blue-700 transition">Search</button>
+        </div>
+
+        <nav class="flex items-center space-x-8 text-sm font-medium relative">
+            <a href="#" class="hover:text-blue-600">Categories</a>
+            <a href="#" class="bg-yellow-500 text-white px-4 py-2 rounded-md font-semibold">Add Business</a>
+            <a href="#" class="hover:text-blue-600">Login</a>
+        </nav>
+        
     </div>
 </header>
+<!-- Header End Here -->
+
 
 
 <main>
@@ -118,6 +122,237 @@
         © {% now "Y" %} Findexors. All rights reserved.
     </div>
 </footer>
+
+<!-- CITY POPUP -->
+<div id="cityPopup" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[9999] hidden">
+
+  <div class="bg-white w-[650px] max-w-[95%] p-8 rounded-xl shadow-2xl animate-[popup_.35s_ease]">
+
+
+    <!-- SEARCH -->
+    <h1 class="flex items-center gap-2 text-lg mb-4 bg-gray-100 text-gray-600 shadow-md px-4 py-2 font-medium">
+      <i class="fa-solid fa-location-dot"></i>
+        Please Select A City First...
+    </h1>
+
+    <div class="relative mb-6">
+      <input type="text" id="citySearch" placeholder="Search city..." class="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400">
+            <i class="fa fa-search absolute right-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+    </div>
+
+    <h4 class="text-gray-700 mb-4 text-sm font-semibold border-b pb-2">
+        Popular Cities
+    </h4>
+
+    <!-- CITY GRID -->
+   <div id="cityList" class="grid grid-cols-2 gap-3 md:grid-cols-4 sm:grid-cols-2 max-h-[350px] overflow-y-auto">
+        {% for city in cities %}
+             <div class="city bg-gray-100 p-3 rounded-lg text-center cursor-pointer font-medium transition hover:bg-orange-500 hover:text-white">{{ city.name|slice:":20" }}</div>
+        {% endfor %}
+    </div>
+
+  </div>
+
+</div>
+
+<style>
+.city.active-city{
+    background:#ff7a00;
+    color:white;
+    font-weight:600;
+}
+
+@keyframes popup{
+    from{opacity:0;transform:scale(.9)}
+    to{opacity:1;transform:scale(1)}
+}
+
+</style>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+const cityPopup = document.getElementById("cityPopup");
+const cityToggle = document.getElementById("cityToggle");
+const cityDropdown = document.getElementById("cityDropdown");
+const selectedCityName = document.getElementById("selectedCityName");
+const arrow = document.getElementById("cityArrow");
+const cityList = document.getElementById("cityList");
+const searchInput = document.getElementById("citySearch");
+
+/* =============================
+   LOAD SAVED CITY
+============================= */
+
+const savedCity = localStorage.getItem("selectedCity");
+
+if(savedCity){
+    if(selectedCityName){
+        selectedCityName.innerText = savedCity;
+    }
+    if(cityPopup){
+        cityPopup.style.display = "none";
+    }
+}else{
+    if(cityPopup){
+        cityPopup.style.display = "flex";
+    }
+}
+
+/* =============================
+   HIGHLIGHT SAVED CITY
+============================= */
+
+document.querySelectorAll(".city").forEach(city => {
+    if(city.innerText.trim() === savedCity){
+        city.classList.add("active-city");
+    }
+});
+
+/* =============================
+   CITY CLICK (POPUP SELECT)
+============================= */
+
+function selectCity(cityName){
+
+    localStorage.setItem("selectedCity", cityName);
+
+    if(selectedCityName){
+        selectedCityName.innerText = cityName;
+    }
+
+    document.querySelectorAll(".city").forEach(c=>{
+        c.classList.remove("active-city");
+    });
+
+    if(cityPopup){
+        cityPopup.style.display = "none";
+    }
+
+}
+
+document.querySelectorAll(".city").forEach(city => {
+
+    city.addEventListener("click", function(){
+
+        const selected = this.innerText.trim();
+
+        this.classList.add("active-city");
+
+        selectCity(selected);
+
+    });
+
+});
+
+
+/* =============================
+   SEARCH CITY (DATABASE)
+============================= */
+
+searchInput.addEventListener("keyup", function(){
+
+    const query = this.value.trim();
+
+    if(query.length < 2){
+        return;
+    }
+
+    fetch(`/search-city/?q=${query}`)
+    .then(res => res.json())
+    .then(data => {
+
+        cityList.innerHTML = "";
+
+        data.forEach(city => {
+
+            const div = document.createElement("div");
+
+            div.className =
+            "city bg-gray-100 p-3 rounded-lg text-center cursor-pointer font-medium transition hover:bg-orange-500 hover:text-white";
+
+            div.innerText = city.name;
+
+            div.addEventListener("click", function(){
+                selectCity(city.name);
+            });
+
+            cityList.appendChild(div);
+
+        });
+
+    });
+
+});
+
+
+/* =============================
+   DROPDOWN OPEN / CLOSE
+============================= */
+
+if(cityToggle){
+cityToggle.addEventListener("click", function(e){
+
+    e.stopPropagation();
+
+    cityDropdown.classList.toggle("hidden");
+
+    if(arrow){
+        arrow.classList.toggle("rotate-180");
+    }
+
+});
+}
+
+
+/* =============================
+   DROPDOWN CITY SELECT
+============================= */
+
+document.querySelectorAll(".city-option").forEach(option => {
+
+option.addEventListener("click", function(){
+
+    const city = this.innerText.trim();
+
+    selectCity(city);
+
+    cityDropdown.classList.add("hidden");
+
+    if(arrow){
+        arrow.classList.remove("rotate-180");
+    }
+
+});
+
+});
+
+
+/* =============================
+   OUTSIDE CLICK CLOSE
+============================= */
+
+document.addEventListener("click", function(e){
+
+if(cityToggle && cityDropdown){
+
+if(!cityToggle.contains(e.target) && !cityDropdown.contains(e.target)){
+
+    cityDropdown.classList.add("hidden");
+
+    if(arrow){
+        arrow.classList.remove("rotate-180");
+    }
+
+}
+
+}
+
+});
+
+});
+</script>
+
 
 {% block extra_js %}{% endblock %}
 </body>

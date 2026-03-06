@@ -56,28 +56,23 @@ class SocialSite(models.Model):
     class Meta:
         verbose_name_plural='3. SocialSite'
 
-
 class City(MPTTModel):
-    name = models.CharField(max_length=150, default="", blank=True)
-    slug = models.SlugField(max_length=150, unique=True, null=True, blank=True)
-
-    parent = TreeForeignKey(
-        'self',
-        on_delete=models.CASCADE,
-        null=True,
-        blank=True,
-        related_name='children',
-        verbose_name='Parent Location (State/City)'
-    )
-
     level_choices = (
         ('STATE', 'State/Province'),
         ('CITY', 'City'),
         ('LOCALITY', 'Locality/Sector'),
         ('AREA', 'Sub-Area/Zone'),
     )
-    level_type = models.CharField(max_length=20, choices=level_choices, default='LOCALITY')
 
+    name = models.CharField(max_length=150, default="", blank=True)
+    slug = models.SlugField(max_length=150, unique=True, null=True, blank=True)
+    parent = TreeForeignKey('self',on_delete=models.CASCADE,null=True,blank=True,related_name='children',verbose_name='Parent Location (State/City)')
+    level_type = models.CharField(max_length=20, choices=level_choices, default='LOCALITY')
+    is_top_cities = models.BooleanField(default=False,null=True,blank=True)
+                                                                                         
+    
+   
+   
     class MPTTMeta:
         order_insertion_by = ['name']
 
@@ -163,26 +158,11 @@ class Response_Status(models.Model):
 
 class Category(MPTTModel):
 
-    parent = TreeForeignKey(
-        'self',
-        blank=True,
-        null=True,
-        related_name='children',
-        on_delete=models.CASCADE
-    )
-
+    parent = TreeForeignKey('self',blank=True,null=True,related_name='children',on_delete=models.CASCADE)
     title = models.CharField(max_length=50)
-
-    icon = models.ImageField(
-        upload_to='category/icons/',
-        blank=True,
-        null=True
-    )
-
+    icon = models.ImageField(upload_to='category/icons/',blank=True,null=True)
     is_featured = models.BooleanField(default=False)
-
     slug = models.SlugField(unique=True, blank=True, null=True)
-
     create_at = models.DateTimeField(auto_now_add=True)
     update_at = models.DateTimeField(auto_now=True)
 

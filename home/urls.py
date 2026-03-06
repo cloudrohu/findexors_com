@@ -23,5 +23,6 @@ urlpatterns = [
 
     path('ajax/get-localities/', views.get_localities, name='get_localities'),
     path('ajax/get-sub-localities/', views.get_sub_localities, name='get_sub_localities'),
+    path("search-city/", views.search_city, name="search_city"),
     
 ]
