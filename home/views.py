@@ -262,8 +262,8 @@ class IndexView(TemplateView):
         if query:
             companies = companies.filter(company_name__icontains=query)
 
-        if city_id:
-            companies = companies.filter(city_id=city_id)
+        if city_id and city_id.isdigit():
+            companies = companies.filter(city_id=int(city_id))
 
         if category_id:
             companies = companies.filter(category_id=category_id)
@@ -321,37 +321,33 @@ def ajax_search_suggestions(request):
                 "value": l.title,
             })
 
-        # ==========================
-        # SUB LOCALITIES
-        # ==========================
-        sub_localities = Sub_Locality.objects.select_related(
-            "locality", "locality__city"
-        ).filter(
-            title__icontains=q
-        )[:5]
+            # SUB LOCALITIES
+            sub_localities = Sub_Locality.objects.select_related(
+                "locality", "locality__city"
+            ).filter(
+                title__icontains=q
+            )[:5]
 
-        for sl in sub_localities:
-            results.append({
-                "type": "sub_locality",
-                "label": f"{sl.title}, {sl.locality.title}, {sl.locality.city.title}",
-                "value": sl.title,
-            })
+            for sl in sub_localities:
+                results.append({
+                    "type": "sub_locality",
+                    "label": f"{sl.title}, {sl.locality.title}, {sl.locality.city.title}",
+                    "value": sl.title,
+                })
 
-        # ==========================
-        # CATEGORIES (MPTT FIX)
-        # ==========================
-        categories = Category.objects.filter(
-            title__icontains=q
-        ).select_related("parent")[:5]
 
-        for cat in categories:
-            full_name = str(cat)  # 🔥 uses __str__ (parent / child path)
+            # CATEGORIES
+            categories = Category.objects.filter(
+                title__icontains=q
+            ).select_related("parent")[:5]
 
-            results.append({
-                "type": "category",
-                "label": full_name,
-                "slug": cat.slug,
-            })
+            for cat in categories:
+                results.append({
+                    "type": "category",
+                    "label": str(cat),
+                    "slug": cat.slug,
+                    "url": cat.get_absolute_url(), 
+                })
 
     return JsonResponse(results, safe=False)
 
@@ -365,3 +361,26 @@ def search_city(request):
     ).values("id", "name")[:20]
 
     return JsonResponse(list(cities), safe=False)
+
+def company_list_view(request):
+
+    query = request.GET.get("q")
+    city = request.GET.get("city")
+
+    companies = Company.objects.filter(is_active=True)
+
+    if query:
+        companies = companies.filter(
+            Q(company_name__icontains=query) |
+            Q(locality__title__icontains=query) |
+            Q(category__title__icontains=query)
+        )
+
+    if city and city.isdigit():
+        companies = companies.filter(city_id=int(city))
+
+    return render(request, "company/company_list.html", {
+        "companies": companies,
+        "search_query": query,
+        "selected_city": city,
+    })

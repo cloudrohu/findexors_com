@@ -10,12 +10,9 @@
         </p>
 
           
-        <form method="get"
-              action="/"
-              class="bg-white rounded-xl p-4 flex flex-col md:flex-row gap-3 relative">
+        <form method="get" action="/" class="bg-white rounded-xl p-4 flex flex-col md:flex-row gap-3 relative">
             <!-- CITY SELECT -->
-            <select name="city"
-                    class="px-4 py-3 rounded-lg border text-gray-700">
+            <select name="city" class="px-4 py-3 rounded-lg border text-gray-700">
                 <option value="">Select City</option>
                 {% for city in cities %}
                     <option value="{{ city.id }}"
@@ -27,18 +24,10 @@
 
             <!-- SEARCH INPUT WITH AUTOSUGGEST -->
             <div class="relative flex-1">
-                <input type="text"
-                       id="searchInput"
-                       name="q"
-                       value="{{ search_query|default:'' }}"
-                       autocomplete="off"
-                       placeholder="Search business, locality or service"
-                       class="w-full px-4 py-3 rounded-lg border outline-none text-gray-700">
+                <input type="text" id="searchInput" name="q" value="{{ search_query|default:'' }}" autocomplete="off" placeholder="Search business, locality or service" class="w-full px-4 py-3 rounded-lg border outline-none text-gray-700">
 
                 <!-- SUGGESTION BOX -->
-                <div id="suggestions"
-                     class="absolute left-0 right-0 bg-white text-gray-800
-                            rounded-lg shadow-lg mt-1 hidden z-50 max-h-72 overflow-y-auto">
+                <div id="suggestions" class="absolute left-0 right-0 bg-white text-gray-800 rounded-lg shadow-lg mt-1 hidden z-50 max-h-72 overflow-y-auto">
                 </div>
             </div>
 

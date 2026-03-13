@@ -26,58 +26,58 @@
 
 <body class="bg-gray-50 text-gray-800">
 
-<!-- Header Start Here -->
-<header class="hidden lg:block bg-white shadow-md sticky top-0 z-50">
-    <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-        <div>
-            <h2 class="text-2xl font-bold text-blue-600">Findexors</h2>
-        </div>
-
-        <div class="flex items-center bg-gray-100 rounded-md overflow-hidden w-[40%]">
+<header class="hidden lg:block bg-white shadow-sm border-b border-gray-100 sticky top-0 z-50">
+    <div class="max-w-7xl px-4 mx-auto h-[90px] flex items-center justify-between">
         
-
-            <div class="relative w-[180px]">
-
-                    <button id="cityToggle"
-                        class="w-full flex items-center justify-between bg-gray-100 px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-200">
-
-                        <span id="selectedCityName">Select City</span>
-                        <i id="cityArrow" class="fa-solid fa-chevron-down text-xs ml-2 transition-transform"></i>
-
-                    </button>
-
-                    <div id="cityDropdown"
-                        class="absolute left-0 top-12 w-full bg-white shadow-xl rounded-md hidden z-50">
-
-                        <ul class="max-h-[220px] overflow-y-auto text-sm">
-
-                            {% for city in cities %}
-                            <li class="city-option px-4 py-2 hover:bg-gray-100 cursor-pointer">
-                                {{ city.name }}
-                            </li>
-                            {% endfor %}
-
-                        </ul>
-                    </div>
-
-             </div>
-
-            <div class="h-6 w-px bg-gray-300"></div>
-            <input type="text" placeholder="Search businesses..." class="bg-transparent px-4 py-2 flex-1 focus:outline-none text-sm"/>
-            <button class="bg-blue-600 text-white px-6 py-2 hover:bg-blue-700 transition">Search</button>
+        <div class="flex-shrink-0">
+            <h2 class="text-2xl font-black tracking-tight text-blue-600">Findexors</h2>
         </div>
 
-        <nav class="flex items-center space-x-8 text-sm font-medium relative">
-            <a href="#" class="hover:text-blue-600">Categories</a>
-            <a href="#" class="bg-yellow-500 text-white px-4 py-2 rounded-md font-semibold">Add Business</a>
-            <a href="#" class="hover:text-blue-600">Login</a>
+        <form method="get" action="{% url 'company_list' %}" 
+            class="flex items-center bg-gray-100 border border-gray-200 rounded-lg overflow-hidden w-[35%] ml-6">
+
+                <!-- hidden city -->
+                <input type="hidden" name="city" id="selectedCityId" value="">
+
+                <input
+                    type="text"
+                    name="q"
+                    id="searchInputHeader"
+                    placeholder="Search businesses..."
+                    class="bg-transparent px-4 py-2 flex-1 focus:outline-none text-sm text-gray-700"
+                >
+
+                <button type="submit"
+                class="bg-blue-600 text-white px-5 py-2.5 hover:bg-blue-700">
+                    Search
+                </button>
+
+        </form>
+
+        <nav class="flex items-center gap-5 ml-auto pl-4">
+            <div class="flex items-center gap-5 text-[15px] font-semibold text-gray-600">
+                <a href="#" class="hover:text-blue-600 transition">Businesses</a>
+                <a href="#" class="hover:text-blue-600 transition">Jobs</a>
+                <a href="#" class="hover:text-blue-600 transition">About</a>
+                <a href="#" class="hover:text-blue-600 transition">Contact</a>
+            </div>
+
+            <div class="flex items-center gap-3 ml-2">
+                <a href="#" class="bg-green-600 text-white px-4 py-2 rounded-md text-sm font-bold hover:bg-green-700 transition shadow-sm">
+                    Post Job
+                </a>
+                <a href="#" class="bg-yellow-500 text-white px-4 py-2 rounded-md text-sm font-bold hover:bg-yellow-600 transition shadow-sm">
+                    Add Business
+                </a>
+            </div>
+
+            <a href="#" class="text-[15px] font-bold text-gray-700 hover:text-blue-600 transition ml-2 border-l pl-5 border-gray-200">
+                Login
+            </a>
         </nav>
         
     </div>
 </header>
-<!-- Header End Here -->
-
-
 
 <main>
     {% block content %}{% endblock %}
@@ -123,7 +123,6 @@
     </div>
 </footer>
 
-<!-- CITY POPUP -->
 <div id="cityPopup" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[9999] hidden">
 
   <div class="bg-white w-[650px] max-w-[95%] p-8 rounded-xl shadow-2xl animate-[popup_.35s_ease]">
@@ -170,128 +169,41 @@
 </style>
 
 <script>
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", () => {
 
 const cityPopup = document.getElementById("cityPopup");
 const cityToggle = document.getElementById("cityToggle");
 const cityDropdown = document.getElementById("cityDropdown");
 const selectedCityName = document.getElementById("selectedCityName");
-const arrow = document.getElementById("cityArrow");
 const cityList = document.getElementById("cityList");
-const searchInput = document.getElementById("citySearch");
+const citySearch = document.getElementById("citySearch");
+const arrow = document.getElementById("cityArrow");
 
-/* =============================
+const STORAGE_KEY = "selectedCity";
+
+
+
+/* ==============================
    LOAD SAVED CITY
-============================= */
+============================== */
 
-const savedCity = localStorage.getItem("selectedCity");
+const savedCity = localStorage.getItem(STORAGE_KEY);
 
 if(savedCity){
-    if(selectedCityName){
-        selectedCityName.innerText = savedCity;
-    }
-    if(cityPopup){
-        cityPopup.style.display = "none";
-    }
+    if(selectedCityName) selectedCityName.innerText = savedCity;
+    if(cityPopup) cityPopup.style.display = "none";
 }else{
-    if(cityPopup){
-        cityPopup.style.display = "flex";
-    }
+    if(cityPopup) cityPopup.style.display = "flex";
 }
 
-/* =============================
-   HIGHLIGHT SAVED CITY
-============================= */
-
-document.querySelectorAll(".city").forEach(city => {
-    if(city.innerText.trim() === savedCity){
-        city.classList.add("active-city");
-    }
-});
-
-/* =============================
-   CITY CLICK (POPUP SELECT)
-============================= */
-
-function selectCity(cityName){
-
-    localStorage.setItem("selectedCity", cityName);
-
-    if(selectedCityName){
-        selectedCityName.innerText = cityName;
-    }
-
-    document.querySelectorAll(".city").forEach(c=>{
-        c.classList.remove("active-city");
-    });
-
-    if(cityPopup){
-        cityPopup.style.display = "none";
-    }
-
-}
-
-document.querySelectorAll(".city").forEach(city => {
-
-    city.addEventListener("click", function(){
-
-        const selected = this.innerText.trim();
-
-        this.classList.add("active-city");
-
-        selectCity(selected);
-
-    });
-
-});
 
 
-/* =============================
-   SEARCH CITY (DATABASE)
-============================= */
-
-searchInput.addEventListener("keyup", function(){
-
-    const query = this.value.trim();
-
-    if(query.length < 2){
-        return;
-    }
-
-    fetch(`/search-city/?q=${query}`)
-    .then(res => res.json())
-    .then(data => {
-
-        cityList.innerHTML = "";
-
-        data.forEach(city => {
-
-            const div = document.createElement("div");
-
-            div.className =
-            "city bg-gray-100 p-3 rounded-lg text-center cursor-pointer font-medium transition hover:bg-orange-500 hover:text-white";
-
-            div.innerText = city.name;
-
-            div.addEventListener("click", function(){
-                selectCity(city.name);
-            });
-
-            cityList.appendChild(div);
-
-        });
-
-    });
-
-});
-
-
-/* =============================
-   DROPDOWN OPEN / CLOSE
-============================= */
+/* ==============================
+   DROPDOWN TOGGLE
+============================== */
 
 if(cityToggle){
-cityToggle.addEventListener("click", function(e){
+cityToggle.addEventListener("click",(e)=>{
 
     e.stopPropagation();
 
@@ -305,17 +217,18 @@ cityToggle.addEventListener("click", function(e){
 }
 
 
-/* =============================
-   DROPDOWN CITY SELECT
-============================= */
 
-document.querySelectorAll(".city-option").forEach(option => {
+/* ==============================
+   SELECT CITY
+============================== */
 
-option.addEventListener("click", function(){
+function selectCity(cityName){
 
-    const city = this.innerText.trim();
+    localStorage.setItem(STORAGE_KEY, cityName);
 
-    selectCity(city);
+    if(selectedCityName){
+        selectedCityName.innerText = cityName;
+    }
 
     cityDropdown.classList.add("hidden");
 
@@ -323,18 +236,97 @@ option.addEventListener("click", function(){
         arrow.classList.remove("rotate-180");
     }
 
+    if(cityPopup){
+        cityPopup.style.display="none";
+    }
+
+}
+
+
+
+/* ==============================
+   DROPDOWN CITY SELECT
+============================== */
+
+document.querySelectorAll(".city-option").forEach(city => {
+
+city.addEventListener("click",()=>{
+
+    const name = city.innerText.trim();
+
+    selectCity(name);
+
+});
+
+});
+
+
+
+/* ==============================
+   POPUP CITY SELECT
+============================== */
+
+document.querySelectorAll(".city").forEach(city => {
+
+city.addEventListener("click",()=>{
+
+    const name = city.innerText.trim();
+
+    selectCity(name);
+
 });
 
 });
 
 
-/* =============================
+
+/* ==============================
+   SEARCH CITY
+============================== */
+
+if(citySearch){
+
+citySearch.addEventListener("keyup",()=>{
+
+    const query = citySearch.value.trim();
+
+    if(query.length < 2) return;
+
+    fetch(`/search-city/?q=${query}`)
+    .then(res => res.json())
+    .then(data=>{
+
+        if(!cityList) return;
+
+        cityList.innerHTML="";
+
+        data.forEach(city=>{
+
+            const div = document.createElement("div");
+
+            div.className="city bg-gray-100 p-3 rounded-lg text-center cursor-pointer font-medium hover:bg-orange-500 hover:text-white";
+
+            div.innerText=city.name;
+
+            div.onclick=()=>selectCity(city.name);
+
+            cityList.appendChild(div);
+
+        });
+
+    });
+
+});
+
+}
+
+
+
+/* ==============================
    OUTSIDE CLICK CLOSE
-============================= */
+============================== */
 
-document.addEventListener("click", function(e){
-
-if(cityToggle && cityDropdown){
+document.addEventListener("click",(e)=>{
 
 if(!cityToggle.contains(e.target) && !cityDropdown.contains(e.target)){
 
@@ -346,13 +338,10 @@ if(!cityToggle.contains(e.target) && !cityDropdown.contains(e.target)){
 
 }
 
-}
-
 });
 
 });
 </script>
-
 
 {% block extra_js %}{% endblock %}
 </body>

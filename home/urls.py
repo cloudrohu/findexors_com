@@ -1,6 +1,6 @@
 from django.urls import path
 
-from home.views import IndexView,DashboardView,company_meeting_list, response_meeting_list,CategoryDetailView
+from home.views import IndexView,DashboardView,company_meeting_list, response_meeting_list,CategoryDetailView,company_list_view
 from .import views 
 
 from django.contrib.auth.views import LogoutView
@@ -12,10 +12,10 @@ urlpatterns = [
     
     path("admin/logout/", LogoutView.as_view(), name="logout"),
     path('dashboard/', DashboardView.as_view(), name='dashboard'), 
-    # 🏢 Company Meetings Filter Views
+    
     path('company-meetings/<str:filter_type>/', company_meeting_list, name='company_meeting_list'),
 
-    # 📊 Response Meetings Filter Views
+    
     path('response-meetings/<str:filter_type>/', response_meeting_list, name='response_meeting_list'),
 
     path('company-meetings/edit/<int:pk>/', views.edit_company_meeting, name='edit_company_meeting'),
@@ -24,5 +24,7 @@ urlpatterns = [
     path('ajax/get-localities/', views.get_localities, name='get_localities'),
     path('ajax/get-sub-localities/', views.get_sub_localities, name='get_sub_localities'),
     path("search-city/", views.search_city, name="search_city"),
+
+    path("companies/", views.company_list_view, name="company_list"),
     
 ]
