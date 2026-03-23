@@ -1,0 +1,33 @@
+{% block result_list %}
+<div class="cards">
+
+{% for obj in cl.result_list %}
+<div class="card">
+
+<div class="title">🤝 Meeting</div>
+
+<div class="meta">🏢 {{ obj.company }}</div>
+<div class="meta">Status: {{ obj.status }}</div>
+
+<div class="meta">
+📅 {{ obj.meeting_date|date:"d M Y, h:i A" }}
+</div>
+
+<div class="meta">👤 {{ obj.assigned_to }}</div>
+
+{% if obj.comment %}
+<div class="meta">💬 {{ obj.comment }}</div>
+{% endif %}
+
+<div class="actions">
+<a class="edit"
+href="{% url 'admin:business_meeting_change' obj.id %}">
+✏️ Edit
+</a>
+</div>
+
+</div>
+{% endfor %}
+
+</div>
+{% endblock %}

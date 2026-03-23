@@ -1,0 +1,107 @@
+{% extends "admin/change_list.html" %}
+{% load static %}
+
+{% block extrastyle %}
+<style>
+.cards{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(420px,1fr));
+    gap:18px;
+}
+.card{
+    background:#fff;
+    border-radius:14px;
+    padding:14px;
+    box-shadow:0 10px 25px rgba(0,0,0,.08);
+}
+.title{font-weight:800;font-size:16px;}
+.meta{font-size:13px;color:#555;margin-top:6px;}
+.actions{margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;}
+.actions a{
+    padding:7px 12px;
+    border-radius:20px;
+    font-size:12px;
+    text-decoration:none;
+}
+.call{background:#16a34a;color:#fff;}
+.whatsapp{background:#25D366;color:#fff;}
+.edit{background:#111;color:#fff;}
+.badge{
+    padding:3px 8px;
+    background:#eef2ff;
+    border-radius:12px;
+    font-size:11px;
+}
+</style>
+{% endblock %}
+
+{% block result_list %}
+<div class="cards">
+
+{% for obj in cl.result_list %}
+<div class="card">
+
+    <!-- TITLE -->
+    <div class="title">
+        <span class="badge">C{{ obj.id|stringformat:"03d" }}</span>
+        {{ obj.company_name }}
+    </div>
+
+    <!-- BASIC INFO -->
+    <div class="meta">📞 {{ obj.contact_no|default:"—" }}</div>
+    <div class="meta">📍 {{ obj.city }} • {{ obj.locality }}</div>
+
+    <!-- RATING -->
+    {% if obj.rating %}
+    <div class="meta">⭐ {{ obj.rating }} ({{ obj.reviews_count|default:"0" }})</div>
+    {% endif %}
+
+    <!-- FOLLOWUP -->
+    {% if obj.followup %}
+    <div class="meta">
+        📅 Followup: 
+        {{ obj.followup.followup_date|date:"d M Y, h:i A"|default:"—" }} 
+        ({{ obj.followup.status }})
+    </div>
+    {% endif %}
+
+    <!-- MEETING -->
+    {% if obj.meeting %}
+    <div class="meta">
+        🤝 Meeting: 
+        {{ obj.meeting.meeting_date|date:"d M Y, h:i A"|default:"—" }} 
+        ({{ obj.meeting.status }})
+    </div>
+    {% endif %}
+
+    <!-- LAST COMMENT -->
+    {% with obj.comments.last as c %}
+    {% if c %}
+    <div class="meta">
+        💬 {{ c.comment|truncatechars:80 }}
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    <!-- ACTIONS -->
+    <div class="actions">
+
+        {% if obj.contact_no %}
+        <a href="tel:{{ obj.contact_no }}" class="call">📞 Call</a>
+
+        <a href="https://wa.me/{{ obj.contact_no|cut:'+' }}" target="_blank"
+           class="whatsapp">💬 WhatsApp</a>
+        {% endif %}
+
+        <!-- ✅ FINAL FIXED EDIT BUTTON -->
+        <a href="{% url 'admin:business_company_change' obj.id %}" class="edit">
+            ✏️ Edit
+        </a>
+
+    </div>
+
+</div>
+{% endfor %}
+
+</div>
+{% endblock %}

@@ -1,0 +1,174 @@
+{% extends "admin/change_list.html" %}
+{% load static %}
+
+{% block extrastyle %}
+<style>
+
+/* ❌ HIDE DEFAULT FILTER */
+#changelist-filter{
+    display:none !important;
+}
+
+/* ✅ TOP FILTER BAR */
+.top-filters{
+    background:#fff;
+    padding:12px;
+    border-radius:10px;
+    margin-bottom:15px;
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+}
+
+.top-filters select,
+.top-filters input{
+    padding:8px 10px;
+    border:1px solid #ddd;
+    border-radius:6px;
+    font-size:13px;
+}
+
+.top-filters button{
+    background:#2563eb;
+    color:#fff;
+    border:none;
+    padding:8px 14px;
+    border-radius:6px;
+}
+
+/* ✅ CARDS */
+.cards{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(420px,1fr));
+    gap:18px;
+}
+.card{
+    background:#fff;
+    border-radius:14px;
+    padding:14px;
+    box-shadow:0 10px 25px rgba(0,0,0,.08);
+}
+.title{font-weight:800;font-size:16px;}
+.meta{font-size:13px;color:#555;margin-top:6px;}
+.actions{margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;}
+.actions a{
+    padding:7px 12px;
+    border-radius:20px;
+    font-size:12px;
+    text-decoration:none;
+}
+.call{background:#16a34a;color:#fff;}
+.whatsapp{background:#25D366;color:#fff;}
+.edit{background:#111;color:#fff;}
+.badge{
+    padding:3px 8px;
+    background:#eef2ff;
+    border-radius:12px;
+    font-size:11px;
+}
+
+</style>
+{% endblock %}
+
+
+{% block result_list %}
+
+<!-- ✅ CUSTOM FILTER BAR -->
+<div class="top-filters">
+<form method="get">
+
+    <select name="status">
+        <option value="">Status</option>
+        {% for val, label in cl.model_admin.model.STATUS_CHOICES %}
+        <option value="{{ val }}" {% if request.GET.status == val %}selected{% endif %}>
+            {{ label }}
+        </option>
+        {% endfor %}
+    </select>
+
+    <select name="city">
+        <option value="">City</option>
+        {% for c in cl.result_list %}
+            {% if c.city %}
+            <option value="{{ c.city.id }}">{{ c.city }}</option>
+            {% endif %}
+        {% endfor %}
+    </select>
+
+    <select name="assigned_to">
+        <option value="">Assigned</option>
+        {% for c in cl.result_list %}
+            {% if c.assigned_to %}
+            <option value="{{ c.assigned_to.id }}">{{ c.assigned_to }}</option>
+            {% endif %}
+        {% endfor %}
+    </select>
+
+    <input type="text" name="q" placeholder="Search..." value="{{ request.GET.q }}">
+
+    <button type="submit">Search</button>
+
+</form>
+</div>
+
+
+<!-- ✅ CARD LIST -->
+<div class="cards">
+
+{% for obj in cl.result_list %}
+<div class="card">
+
+    <div class="title">
+        <span class="badge">C{{ obj.id|stringformat:"03d" }}</span>
+        {{ obj.company_name }}
+    </div>
+
+    <div class="meta">📞 {{ obj.contact_no|default:"—" }}</div>
+    <div class="meta">📍 {{ obj.city }} • {{ obj.locality }}</div>
+
+    {% if obj.rating %}
+    <div class="meta">⭐ {{ obj.rating }} ({{ obj.reviews_count|default:"0" }})</div>
+    {% endif %}
+
+    {% if obj.followup %}
+    <div class="meta">
+        📅 {{ obj.followup.followup_date|date:"d M Y, h:i A" }} 
+        ({{ obj.followup.status }})
+    </div>
+    {% endif %}
+
+    {% if obj.meeting %}
+    <div class="meta">
+        🤝 {{ obj.meeting.meeting_date|date:"d M Y, h:i A" }} 
+        ({{ obj.meeting.status }})
+    </div>
+    {% endif %}
+
+    {% with obj.comments.last as c %}
+    {% if c %}
+    <div class="meta">💬 {{ c.comment|truncatechars:80 }}</div>
+    {% endif %}
+    {% endwith %}
+
+    <div class="actions">
+
+        {% if obj.contact_no %}
+        <a href="tel:{{ obj.contact_no }}" class="call">📞 Call</a>
+
+        <a href="https://wa.me/{{ obj.contact_no|cut:'+' }}" target="_blank"
+           class="whatsapp">💬 WhatsApp</a>
+        {% endif %}
+
+        <!-- ✅ SAFE EDIT -->
+         <a href="{% url 'admin:business_company_change' obj.id %}" class="edit"></a>
+            ✏️ Edit
+        </a>
+
+    </div>
+
+</div>
+{% endfor %}
+
+</div>
+
+{% endblock %}

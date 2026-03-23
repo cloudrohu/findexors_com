@@ -1,0 +1,238 @@
+{% extends "admin/change_list.html" %}
+{% load static %}
+
+{% block extrastyle %}
+{{ block.super }}
+
+<style>
+
+/* ============================= */
+/* 🔥 HIDE DEFAULT DJANGO UI */
+/* ============================= */
+#changelist-filter,
+#toolbar,
+#changelist-search {
+    display: none !important;
+}
+
+/* ============================= */
+/* 🔥 CARD GRID */
+/* ============================= */
+.cards{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(420px,1fr));
+    gap:18px;
+    margin-top:20px;
+}
+
+/* ============================= */
+/* 🔥 CARD DESIGN */
+/* ============================= */
+.card{
+    background:#fff;
+    border-radius:14px;
+    padding:16px;
+    box-shadow:0 10px 25px rgba(0,0,0,.08);
+    transition:0.2s;
+}
+
+.card:hover{
+    transform: translateY(-3px);
+}
+
+/* ============================= */
+/* 🔥 TEXT */
+/* ============================= */
+.title{
+    font-weight:800;
+    font-size:16px;
+    margin-bottom:6px;
+}
+
+.meta{
+    font-size:13px;
+    color:#555;
+    margin-top:6px;
+    line-height:1.5;
+    word-wrap: break-word;
+}
+
+/* ============================= */
+/* 🔥 BADGE */
+/* ============================= */
+.badge{
+    padding:3px 8px;
+    background:#eef2ff;
+    border-radius:12px;
+    font-size:11px;
+    margin-right:6px;
+}
+
+/* ============================= */
+/* 🔥 ACTION BUTTONS */
+/* ============================= */
+.actions{
+    margin-top:12px;
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+}
+
+.actions a{
+    padding:8px 14px;
+    border-radius:20px;
+    font-size:12px;
+    text-decoration:none;
+}
+
+.call{
+    background:#16a34a;
+    color:#fff;
+}
+
+.whatsapp{
+    background:#25D366;
+    color:#fff;
+}
+
+.edit{
+    background:#111;
+    color:#fff;
+}
+
+/* ============================= */
+/* 🔥 DIVIDER */
+/* ============================= */
+hr{
+    border:none;
+    border-top:1px solid #eee;
+    margin:12px 0;
+}
+
+/* ============================= */
+/* 📱 MOBILE */
+/* ============================= */
+@media (max-width: 768px){
+
+    .cards{
+        grid-template-columns: 1fr;
+    }
+
+    .actions{
+        flex-direction:column;
+    }
+
+    .actions a{
+        width:100%;
+        text-align:center;
+    }
+}
+
+</style>
+{% endblock %}
+
+
+{% block result_list %}
+<div class="cards">
+
+{% for obj in cl.result_list %}
+<div class="card">
+
+    <!-- HEADER -->
+    <div class="title">
+        <span class="badge">CM{{ obj.id|stringformat:"03d" }}</span>
+        {{ obj.company }}
+    </div>
+
+    <!-- LOCATION -->
+    <div class="meta">
+        📍 {{ obj.company.city }} • {{ obj.company.locality }}
+    </div>
+
+    <!-- COMMENT -->
+    <div class="meta">
+        💬 {{ obj.comment }}
+    </div>
+
+    <hr>
+
+    <!-- COMPANY INFO -->
+    <div class="meta">
+        📞 {{ obj.company.contact_no|default:"—" }}
+    </div>
+
+    <div class="meta">
+        📧 {{ obj.company.email|default:"—" }}
+    </div>
+
+    <div class="meta">
+        🌐 
+        {% if obj.company.website %}
+        <a href="{{ obj.company.website }}" target="_blank">
+            {{ obj.company.website }}
+        </a>
+        {% else %} — {% endif %}
+    </div>
+
+    <hr>
+
+    <!-- LAST VISIT -->
+    {% with obj.company.visits.last as v %}
+    {% if v %}
+    <div class="meta">
+        🚗 <strong>Last Visit:</strong><br>
+        {{ v.visit_type }} | {{ v.visit_status }}<br>
+        👤 {{ v.uploaded_by }} | {{ v.uploaded_at|date:"d M Y, h:i A" }}
+    </div>
+    <hr>
+    {% endif %}
+    {% endwith %}
+
+    <!-- FOLLOWUP -->
+    {% if obj.company.followup %}
+    <div class="meta">
+        📌 <strong>Followup:</strong><br>
+        {{ obj.company.followup.status }}<br>
+        {{ obj.company.followup.followup_date|date:"d M Y, h:i A" }}
+    </div>
+    <hr>
+    {% endif %}
+
+    <!-- MEETING -->
+    {% if obj.company.meeting %}
+    <div class="meta">
+        🤝 <strong>Meeting:</strong><br>
+        {{ obj.company.meeting.status }}<br>
+        {{ obj.company.meeting.meeting_date|date:"d M Y, h:i A" }}
+    </div>
+    <hr>
+    {% endif %}
+
+    <!-- AUDIT -->
+    <div class="meta">
+        👤 Created: {{ obj.created_by }} | {{ obj.create_at|date:"d M Y, h:i A" }}<br>
+        ✏️ Updated: {{ obj.updated_by }} | {{ obj.update_at|date:"d M Y, h:i A" }}
+    </div>
+
+    <!-- ACTIONS -->
+    <div class="actions">
+
+        {% if obj.company.contact_no %}
+        <a href="tel:{{ obj.company.contact_no }}" class="call">📞 Call</a>
+
+        <a href="https://wa.me/{{ obj.company.contact_no|cut:'+' }}" target="_blank"
+           class="whatsapp">💬 WhatsApp</a>
+        {% endif %}
+
+        <a class="edit"
+           href="{% url 'admin:business_comment_change' obj.id %}?_changelist_filters={{ request.GET.urlencode }}">
+            ✏️ Edit
+        </a>
+
+    </div>
+
+</div>
+{% endfor %}
+
+</div>
+{% endblock %}
