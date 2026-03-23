@@ -33,22 +33,13 @@
             <h2 class="text-2xl font-black tracking-tight text-blue-600">Findexors</h2>
         </div>
 
-        <form method="get" action="{% url 'company_list' %}" 
-            class="flex items-center bg-gray-100 border border-gray-200 rounded-lg overflow-hidden w-[35%] ml-6">
+        <form method="get" action="{% url 'business:company_list' %}" class="flex items-center bg-gray-100 border border-gray-200 rounded-lg overflow-hidden w-[35%] ml-6">
 
-                <!-- hidden city -->
                 <input type="hidden" name="city" id="selectedCityId" value="">
 
-                <input
-                    type="text"
-                    name="q"
-                    id="searchInputHeader"
-                    placeholder="Search businesses..."
-                    class="bg-transparent px-4 py-2 flex-1 focus:outline-none text-sm text-gray-700"
-                >
+                <input type="text" name="q" id="searchInputHeader" placeholder="Search businesses..." class="bg-transparent px-4 py-2 flex-1 focus:outline-none text-sm text-gray-700" >
 
-                <button type="submit"
-                class="bg-blue-600 text-white px-5 py-2.5 hover:bg-blue-700">
+                <button type="submit" class="bg-blue-600 text-white px-5 py-3 hover:bg-blue-700">
                     Search
                 </button>
 
@@ -63,10 +54,10 @@
             </div>
 
             <div class="flex items-center gap-3 ml-2">
-                <a href="#" class="bg-green-600 text-white px-4 py-2 rounded-md text-sm font-bold hover:bg-green-700 transition shadow-sm">
+                <a href="#" class="bg-green-600 text-white px-4 py-2 text-sm font-bold hover:bg-green-700 transition shadow-sm">
                     Post Job
                 </a>
-                <a href="#" class="bg-yellow-500 text-white px-4 py-2 rounded-md text-sm font-bold hover:bg-yellow-600 transition shadow-sm">
+                <a href="#" class="bg-yellow-500 text-white px-4 py-2 text-sm font-bold hover:bg-yellow-600 transition shadow-sm">
                     Add Business
                 </a>
             </div>
@@ -82,6 +73,7 @@
 <main>
     {% block content %}{% endblock %}
 </main>
+
 
 <footer class="bg-gray-900 text-gray-300 mt-20">
     <div class="max-w-7xl mx-auto px-6 py-10 grid md:grid-cols-4 gap-8">
@@ -152,7 +144,7 @@
 
   </div>
 
-</div>
+</div> 
 
 <style>
 .city.active-city{
@@ -341,6 +333,89 @@ if(!cityToggle.contains(e.target) && !cityDropdown.contains(e.target)){
 });
 
 });
+</script>
+
+<script>
+
+const searchInput = document.getElementById("searchInputHeader");
+const suggestionsBox = document.getElementById("searchSuggestions");
+
+
+    // Example Data
+    const businesses = [
+
+    "Digital Marketing Agency",
+    "SEO Expert",
+    "Graphic Designer",
+    "Website Developer",
+    "Hospital Near Me",
+    "Best Doctor",
+    "Car Repair Shop",
+    "Interior Designer",
+    "Real Estate Agent",
+    "Fitness Trainer",
+    "Salon Near Me",
+    "Restaurant Near Me"
+
+    ];
+
+
+    searchInput.addEventListener("input", function(){
+
+    let value = this.value.toLowerCase();
+
+    suggestionsBox.innerHTML = "";
+
+    if(value.length < 1){
+    suggestionsBox.classList.add("hidden");
+    return;
+    }
+
+    let filtered = businesses.filter(item =>
+    item.toLowerCase().includes(value)
+    );
+
+    if(filtered.length === 0){
+    suggestionsBox.classList.add("hidden");
+    return;
+    }
+
+
+    filtered.forEach(item => {
+
+    let div = document.createElement("div");
+
+    div.className = "px-4 py-2 text-sm hover:bg-gray-100 cursor-pointer";
+
+    div.innerText = item;
+
+    div.onclick = function(){
+
+    searchInput.value = item;
+
+    suggestionsBox.classList.add("hidden");
+
+    };
+
+    suggestionsBox.appendChild(div);
+
+    });
+
+    suggestionsBox.classList.remove("hidden");
+
+    });
+
+
+    // click outside close
+
+    document.addEventListener("click", function(e){
+
+    if(!searchInput.contains(e.target)){
+    suggestionsBox.classList.add("hidden");
+    }
+
+});
+
 </script>
 
 {% block extra_js %}{% endblock %}

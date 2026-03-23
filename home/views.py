@@ -362,25 +362,3 @@ def search_city(request):
 
     return JsonResponse(list(cities), safe=False)
 
-def company_list_view(request):
-
-    query = request.GET.get("q")
-    city = request.GET.get("city")
-
-    companies = Company.objects.filter(is_active=True)
-
-    if query:
-        companies = companies.filter(
-            Q(company_name__icontains=query) |
-            Q(locality__title__icontains=query) |
-            Q(category__title__icontains=query)
-        )
-
-    if city and city.isdigit():
-        companies = companies.filter(city_id=int(city))
-
-    return render(request, "company/company_list.html", {
-        "companies": companies,
-        "search_query": query,
-        "selected_city": city,
-    })

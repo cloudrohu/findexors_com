@@ -1,0 +1,591 @@
+{% extends "main/base/homebase.html" %}
+{% block content %}
+
+<style>
+  input[type="checkbox"] {
+    accent-color: #ee8248;
+  }
+  input[type="radio"]{
+    accent-color: #ee8248;
+    font-size: xx-large;
+  }
+  #statusBox{
+    transition: all 0.3s ease;
+  }
+  #statusBox label:has(input:checked){
+    border-color:#2563eb;
+    background:#eff6ff;
+  }
+  #ratingBox{
+    transition: all 0.3s ease;
+  }
+  #ratingBox label:has(input:checked){
+    border-color:#2563eb;
+    background:#eff6ff;
+  }
+</style>
+
+<!-- Main Container -->
+<div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6 px-4">
+
+  <!-- Left Side - Sidebar -->
+  <aside class="space-y-6 md:hidden hidden lg:block">
+  
+    <!-- Advanced Search -->
+    <div class="bg-white shadow rounded p-6">
+      <h3 class="font-bold text-gray-700 mb-4 text-lg">ADVANCED SEARCH</h3>
+       
+        <!-- CATEGORY FILTER -->
+        <div class="bg-white border border-gray-300 p-4 mb-5 w-full max-w-sm">
+
+            <!-- Header -->
+            <div class="flex justify-between items-center cursor-pointer" onclick="toggleCategory()">
+                <h3 class="text-gray-700 font-semibold">Category</h3>
+
+                <div class="flex items-center gap-3">
+                    <i id="catArrow" class="fa fa-chevron-up text-gray-500 text-sm"></i>
+                </div>
+            </div>
+
+            <!-- Dropdown Body -->
+            <div id="categoryBox">
+
+                <!-- Search -->
+                <div class="relative mb-3 mt-4">
+                    <span class="absolute left-3 top-2.5 text-gray-400">
+                        <i class="fa fa-search"></i>
+                    </span>
+
+                    <input type="text" placeholder="Search Category..." class="w-full border border-gray-300 pl-9 pr-3 py-2 text-sm focus:outline-none" />
+                </div>
+
+                <!-- List -->
+                <div class="border border-gray-300 h-48 overflow-y-auto bg-white">
+
+                    <label class="flex items-center gap-3 px-3 py-2 hover:bg-gray-100 cursor-pointer">
+                        <input type="checkbox"> Real Estate
+                    </label>
+
+                    <label class="flex items-center gap-3 px-3 py-2 hover:bg-gray-100 cursor-pointer">
+                        <input type="checkbox"> Builders & Developers
+                    </label>
+
+                    <label class="flex items-center gap-3 px-3 py-2 hover:bg-gray-100 cursor-pointer">
+                        <input type="checkbox"> Packers & Movers
+                    </label>
+
+                    <label class="flex items-center gap-3 px-3 py-2 hover:bg-gray-100 cursor-pointer">
+                        <input type="checkbox"> Restaurants
+                    </label>
+
+                    <label class="flex items-center gap-3 px-3 py-2 hover:bg-gray-100 cursor-pointer">
+                        <input type="checkbox"> Hospitals
+                    </label>
+
+                    <label class="flex items-center gap-3 px-3 py-2 hover:bg-gray-100 cursor-pointer">
+                        <input type="checkbox"> Hotels
+                    </label>
+
+                    <label class="flex items-center gap-3 px-3 py-2 hover:bg-gray-100 cursor-pointer">
+                        <input type="checkbox"> Schools
+                    </label>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- RATING FILTER -->
+        <div class="bg-white shadow-md border border-gray-200 mb-5 overflow-hidden">
+
+            <div class="flex justify-between items-center px-4 py-3 bg-gray-50 cursor-pointer" onclick="toggleRating()">
+
+                <h3 class="font-semibold text-gray-800">Customer Rating</h3>
+
+                <i id="ratingArrow" class="fa fa-chevron-up text-gray-500 text-sm"></i>
+            </div>
+
+            <div id="ratingBox" class="p-3 space-y-2">
+
+                <!-- 5 Star -->
+                <label class="rating-item flex items-center gap-3 p-2 border rounded-md cursor-pointer hover:bg-yellow-50 transition">
+                    <input type="checkbox" name="rating" value="5" class="hidden rating-input">
+                    <span class="text-yellow-500">★★★★★</span>
+                </label>
+
+                <!-- 4 Star -->
+                <label class="rating-item flex items-center gap-3 p-2 border rounded-md cursor-pointer hover:bg-yellow-50 transition">
+                    <input type="checkbox" name="rating" value="4" class="hidden rating-input">
+                    <span class="text-yellow-500">★★★★☆</span>
+                    <span class="text-gray-600 text-xs">& up</span>
+                </label>
+
+                <!-- 3 Star -->
+                <label class="rating-item flex items-center gap-3 p-2 border rounded-md cursor-pointer hover:bg-yellow-50 transition">
+                    <input type="checkbox" name="rating" value="3" class="hidden rating-input">
+                    <span class="text-yellow-500">★★★☆☆</span>
+                    <span class="text-gray-600 text-xs">& up</span>
+                </label>
+
+                <!-- 2 Star -->
+                <label class="rating-item flex items-center gap-3 p-2 border rounded-md cursor-pointer hover:bg-yellow-50 transition">
+                    <input type="checkbox" name="rating" value="2" class="hidden rating-input">
+                    <span class="text-yellow-500">★★☆☆☆</span>
+                    <span class="text-gray-600 text-xs">& up</span>
+                </label>
+
+            </div>
+        </div>
+
+        <!-- STATUS FILTER -->
+        <div class="bg-white shadow-md border border-gray-200 mb-5 overflow-hidden">
+
+            <div class="flex justify-between items-center px-4 py-3 bg-gray-50 cursor-pointer" onclick="toggleStatus()">
+
+                <h3 class="font-semibold text-gray-800">Status</h3>
+
+                <i id="statusArrow" class="fa fa-chevron-up text-gray-500 text-sm"></i>
+            </div>
+
+            <div id="statusBox" class="p-3 space-y-3">
+
+                <!-- Open Now -->
+                <label class="flex items-center gap-3 p-3 border border-gray-300 cursor-pointer hover:bg-gray-50">
+                    <input type="checkbox" class="accent-blue-600">
+                    <span class="text-gray-700">Open Now</span>
+                </label>
+
+                <!-- 24 Hours -->
+                <label class="flex items-center gap-3 p-3 border border-gray-300 cursor-pointer hover:bg-gray-50">
+                    <input type="checkbox" class="accent-blue-600">
+                    <span class="text-gray-700">Open 24 Hours</span>
+                </label>
+
+                <!-- Featured -->
+                <label class="flex items-center gap-3 p-3 border border-gray-300 cursor-pointer hover:bg-gray-50">
+                    <input type="checkbox" class="accent-blue-600">
+                    <span class="text-gray-700">Featured Listing</span>
+                </label>
+
+                <!-- Verified -->
+                <label class="flex items-center gap-3 p-3 border border-gray-300 cursor-pointer hover:bg-gray-50">
+                    <input type="checkbox" class="accent-blue-600">
+                    <span class="text-gray-700">Verified</span>
+                </label>
+
+                <!-- Newly Added -->
+                <label class="flex items-center gap-3 p-3 border border-gray-300 cursor-pointer hover:bg-gray-50">
+                    <input type="checkbox" class="accent-blue-600">
+                    <span class="text-gray-700">Newly Added</span>
+                </label>
+
+            </div>
+
+        </div>
+
+        <!-- VERIFIED BUSINESS -->
+        <label class="flex items-center gap-3 p-3 border border-gray-300 mb-5 cursor-pointer">
+          <input type="checkbox">
+          <span class="text-gray-700">Verified Businesses Only</span>
+        </label>
+
+
+      <button class="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-3">SEARCH</button>
+    </div>
+
+    <!-- Popular Category -->
+    <div class="bg-white shadow rounded p-6">
+      <h3 class="font-bold text-gray-700 mb-3 text-lg">POPULAR CATEGORY</h3>
+      <p class="text-gray-600 text-sm flex justify-between">Residential Apartment <span>(14)</span></p>
+    </div>
+
+    <!-- Recent Properties -->
+    <div class="bg-white shadow rounded p-6">
+      <h3 class="font-bold text-gray-700 mb-3 text-lg">RECENT SEARCHED FOR YOU</h3>
+      <div class="space-y-3 text-sm">
+        <div class="flex gap-3">
+          <img src="https://dummyimage.com/80x60/aaaaaa/000000" class="w-20 h-14 object-cover rounded">
+          <div>
+            <p class="text-orange-600">700 Sq.Ft. 2 BHK Apartment</p>
+            <p class="text-gray-600">₹65.00 Th</p>
+          </div>
+        </div>
+        <div class="flex gap-3">
+          <img src="https://dummyimage.com/80x60/cccccc/000000" class="w-20 h-14 object-cover rounded">
+          <div>
+            <p class="text-orange-600">610 Sq.Ft. 2 BHK Apartment</p>
+            <p class="text-gray-600">₹70.00 Th</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Helping Center -->
+    <div class="bg-white shadow rounded p-6">
+      <h3 class="font-bold text-gray-700 mb-3 text-lg">HELPING CENTER</h3>
+      <p class="text-gray-700 text-sm mb-2"><strong>Address</strong><br> Skydeck Building, Shop number 4, Sundervan Complex, Andheri (West), Mumbai - 400053</p>
+      <p class="text-gray-700 text-sm"><strong>Phone</strong><br> +91-9820070344</p>
+    </div>
+
+    <!-- Property Filters Start -->
+     <filter-section>
+
+      <div class="bg-white shadow rounded p-4 flex flex-wrap gap-4 items-center lg:hidden">
+
+        <!-- Location -->
+        <select class="border px-3 py-2 rounded text-sm">
+          <option>All Locations</option>
+          <option>Mira Road</option>
+          <option>Andheri</option>
+          <option>Borivali</option>
+        </select>
+
+        <!-- Property Type -->
+        <select class="border px-3 py-2 rounded text-sm">
+          <option>Property Type</option>
+          <option>Apartment</option>
+          <option>Plot</option>
+          <option>Villa</option>
+          <option>Builder Floor</option>
+        </select>
+
+        <!-- BHK -->
+        <select class="border px-3 py-2 rounded text-sm">
+          <option>BHK</option>
+          <option>1 RK</option>
+          <option>1 BHK</option>
+          <option>1.5 BHK</option>
+          <option>2 BHK</option>
+          <option>2.5 BHK</option>
+          <option>3 BHK</option>
+          <option>3.5 BHK</option>
+        </select>
+
+        <!-- Price -->
+        <div class="flex gap-2">
+          <input type="text" placeholder="Min Price" class="border px-3 py-2 rounded text-sm w-28">
+          <input type="text" placeholder="Max Price" class="border px-3 py-2 rounded text-sm w-28">
+        </div>
+
+        <!-- Brokerage -->
+        <select class="border px-3 py-2 rounded text-sm">
+          <option>Brokerage Charges</option>
+          <option>No Brokerage</option>
+          <option>With Brokerage</option>
+        </select>
+
+        <!-- Carpet Area -->
+        <div class="flex gap-2">
+          <input type="text" placeholder="Min (sqft)" class="border px-3 py-2 rounded text-sm w-28">
+          <input type="text" placeholder="Max (sqft)" class="border px-3 py-2 rounded text-sm w-28">
+        </div>
+
+        <!-- More Filters Button -->
+        <button id="moreFiltersBtn" class="text-orange-600 font-semibold underline text-sm ml-auto">More Filters</button>
+
+        <!-- Submit -->
+        <button
+          class="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600 text-sm font-semibold">
+          Filter
+        </button>
+      </div>
+
+      <!-- More Filters Panel -->
+      <div id="moreFiltersPanel" class="hidden bg-white shadow rounded p-4 mt-3">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
+          <select class="border px-3 py-2 rounded">
+            <option>Posted By</option>
+            <option>Owner</option>
+            <option>Dealer</option>
+          </select>
+          <select class="border px-3 py-2 rounded">
+            <option>Sale Type</option>
+            <option>New</option>
+            <option>Resale</option>
+          </select>
+          <select class="border px-3 py-2 rounded">
+            <option>Property Status</option>
+            <option>Ready to Move</option>
+            <option>Under Construction</option>
+          </select>
+          <select class="border px-3 py-2 rounded">
+            <option>Possession From</option>
+            <option>2024</option>
+            <option>2025</option>
+          </select>
+          <select class="border px-3 py-2 rounded">
+            <option>Property Age</option>
+            <option>0-5 Years</option>
+            <option>5-10 Years</option>
+          </select>
+          <select class="border px-3 py-2 rounded">
+            <option>Bathrooms</option>
+            <option>1</option>
+            <option>2</option>
+            <option>3+</option>
+          </select>
+          <label class="flex items-center gap-2">
+            <input type="checkbox"> Parking
+          </label>
+          <label class="flex items-center gap-2">
+            <input type="checkbox"> Live-in Tour / Video
+          </label>
+        </div>
+
+        <!-- Bottom Buttons -->
+        <div class="flex justify-between items-center mt-4">
+          <button id="closeFilters" class="text-sm text-blue-600">Clear Filters & Close</button>
+          <button class="bg-orange-500 px-4 py-2 rounded text-white font-semibold">
+            Show Properties
+          </button>
+        </div>
+      </div>
+
+        <!-- JS -->
+        <script>
+          document.getElementById("moreFiltersBtn").addEventListener("click", () => {
+            document.getElementById("moreFiltersPanel").classList.toggle("hidden");
+          });
+          document.getElementById("closeFilters").addEventListener("click", () => {
+            document.getElementById("moreFiltersPanel").classList.add("hidden");
+          });
+        </script>
+     </filter-section>
+    <!-- Property Filters End -->
+  </aside>
+
+  <!-- Right Side -  Property List -->
+  <div class="lg:col-span-2 space-y-6">
+
+    <!-- Header -->
+    <div class="flex items-center gap-2 bg-white shadow p-3 rounded mb-4">
+    <!-- List Button -->
+    <button id="listViewBtn" class="bg-orange-500 text-white p-2 rounded">
+        <i class="fas fa-list"></i>
+    </button>
+
+    <!-- Grid Button -->
+    <button id="gridViewBtn" class="bg-gray-200 text-gray-700 p-2 rounded">
+        <i class="fas fa-th"></i>
+    </button>
+
+    <span class="font-semibold text-orange-600">Properties</span>
+    </div>
+
+
+    <!-- ✅ List View -->
+    <div id="listView" class="space-y-6">
+
+      <div class="flex flex-col md:flex-row bg-white shadow-md p-5 border border-gray-200 hover:shadow-xl hover:border-orange-500 transition duration-300">
+
+        <!-- Image -->
+        <div class="relative">
+          <img src="https://sunnyestateagent.com/settings/96684.jpg" class="w-full md:w-60 h-56 md:h-68 rounded-lg object-cover">
+        </div>
+
+        <!-- Content -->
+        <div class="md:ml-6 mt-4 md:mt-0 flex-1">
+
+          <!-- Name -->
+          <div class="flex items-center justify-between">
+            <h3 class="text-xl font-bold text-gray-800">
+              Shree Sai Real Estate
+            </h3>
+          </div>
+
+          <!-- Rating -->
+          <div class="flex items-center mt-1">
+            <span class="text-yellow-500 text-sm">★★★★★</span>
+            <span class="text-gray-500 text-sm ml-2">(124 Reviews)</span>
+          </div>
+
+          <!-- Category -->
+          <p class="text-sm text-gray-600 mt-1">
+            Real Estate Agents • Virar West, Mumbai
+          </p>
+
+          <!-- Services -->
+          <div class="flex flex-wrap gap-2 mt-3">
+            <span class="text-xs bg-gray-100 px-2 py-1">Buy</span>
+            <span class="text-xs bg-gray-100 px-2 py-1">Sell</span>
+            <span class="text-xs bg-gray-100 px-2 py-1">Rent</span>
+            <span class="text-xs bg-gray-100 px-2 py-1">Commercial</span>
+          </div>
+
+          <!-- Details -->
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 mt-4 text-xs text-gray-600">
+
+            <div class="bg-gray-50 p-2">
+              <p class="font-semibold text-gray-800">Experience</p>
+              <p>15 Years</p>
+            </div>
+
+            <div class="bg-gray-50 p-2 rounded">
+              <p class="font-semibold text-gray-800">Projects</p>
+              <p>120+</p>
+            </div>
+
+            <div class="bg-gray-50 p-2 rounded">
+              <p class="font-semibold text-gray-800">Response</p>
+              <p>30 mins</p>
+            </div>
+
+          </div>
+
+          <!-- Buttons -->
+          <div class="flex flex-wrap gap-3 mt-5">
+
+            <button class="bg-orange-500 hover:bg-orange-600 text-white text-sm px-5 py-2 transition">
+              View Details
+            </button>
+
+            <button class="border border-gray-300 hover:bg-gray-100 text-sm px-5 py-2 transition">
+              Call Now
+            </button>
+
+            <button class="border border-green-500 font-semibold text-green-900 hover:bg-green-500 text-sm px-5 py-2 transition">
+              WhatsApp
+            </button>
+
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ✅ Grid View -->
+    <div id="gridView" class="hidden grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6">
+      <!-- Project Card -->
+      <div class="bg-white rounded-lg shadow p-4 border hover:shadow-lg hover:border-orange-500 transition">
+        <img src="assets/images/hero/slid-1 (1).jpg" class="w-full h-48 object-cover rounded">
+        <div class="mt-4">
+          <h2 class="text-xl font-semibold text-gray-800">127 Raj Homes</h2>
+          <p class="text-sm text-gray-500 mb-2"><i class="fas fa-map-marker-alt text-orange-500"></i> Mira Road East — Mumbai</p>
+          <p class="text-gray-600 text-sm mb-2">Under Construction | Residential Apartment | Land Parcel: 0.45 acres</p>
+          <p class="text-gray-600 text-sm mb-2">1, 2 BHK Luxurious Apartment | Total Floors: 17</p>
+          <p class="text-gray-700 text-sm mb-2 font-medium">Price: ₹73.74 L - 1.32 Cr</p>
+          <p class="text-gray-600 text-sm mb-3">Possession: Sep, 2025</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ✅ JS Toggle -->
+    <script>
+      const listViewBtn = document.getElementById("listViewBtn");
+      const gridViewBtn = document.getElementById("gridViewBtn");
+      const listView = document.getElementById("listView");
+      const gridView = document.getElementById("gridView");
+
+      listViewBtn.addEventListener("click", () => {
+        listView.classList.remove("hidden");
+        gridView.classList.add("hidden");
+
+        listViewBtn.classList.add("bg-orange-500", "text-white");
+        listViewBtn.classList.remove("bg-gray-200", "text-gray-700");
+
+        gridViewBtn.classList.remove("bg-orange-500", "text-white");
+        gridViewBtn.classList.add("bg-gray-200", "text-gray-700");
+      });
+
+      gridViewBtn.addEventListener("click", () => {
+        gridView.classList.remove("hidden");
+        listView.classList.add("hidden");
+
+        gridViewBtn.classList.add("bg-orange-500", "text-white");
+        gridViewBtn.classList.remove("bg-gray-200", "text-gray-700");
+
+        
+        listViewBtn.classList.remove("bg-orange-500", "text-white");
+        listViewBtn.classList.add("bg-gray-200", "text-gray-700");
+      });
+    </script>
+
+  </div>
+
+</div>
+<!-- Main Container End-->
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function(){
+
+const searchInput = document.getElementById("categorySearch");
+const items = document.querySelectorAll(".category-item");
+
+if(searchInput){
+searchInput.addEventListener("keyup", function(){
+
+  let value = this.value.toLowerCase();
+
+  items.forEach(item => {
+
+    let text = item.innerText.toLowerCase();
+
+    item.style.display = text.includes(value) ? "flex" : "none";
+
+  });
+
+});
+}
+
+});
+
+
+// CATEGORY
+function toggleCategory(){
+
+  let box = document.getElementById("categoryBox");
+  let arrow = document.getElementById("catArrow");
+
+  box.classList.toggle("hidden");
+
+  arrow.classList.toggle("fa-chevron-up");
+  arrow.classList.toggle("fa-chevron-down");
+
+}
+
+
+// RATING
+function toggleRating(){
+
+  let box = document.getElementById("ratingBox");
+  let arrow = document.getElementById("ratingArrow");
+
+  box.classList.toggle("hidden");
+
+  arrow.classList.toggle("fa-chevron-up");
+arrow.classList.toggle("fa-chevron-down");
+
+}
+
+
+// STATUS
+function toggleStatus(){
+
+  let box = document.getElementById("statusBox");
+  let arrow = document.getElementById("statusArrow");
+
+  box.classList.toggle("hidden");
+
+  arrow.classList.toggle("fa-chevron-up");
+  arrow.classList.toggle("fa-chevron-down");
+
+}
+
+// RANG
+function togglePrice(){
+
+let box = document.getElementById("priceBox");
+let arrow = document.getElementById("priceArrow");
+
+box.classList.toggle("hidden");
+
+arrow.classList.toggle("fa-chevron-up");
+arrow.classList.toggle("fa-chevron-down");
+
+}
+
+</script>
+{% endblock %}

@@ -45,14 +45,12 @@ def load_projects(request):
 
 
 
-
-
 # =====================================================
 # 📄 COMPANY LIST VIEW (with Filters)
 # =====================================================
 class CompanyListView(LoginRequiredMixin, ListView):
     model = Company
-    template_name = 'business/company_list.html'
+    template_name = 'company/company_list.html'
     context_object_name = 'companies'
     paginate_by = 10
 
@@ -91,10 +89,9 @@ class CompanyListView(LoginRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['categories'] = Category.objects.all().order_by('title')
-        context['cities'] = City.objects.all().order_by('title')
+        context['cities'] = City.objects.all().order_by('name')
         context['localities'] = Locality.objects.all().order_by('title')
         context['users'] = User.objects.all().order_by('username')
-        
         # Preserve filters during pagination
         context['querystring'] = "&".join(
             [f"{k}={v}" for k, v in self.request.GET.items() if k != 'page']
@@ -352,3 +349,5 @@ class CompanyMeetingListView(LoginRequiredMixin, ListView):
             [f"{k}={v}" for k, v in self.request.GET.items() if k != 'page']
         )
         return ctx
+    
+    

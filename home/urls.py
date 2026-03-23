@@ -1,6 +1,6 @@
 from django.urls import path
 
-from home.views import IndexView,DashboardView,company_meeting_list, response_meeting_list,CategoryDetailView,company_list_view
+from home.views import IndexView,DashboardView,company_meeting_list, response_meeting_list,CategoryDetailView
 from .import views 
 
 from django.contrib.auth.views import LogoutView
@@ -25,6 +25,5 @@ urlpatterns = [
     path('ajax/get-sub-localities/', views.get_sub_localities, name='get_sub_localities'),
     path("search-city/", views.search_city, name="search_city"),
 
-    path("companies/", views.company_list_view, name="company_list"),
     
 ]

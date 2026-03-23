@@ -17,9 +17,8 @@ urlpatterns = [
     # 2. HOME App URLs (Main/Root Pages)
     # ------------------------------------
     path('', include('home.urls')), # Home app manages the root path ('/')
-    path('', include('business.urls')),
     path("jobs/", include("jobs.urls")),
-
+    path('business/', include('business.urls')),
     
    
     # ------------------------------------
