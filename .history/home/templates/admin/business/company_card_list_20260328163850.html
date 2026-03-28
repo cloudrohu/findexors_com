@@ -1,0 +1,128 @@
+{% extends "admin/change_list.html" %}
+{% load static %}
+
+{% block result_list %}
+<div class="cards">
+
+{% for obj in cl.result_list %}
+<div class="card">
+
+    <!-- ================= LOGO + HEADER ================= -->
+    <div style="display:flex; gap:10px; align-items:center; margin-bottom:10px;">
+
+        {% if obj.logo %}
+            <img src="{{ obj.logo.url }}" style="width:50px;height:50px;border-radius:10px;object-fit:cover;">
+        {% else %}
+            <div style="width:50px;height:50px;background:#eee;border-radius:10px;display:flex;align-items:center;justify-content:center;">
+                🏢
+            </div>
+        {% endif %}
+
+        <div>
+            <div class="title">
+                C{{ obj.id|stringformat:"03d" }} - {{ obj.company_name }}
+
+                <span class="status-badge status-{{ obj.status|slugify }}">
+                    {{ obj.status }}
+                </span>
+            </div>
+
+            <div class="meta">
+                📍 {{ obj.city }} • {{ obj.locality }}
+            </div>
+        </div>
+
+    </div>
+
+    <hr>
+
+    <!-- ================= ALL FIELDS AUTO ================= -->
+    {% for field in obj._meta.fields %}
+        {% with value=field.value_from_object(obj) %}
+
+            {% if value %}
+                <div class="meta">
+                    <strong>{{ field.verbose_name|capfirst }}:</strong>
+
+                    {% if field.name == "logo" %}
+                        <img src="{{ obj.logo.url }}" style="width:60px;border-radius:6px;">
+                    
+                    {% elif field.name == "website" %}
+                        <a href="{{ value }}" target="_blank">{{ value }}</a>
+
+                    {% else %}
+                        {{ value }}
+                    {% endif %}
+                </div>
+            {% endif %}
+
+        {% endwith %}
+    {% endfor %}
+
+    <hr>
+
+    <!-- ================= RELATED MODELS ================= -->
+
+    <!-- FOLLOWUP -->
+    {% if obj.followup %}
+    <div class="meta">
+        📌 <strong>Followup:</strong><br>
+        {{ obj.followup.status }}<br>
+        {{ obj.followup.followup_date|date:"d M Y, h:i A" }}
+    </div>
+    {% endif %}
+
+    <!-- MEETING -->
+    {% if obj.meeting %}
+    <div class="meta">
+        🤝 <strong>Meeting:</strong><br>
+        {{ obj.meeting.status }}<br>
+        {{ obj.meeting.meeting_date|date:"d M Y, h:i A" }}
+    </div>
+    {% endif %}
+
+    <!-- VISITS -->
+    {% for v in obj.visits.all|slice:":2" %}
+    <div class="meta">
+        🚗 {{ v.visit_type }} - {{ v.visit_status }}
+    </div>
+    {% endfor %}
+
+    <!-- COMMENTS -->
+    {% for c in obj.comments.all|slice:":2" %}
+    <div class="meta">
+        💬 {{ c.comment }}
+    </div>
+    {% endfor %}
+
+    <!-- VOICE -->
+    {% if obj.voice_recordings.last %}
+    <div class="meta">
+        🎧 Voice Available
+    </div>
+    {% endif %}
+
+    <hr>
+
+    <!-- ================= ACTIONS ================= -->
+    <div class="actions">
+
+        {% if obj.contact_no %}
+        <a href="tel:{{ obj.contact_no }}" class="call">📞 Call</a>
+
+        <a href="https://wa.me/{{ obj.contact_no|cut:'+' }}" target="_blank"
+           class="whatsapp">💬 WhatsApp</a>
+        {% endif %}
+
+        <a class="edit"
+           href="{% url 'admin:business_company_change' obj.id %}">
+            ✏️ Edit
+        </a>
+
+    </div>
+
+</div>
+{% endfor %}
+
+</div>
+{% endblock %}

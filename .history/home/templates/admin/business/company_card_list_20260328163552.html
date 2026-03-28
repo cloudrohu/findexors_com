@@ -115,7 +115,16 @@
     </div>
 
 </div>
-    
+    <!-- HEADER -->
+    <div class="title">
+        <span class="badge">C{{ obj.id|stringformat:"03d" }}</span>
+        {{ obj.company_name }}
+
+        <!-- STATUS BADGE -->
+        <span class="status-badge status-{{ obj.status|slugify }}">
+            {{ obj.status }}
+        </span>
+    </div>
 
     <!-- CATEGORY -->
     <div class="meta">
@@ -142,7 +151,6 @@
 
     <!-- ADDRESS -->
     <div class="meta">📌 {{ obj.address|default:"—" }}</div>
-    <div class="meta">📌 {{ obj.description|default:"—" }}</div>
 
     <!-- RATING -->
     {% if obj.rating %}

@@ -130,7 +130,15 @@ class CompanyAdmin(AutoUserAdminMixin, admin.ModelAdmin):
         FaqInline,
     ]
 
-    
+    def changelist_view(self, request, extra_context=None):
+        extra_context = extra_context or {}
+
+        # ALL FIELDS PASS TO TEMPLATE
+        extra_context["model_fields"] = [
+            field for field in self.model._meta.fields
+        ]
+
+        return super().changelist_view(request, extra_context=extra_context)
 
 # =====================================================
 # ✅ COMMENT ADMIN

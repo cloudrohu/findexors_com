@@ -1,0 +1,213 @@
+{% extends "admin/change_list.html" %}
+{% load static %}
+
+{% block extrastyle %}
+{{ block.super }}
+
+<style>
+
+.status-badge{
+    padding:4px 10px;
+    border-radius:20px;
+    font-size:11px;
+    margin-left:8px;
+    font-weight:600;
+}
+
+/* STATUS COLORS */
+.status-new{ background:#e0f2fe; color:#0369a1; }
+.status-meeting{ background:#dcfce7; color:#166534; }
+.status-follow_up{ background:#fef9c3; color:#854d0e; }
+.status-not_received{ background:#fee2e2; color:#991b1b; }
+.status-not-interested{ background:#fee2e2; color:#991b1b; }
+.status-they-will-connect{ background:#e0e7ff; color:#3730a3; }
+.status-call-later{ background:#fef3c7; color:#92400e; }
+.status-call-tomorrow{ background:#dbeafe; color:#1e40af; }
+.status-switched-off{ background:#f3f4f6; color:#374151; }
+.status-invalid-number{ background:#fee2e2; color:#991b1b; }
+
+.cards{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(420px,1fr));
+    gap:18px;
+    margin-top:20px;
+}
+
+.card{
+    background:#fff;
+    border-radius:14px;
+    padding:14px;
+    box-shadow:0 10px 25px rgba(0,0,0,.08);
+}
+
+.title{font-weight:800;font-size:16px;}
+.meta{font-size:13px;color:#555;margin-top:6px;}
+
+.actions{
+    margin-top:10px;
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+}
+
+.actions a{
+    padding:7px 12px;
+    border-radius:20px;
+    font-size:12px;
+    text-decoration:none;
+}
+
+.call{background:#16a34a;color:#fff;}
+.whatsapp{background:#25D366;color:#fff;}
+.edit{background:#111;color:#fff;}
+
+.badge{
+    padding:3px 8px;
+    background:#eef2ff;
+    border-radius:12px;
+    font-size:11px;
+}
+
+.logo{
+    width:50px;
+    height:50px;
+    border-radius:10px;
+    object-fit:cover;
+}
+
+.logo-placeholder{
+    width:50px;
+    height:50px;
+    border-radius:10px;
+    background:#6366f1;
+    color:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:bold;
+}
+
+</style>
+{% endblock %}
+
+
+{% block result_list %}
+<div class="cards">
+
+{% for obj in cl.result_list %}
+<div class="card">
+
+    <!-- 🔥 HEADER WITH LOGO -->
+    <div style="display:flex; gap:10px; align-items:center; margin-bottom:10px;">
+
+        {% if obj.logo %}
+            <img src="{{ obj.logo.url }}" class="logo">
+        {% else %}
+            <div class="logo-placeholder">
+                {{ obj.company_name|first|upper }}
+            </div>
+        {% endif %}
+
+        <div>
+            <div class="title">
+                <span class="badge">C{{ obj.id|stringformat:"03d" }}</span>
+                {{ obj.company_name }}
+
+                <span class="status-badge status-{{ obj.status|slugify }}">
+                    {{ obj.status }}
+                </span>
+            </div>
+
+            <div class="meta">
+                📍 {{ obj.city }} • {{ obj.locality }}
+            </div>
+        </div>
+
+    </div>
+
+    <hr>
+
+    <!-- 🔥 ALL FIELDS AUTO -->
+    {% for field in obj._meta.fields %}
+        {% with value=field.value_from_object(obj) %}
+            {% if value and field.name != "logo" and field.name != "company_name" and field.name != "status" %}
+                <div class="meta">
+                    <strong>{{ field.verbose_name|capfirst }}:</strong>
+
+                    {% if field.name == "website" %}
+                        <a href="{{ value }}" target="_blank">{{ value }}</a>
+                    {% else %}
+                        {{ value }}
+                    {% endif %}
+                </div>
+            {% endif %}
+        {% endwith %}
+    {% endfor %}
+
+    <hr>
+
+    <!-- FOLLOWUP -->
+    {% if obj.followup %}
+    <div class="meta">
+        📌 <strong>Followup:</strong><br>
+        {{ obj.followup.status }} |
+        {{ obj.followup.followup_date|date:"d M Y, h:i A" }}
+    </div>
+    {% endif %}
+
+    <!-- MEETING -->
+    {% if obj.meeting %}
+    <div class="meta">
+        🤝 <strong>Meeting:</strong><br>
+        {{ obj.meeting.status }} |
+        {{ obj.meeting.meeting_date|date:"d M Y, h:i A" }}
+    </div>
+    {% endif %}
+
+    <!-- LAST VISIT -->
+    {% with obj.visits.last as v %}
+    {% if v %}
+    <div class="meta">
+        🚗 {{ v.visit_type }} - {{ v.visit_status }}
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    <!-- LAST COMMENT -->
+    {% with obj.comments.last as c %}
+    {% if c %}
+    <div class="meta">
+        💬 {{ c.comment|truncatechars:80 }}
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    <!-- VOICE -->
+    {% if obj.voice_recordings.last %}
+    <div class="meta">🎧 Voice Available</div>
+    {% endif %}
+
+    <hr>
+
+    <!-- ACTIONS -->
+    <div class="actions">
+
+        {% if obj.contact_no %}
+        <a href="tel:{{ obj.contact_no }}" class="call">📞 Call</a>
+
+        <a href="https://wa.me/{{ obj.contact_no|cut:'+' }}" target="_blank"
+           class="whatsapp">💬 WhatsApp</a>
+        {% endif %}
+
+        <a class="edit"
+           href="{% url 'admin:business_company_change' obj.id %}">
+            ✏️ Edit
+        </a>
+
+    </div>
+
+</div>
+{% endfor %}
+
+</div>
+{% endblock %}
