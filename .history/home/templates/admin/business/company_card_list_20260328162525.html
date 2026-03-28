@@ -1,0 +1,218 @@
+{% extends "admin/change_list.html" %}
+{% load static %}
+
+{% block extrastyle %}
+{{ block.super }}
+
+<style>
+
+/* ❌ REMOVE THIS (IMPORTANT) */
+/* #changelist-filter { display:none } */
+/* #toolbar { display:none } */
+
+/* ✅ ONLY CARD CSS */
+.status-badge{
+    padding:4px 10px;
+    border-radius:20px;
+    font-size:11px;
+    margin-left:8px;
+    font-weight:600;
+}
+
+/* 🎯 STATUS COLORS */
+.status-new{ background:#e0f2fe; color:#0369a1; }
+.status-meeting{ background:#dcfce7; color:#166534; }
+.status-follow_up{ background:#fef9c3; color:#854d0e; }
+.status-not_received{ background:#fee2e2; color:#991b1b; }
+.status-not-interested{ background:#fee2e2; color:#991b1b; }
+.status-they-will-connect{ background:#e0e7ff; color:#3730a3; }
+.status-call-later{ background:#fef3c7; color:#92400e; }
+.status-call-tomorrow{ background:#dbeafe; color:#1e40af; }
+.status-switched-off{ background:#f3f4f6; color:#374151; }
+.status-invalid-number{ background:#fee2e2; color:#991b1b; }
+.cards{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(420px,1fr));
+    gap:18px;
+    margin-top:20px;
+}
+
+.card{
+    background:#fff;
+    border-radius:14px;
+    padding:14px;
+    box-shadow:0 10px 25px rgba(0,0,0,.08);
+}
+
+.title{font-weight:800;font-size:16px;}
+.meta{font-size:13px;color:#555;margin-top:6px;}
+
+.actions{
+    margin-top:10px;
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+}
+
+.actions a{
+    padding:7px 12px;
+    border-radius:20px;
+    font-size:12px;
+    text-decoration:none;
+}
+
+.call{background:#16a34a;color:#fff;}
+.whatsapp{background:#25D366;color:#fff;}
+.edit{background:#111;color:#fff;}
+
+.badge{
+    padding:3px 8px;
+    background:#eef2ff;
+    border-radius:12px;
+    font-size:11px;
+}
+
+</style>
+{% endblock %}
+
+{% block result_list %}
+<div class="cards">
+
+{% for obj in cl.result_list %}
+<div class="card">
+
+    <!-- HEADER -->
+    <div class="title">
+        <span class="badge">C{{ obj.id|stringformat:"03d" }}</span>
+        {{ obj.company_name }}
+
+        <!-- STATUS BADGE -->
+        <span class="status-badge status-{{ obj.status|slugify }}">
+            {{ obj.status }}
+        </span>
+    </div>
+
+    <!-- CATEGORY -->
+    <div class="meta">
+        🏢 {{ obj.category|default:"—" }} 
+    </div>
+
+    <!-- LOCATION -->
+    <div class="meta">
+        📍 {{ obj.city }} • {{ obj.locality }}
+        {% if obj.sub_locality %}
+            • {{ obj.sub_locality }} • {{ obj.project|default:"—" }}
+        {% endif %}
+    </div>
+    <!-- CONTACT -->
+    <div class="meta">📞 {{ obj.contact_no|default:"—" }}</div>
+    <div class="meta">📧 {{ obj.email|default:"—" }}</div>
+
+    <div class="meta">
+        🌐 
+        {% if obj.website %}
+        <a href="{{ obj.website }}" target="_blank">{{ obj.website }}</a>
+        {% else %} — {% endif %}
+    </div>
+
+    <!-- ADDRESS -->
+    <div class="meta">📌 {{ obj.address|default:"—" }}</div>
+
+    <!-- RATING -->
+    {% if obj.rating %}
+    <div class="meta">
+        ⭐ {{ obj.rating }} ({{ obj.reviews_count|default:"0" }})
+    </div>
+    {% endif %}
+
+    <hr>
+
+    <!-- FOLLOWUP -->
+    {% if obj.followup %}
+    <div class="meta">
+        📌 <strong>Followup:</strong><br>
+        Status: {{ obj.followup.status }} <br>
+        Date: {{ obj.followup.followup_date|date:"d M Y, h:i A" }} <br>
+        Assigned: {{ obj.followup.assigned_to|default:"—" }} <br>
+        Comment: {{ obj.followup.comment|default:"—" }}
+    </div>
+    <hr>
+    {% endif %}
+
+    <!-- MEETING -->
+    {% if obj.meeting %}
+    <div class="meta">
+        🤝 <strong>Meeting:</strong><br>
+        Status: {{ obj.meeting.status }} <br>
+        Date: {{ obj.meeting.meeting_date|date:"d M Y, h:i A" }} <br>
+        Assigned: {{ obj.meeting.assigned_to|default:"—" }} <br>
+        Comment: {{ obj.meeting.comment|default:"—" }}
+    </div>
+    <hr>
+    {% endif %}
+
+    <!-- LAST COMMENT -->
+    {% with obj.comments.last as c %}
+    {% if c %}
+    <div class="meta">
+        💬 <strong>Last Comment:</strong> {{ c.comment|truncatechars:100 }} <br>
+        👤 {{ c.created_by }} | {{ c.create_at|date:"d M Y, h:i A" }}
+    </div>
+    <hr>
+    {% endif %}
+    {% endwith %}
+
+    <!-- LAST VISIT -->
+    {% with obj.visits.last as v %}
+    {% if v %}
+    <div class="meta">
+        🚗 <strong>Last Visit:</strong><br>
+        Type: {{ v.visit_type }} <br>
+        Status: {{ v.visit_status }} <br>
+        By: {{ v.uploaded_by }} | {{ v.uploaded_at|date:"d M Y, h:i A" }}<br>
+        {% if v.comment %}Note: {{ v.comment|truncatechars:100 }}{% endif %}
+    </div>
+    <hr>
+    {% endif %}
+    {% endwith %}
+
+    <!-- VOICE -->
+    {% with obj.voice_recordings.last as vr %}
+    {% if vr %}
+    <div class="meta">
+        🎤 <strong>Voice:</strong>
+        <a href="{{ vr.file.url }}" target="_blank">Play</a><br>
+        By: {{ vr.uploaded_by }} | {{ vr.uploaded_at|date:"d M Y, h:i A" }}
+    </div>
+    <hr>
+    {% endif %}
+    {% endwith %}
+
+    <!-- AUDIT -->
+    <div class="meta">
+        👤 Created: {{ obj.created_by }} | {{ obj.created_at|date:"d M Y, h:i A" }}<br>
+        ✏️ Updated: {{ obj.updated_by }} | {{ obj.updated_at|date:"d M Y, h:i A" }}
+    </div>
+
+    <!-- ACTIONS -->
+    <div class="actions">
+
+        {% if obj.contact_no %}
+        <a href="tel:{{ obj.contact_no }}" class="call">📞 Call</a>
+
+        <a href="https://wa.me/{{ obj.contact_no|cut:'+' }}" target="_blank"
+           class="whatsapp">💬 WhatsApp</a>
+        {% endif %}
+
+        <a class="edit"
+           href="{% url 'admin:business_company_change' obj.id %}?_changelist_filters={{ request.GET.urlencode }}">
+            ✏️ Edit
+        </a>
+
+    </div>
+
+</div>
+{% endfor %}
+
+</div>
+{% endblock %}
