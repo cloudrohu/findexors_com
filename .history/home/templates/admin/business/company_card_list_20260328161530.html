@@ -11,25 +11,6 @@
 /* #toolbar { display:none } */
 
 /* ✅ ONLY CARD CSS */
-.status-badge{
-    padding:4px 10px;
-    border-radius:20px;
-    font-size:11px;
-    margin-left:8px;
-    font-weight:600;
-}
-
-/* 🎯 STATUS COLORS */
-.status-new{ background:#e0f2fe; color:#0369a1; }
-.status-meeting{ background:#dcfce7; color:#166534; }
-.status-follow_up{ background:#fef9c3; color:#854d0e; }
-.status-not_received{ background:#fee2e2; color:#991b1b; }
-.status-not-interested{ background:#fee2e2; color:#991b1b; }
-.status-they-will-connect{ background:#e0e7ff; color:#3730a3; }
-.status-call-later{ background:#fef3c7; color:#92400e; }
-.status-call-tomorrow{ background:#dbeafe; color:#1e40af; }
-.status-switched-off{ background:#f3f4f6; color:#374151; }
-.status-invalid-number{ background:#fee2e2; color:#991b1b; }
 .cards{
     display:grid;
     grid-template-columns:repeat(auto-fill,minmax(420px,1fr));
@@ -85,25 +66,23 @@
     <div class="title">
         <span class="badge">C{{ obj.id|stringformat:"03d" }}</span>
         {{ obj.company_name }}
-
         <!-- STATUS BADGE -->
-        <span class="status-badge status-{{ obj.status|slugify }}">
-            {{ obj.status }}
-        </span>
+    <span class="status-badge status-{{ obj.status|slugify }}">
+        {{ obj.status }}
+    </span>
     </div>
 
-    <!-- CATEGORY -->
+    <!-- CATEGORY + LOCATION -->
     <div class="meta">
         🏢 {{ obj.category|default:"—" }} 
+        
     </div>
 
-    <!-- LOCATION -->
     <div class="meta">
         📍 {{ obj.city }} • {{ obj.locality }}
-        {% if obj.sub_locality %}
-            • {{ obj.sub_locality }} • {{ obj.project|default:"—" }}
-        {% endif %}
+        {% if obj.sub_locality %} • {{ obj.sub_locality }} • {{ obj.project|default:"—" }} {% endif %}
     </div>
+
     <!-- CONTACT -->
     <div class="meta">📞 {{ obj.contact_no|default:"—" }}</div>
     <div class="meta">📧 {{ obj.email|default:"—" }}</div>
