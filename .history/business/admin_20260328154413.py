@@ -183,7 +183,7 @@ class VisitAdmin(AutoUserAdminMixin, admin.ModelAdmin):
 # =====================================================
 @admin.register(Followup)
 class FollowupAdmin(AutoUserAdminMixin, admin.ModelAdmin):
-    change_list_template = "admin/business/followup_card_list.html"
+    change_list_template = "admin/business/company_card_list.html"
 
     list_display = (
         "id", "company", "status",

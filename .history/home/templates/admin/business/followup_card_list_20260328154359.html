@@ -1,0 +1,212 @@
+{% extends "admin/change_list.html" %}
+{% load static %}
+
+{% block extrastyle %}
+{{ block.super }}
+
+<style>
+.cards{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(420px,1fr));
+    gap:18px;
+    margin-top:20px;
+}
+
+.card{
+    background:#fff;
+    border-radius:14px;
+    padding:16px;
+    box-shadow:0 10px 25px rgba(0,0,0,.08);
+}
+
+.title{
+    font-weight:800;
+    font-size:16px;
+}
+
+.meta{
+    font-size:13px;
+    color:#555;
+    margin-top:6px;
+}
+
+.badge{
+    padding:3px 8px;
+    background:#eef2ff;
+    border-radius:12px;
+    font-size:11px;
+    margin-right:6px;
+}
+
+hr{
+    border:none;
+    border-top:1px solid #eee;
+    margin:12px 0;
+}
+
+.actions{
+    margin-top:12px;
+    display:flex;
+    gap:8px;
+}
+
+.actions a{
+    padding:6px 12px;
+    border-radius:20px;
+    font-size:12px;
+    text-decoration:none;
+}
+
+.call{background:#16a34a;color:#fff;}
+.whatsapp{background:#25D366;color:#fff;}
+.edit{background:#111;color:#fff;}
+
+</style>
+{% endblock %}
+
+
+{% block result_list %}
+<div class="cards">
+
+{% for obj in cl.result_list %}
+<div class="card">
+
+<!-- ================= HEADER ================= -->
+<div class="title">
+    <span class="badge">FU{{ obj.id }}</span>
+    {{ obj.company.company_name }}
+</div>
+
+<div class="meta">
+    📍 {{ obj.company.city }} • {{ obj.company.locality }}
+</div>
+
+<hr>
+
+<!-- ================= FOLLOWUP ================= -->
+<div class="meta">
+    📌 <strong>Followup:</strong><br>
+    Status: {{ obj.status }}<br>
+    Date: {{ obj.followup_date|date:"d M Y, h:i A" }}<br>
+    👤 {{ obj.assigned_to }}
+</div>
+
+{% if obj.comment %}
+<div class="meta">
+    💬 {{ obj.comment }}
+</div>
+{% endif %}
+
+<hr>
+
+<!-- ================= COMPANY ================= -->
+<div class="meta">
+    📞 {{ obj.company.contact_no|default:"—" }}
+</div>
+
+<div class="meta">
+    📧 {{ obj.company.email|default:"—" }}
+</div>
+
+<div class="meta">
+    🌐 {{ obj.company.website|default:"—" }}
+</div>
+
+<div class="meta">
+    ⭐ {{ obj.company.rating|default:"0" }} ({{ obj.company.reviews_count|default:"0" }})
+</div>
+
+<hr>
+
+<!-- ================= LAST VISIT ================= -->
+{% with obj.company.visits.last as v %}
+{% if v %}
+<div class="meta">
+🚗 <strong>Last Visit:</strong><br>
+{{ v.visit_type }} | {{ v.visit_status }}<br>
+👤 {{ v.uploaded_by }} | {{ v.uploaded_at|date:"d M Y, h:i A" }}
+</div>
+<hr>
+{% endif %}
+{% endwith %}
+
+<!-- ================= MEETING ================= -->
+{% if obj.company.meeting %}
+<div class="meta">
+🤝 <strong>Meeting:</strong><br>
+{{ obj.company.meeting.status }}<br>
+{{ obj.company.meeting.meeting_date|date:"d M Y, h:i A" }}
+</div>
+<hr>
+{% endif %}
+
+<!-- ================= COMMENTS ================= -->
+{% for c in obj.company.comments.all|slice:":2" %}
+<div class="meta">
+💬 {{ c.comment }}
+</div>
+{% endfor %}
+
+{% if obj.company.comments.count > 2 %}
+<div class="meta">+ more comments...</div>
+{% endif %}
+
+<hr>
+
+<!-- ================= VOICE ================= -->
+{% if obj.company.voice_recordings.last %}
+<div class="meta">
+🎧 Voice Available
+</div>
+<hr>
+{% endif %}
+
+<!-- ================= IMAGES ================= -->
+{% if obj.company.images_set.all %}
+<div class="meta">
+🖼 {{ obj.company.images_set.count }} Images
+</div>
+<hr>
+{% endif %}
+
+<!-- ================= FAQ ================= -->
+{% if obj.company.faq_set.all %}
+<div class="meta">
+❓ {{ obj.company.faq_set.count }} FAQs
+</div>
+<hr>
+{% endif %}
+
+<!-- ================= AUDIT ================= -->
+<div class="meta">
+👤 Created: {{ obj.created_by }}<br>
+📅 {{ obj.create_at|date:"d M Y, h:i A" }}
+</div>
+
+<div class="meta">
+✏️ Updated: {{ obj.updated_by }}<br>
+📅 {{ obj.update_at|date:"d M Y, h:i A" }}
+</div>
+
+<!-- ================= ACTIONS ================= -->
+<div class="actions">
+
+{% if obj.company.contact_no %}
+<a href="tel:{{ obj.company.contact_no }}" class="call">Call</a>
+
+<a href="https://wa.me/{{ obj.company.contact_no|cut:'+' }}" target="_blank"
+class="whatsapp">WhatsApp</a>
+{% endif %}
+
+<a class="edit"
+href="{% url 'admin:business_followup_change' obj.id %}">
+Edit
+</a>
+
+</div>
+
+</div>
+{% endfor %}
+
+</div>
+{% endblock %}
