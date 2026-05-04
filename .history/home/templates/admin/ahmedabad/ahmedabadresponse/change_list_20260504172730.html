@@ -1,0 +1,57 @@
+{% extends "admin/change_list.html" %}
+{% load admin_urls %}
+
+{% block result_list %}
+<div class="cards">
+
+{% for obj in cl.result_list %}
+<div class="card">
+
+<b>MR{{ obj.id|stringformat:"03d" }}</b> — {{ obj.business_name }}
+
+<br>👤 {{ obj.contact_persone }}
+<br>📞 {{ obj.contact_no }}
+<br>📍 {{ obj.locality }}
+<br>Status: {{ obj.status }}
+<br>Lead: {{ obj.lead_source }}
+
+<br><br><b>Requirements:</b>
+{% for r in obj.requirement_types.all %}
+    <span>{{ r.name }}</span>
+{% empty %} None {% endfor %}
+
+<br><br><b>Latest Comment:</b>
+{% with obj.comments.last as c %}
+    {{ c.comment|default:"—" }}
+{% endwith %}
+
+<br><br><b>Meeting:</b>
+{% if obj.meeting %}
+    {{ obj.meeting.status }} | {{ obj.meeting.meeting_date }}
+{% else %} — {% endif %}
+
+<br><b>Followup:</b>
+{% if obj.followup %}
+    {{ obj.followup.status }} | {{ obj.followup.followup_date }}
+{% else %} — {% endif %}
+
+<br><br><b>Visits:</b>
+{% for v in obj.visits.all %}
+    {{ v.visit_type }} - {{ v.visit_status }} <br>
+{% empty %} No visits {% endfor %}
+
+<br><br><b>Voice:</b>
+{% with obj.voice_recordings.last as v %}
+    {% if v %}
+        <a href="{{ v.file.url }}">Play</a>
+    {% endif %}
+{% endwith %}
+
+<br><br>
+<a href="{% url opts|admin_urlname:'change' obj.pk %}">Edit</a>
+
+</div>
+{% endfor %}
+
+</div>
+{% endblock %}

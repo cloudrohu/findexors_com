@@ -1,0 +1,63 @@
+{% extends "admin/change_list.html" %}
+{% load admin_urls %}
+
+{% block result_list %}
+<div class="cards">
+
+{% for obj in cl.result_list %}
+{% with obj.company as r %}
+
+<div class="card">
+
+    <!-- RESPONSE -->
+    <div class="block">
+
+        <b>MR{{ r.id|stringformat:"03d" }}</b> — {{ r.business_name }}
+
+        <br>👤 {{ r.contact_persone }}
+        <br>📞 {{ r.contact_no }}
+        <br>📍 {{ r.locality }}
+
+        <br>Status: {{ r.status }} | {{ r.lead_source }}
+
+        <br>Assigned: {{ r.assigned_to }}
+
+        <br>Created: {{ r.create_at }}
+    </div>
+
+    <!-- MEETING -->
+    <div class="block">
+        <b>Meeting</b><br>
+
+        Status: {{ obj.status }} <br>
+        Date: {{ obj.meeting_date }} <br>
+        Assigned: {{ obj.assigned_to }} <br>
+        Comment: {{ obj.comment }}
+    </div>
+
+    <!-- ACTIONS -->
+    <div class="actions">
+
+        {% if r.contact_no %}
+        <a href="tel:+91{{ r.contact_no }}">📞 Call</a>
+        <a href="https://wa.me/91{{ r.contact_no }}" target="_blank">💬 WhatsApp</a>
+        {% endif %}
+
+        <!-- 🔥 FIXED -->
+        <a href="{% url opts|admin_urlname:'change' r.pk %}">
+            ✏️ Edit Response
+        </a>
+
+        <a href="{% url opts|admin_urlname:'change' obj.pk %}">
+            📅 Edit Meeting
+        </a>
+
+    </div>
+
+</div>
+
+{% endwith %}
+{% endfor %}
+
+</div>
+{% endblock %}

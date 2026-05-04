@@ -1,0 +1,162 @@
+{% extends "admin/change_list.html" %}
+{% load admin_urls %}
+
+{% block extrastyle %}
+{{ block.super }}
+
+<style>
+.cards{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(520px,1fr));
+    gap:18px;
+    margin-top:20px;
+}
+
+.card{
+    background:#fff;
+    border-radius:16px;
+    padding:18px;
+    box-shadow:0 12px 30px rgba(0,0,0,.08);
+    border:1px solid #eef2f7;
+}
+
+.title{
+    font-weight:900;
+    font-size:17px;
+    color:#111;
+}
+
+.meta{
+    font-size:13px;
+    margin-top:6px;
+    color:#444;
+}
+
+.badge{
+    padding:5px 12px;
+    border-radius:20px;
+    font-size:11px;
+    font-weight:800;
+    margin-right:6px;
+}
+
+.blue{background:#dbeafe;color:#1d4ed8;}
+.green{background:#dcfce7;color:#166534;}
+.red{background:#fee2e2;color:#991b1b;}
+.yellow{background:#fef9c3;color:#854d0e;}
+.gray{background:#f3f4f6;color:#111827;}
+
+.block{
+    margin-top:14px;
+    padding:12px;
+    border-radius:12px;
+    background:#f9fafb;
+    border:1px solid #e5e7eb;
+}
+
+.actions{
+    margin-top:16px;
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+}
+
+.actions a{
+    padding:8px 16px;
+    border-radius:25px;
+    text-decoration:none;
+    font-size:12px;
+    font-weight:800;
+}
+
+.call{background:#16a34a;color:#fff;}
+.whatsapp{background:#25D366;color:#fff;}
+.edit{background:#111;color:#fff;}
+</style>
+{% endblock %}
+
+
+{% block result_list %}
+<div class="cards">
+
+{% for obj in cl.result_list %}
+{% with obj.company as r %}
+
+<div class="card">
+
+    <!-- RESPONSE HEADER -->
+    <div class="title">
+        <span class="badge blue">MR{{ r.id|stringformat:"03d" }}</span>
+        {{ r.business_name|default:"No Business Name" }}
+    </div>
+
+    <div class="meta">
+        👤 {{ r.contact_persone|default:"—" }} |
+        📞 {{ r.contact_no|default:"—" }}
+    </div>
+
+    <div class="meta">
+        📍 {{ r.locality|default:"—" }}
+    </div>
+
+    <!-- STATUS -->
+    <div class="meta">
+        🎯 {{ r.status }} | {{ r.lead_source }}
+    </div>
+
+    <!-- RESPONSE DETAILS -->
+    <div class="block">
+        <b>📋 Response Info</b><br><br>
+
+        👤 Assigned: {{ r.assigned_to|default:"—" }} <br>
+        🕒 Created: {{ r.create_at|date:"d M Y, h:i A" }} <br>
+        🔄 Updated: {{ r.update_at|date:"d M Y, h:i A" }} <br>
+        ⏱ Converted: {{ r.is_converted }}
+    </div>
+
+    <!-- MEETING BLOCK -->
+    <div class="block">
+        <b>🤝 Meeting</b><br><br>
+
+        Status: {{ obj.status }} <br>
+        Date: {{ obj.meeting_date|date:"d M Y, h:i A" }} <br>
+        Assigned: {{ obj.assigned_to|default:"—" }} <br>
+        Comment: {{ obj.comment|default:"—"|truncatechars:120 }}
+    </div>
+
+    <!-- ACTIONS -->
+    <div class="actions">
+
+        {% if r.contact_no %}
+
+        <a href="tel:+91{{ r.contact_no }}" class="call">
+            📞 Call
+        </a>
+
+        <a class="whatsapp"
+           href="https://wa.me/91{{ r.contact_no }}?text=Hello%20👋%20{{ r.contact_persone|default:'Sir/Madam' }}%2C%0A%0AThank%20you%20for%20contacting%20Google%20Findexor%20🚀%0A%0AWe%20provide%3A%0A✔%20Website%20Development%0A✔%20Ads%20Management%0A✔%20SEO%0A%0AReply%20with%20your%20requirement."
+           target="_blank">
+            💬 WhatsApp
+        </a>
+
+        {% endif %}
+
+        <!-- 🔥 SAFE URL -->
+        <a href="{% url opts|admin_urlname:'change' obj.pk %}" class="edit">
+            📅 Edit Meeting
+        </a>
+
+        <!-- 🔥 RESPONSE EDIT (SAFE WAY) -->
+        <a href="{% url 'admin:'|add:r._meta.app_label|add:'_'|add:r._meta.model_name|add:'_change' r.pk %}" class="edit">
+            ✏️ Edit Response
+        </a>
+
+    </div>
+
+</div>
+
+{% endwith %}
+{% endfor %}
+
+</div>
+{% endblock %}
