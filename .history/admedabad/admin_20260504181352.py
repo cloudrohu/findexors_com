@@ -25,10 +25,7 @@ class AutoUserAdminMixin:
     def save_formset(self, request, form, formset, change):
         instances = formset.save(commit=False)
 
-        parent = form.instance  # AhmedabadResponse object
-
         for obj in instances:
-            # USER AUTO SET
             if hasattr(obj, "created_by") and not obj.created_by:
                 obj.created_by = request.user
 
@@ -39,18 +36,6 @@ class AutoUserAdminMixin:
                 obj.uploaded_by = request.user
 
             obj.save()
-
-            # 🔥 MAIN LOGIC (IMPORTANT)
-            if isinstance(obj, (Meeting, Followup)):
-                if parent.status != "Deal_close":
-                    parent.status = "Meeting_FollowUp"
-
-                    # optional: deal done check
-                    if getattr(obj, "status", None) == "Deal Done":
-                        parent.status = "Deal_close"
-                        parent.is_converted = True
-
-                    parent.save()
 
         formset.save_m2m()
 

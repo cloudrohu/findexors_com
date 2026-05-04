@@ -128,31 +128,6 @@ class AhmedabadResponse(models.Model):
         ordering = ["-create_at"]
 
 
-    def save(self, *args, **kwargs):
-
-        if self.contact_no:
-            self.contact_no = clean_phone_last10(self.contact_no)
-
-        # 🔥 AUTO STATUS LOGIC
-        if self.pk:  # object already exists
-
-            has_meeting = hasattr(self, "meeting")
-            has_followup = hasattr(self, "followup")
-
-            if not self.is_converted:
-                if has_meeting or has_followup:
-                    self.status = "Meeting_FollowUp"
-
-        # 🔥 CONVERSION LOGIC
-        if self.is_converted and not self.converted_at:
-            self.converted_at = timezone.now()
-
-        if not self.is_converted:
-            self.converted_at = None
-
-        super().save(*args, **kwargs)
-
-
 # =======================
 # Comment
 # =======================
@@ -372,4 +347,12 @@ class Meeting(models.Model):
     def __str__(self):
         return f"Meeting {self.id}"
 
-        
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+
+        if self.company:
+            # ❗ Agar deal already close hai to kuch mat karo
+            if self.company.status != "Deal_close":
+                self.company.status = "Meeting_FollowUp"
+                self.company.save()
