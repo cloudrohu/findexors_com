@@ -1,168 +1,85 @@
 {% extends "admin/change_list.html" %}
 {% load admin_urls %}
 
-{% block extrastyle %}
-{{ block.super }}
-
-<style>
-.cards{
-    display:grid;
-    grid-template-columns:repeat(auto-fill,minmax(520px,1fr));
-    gap:18px;
-    margin-top:20px;
-}
-
-.card{
-    background:#fff;
-    border-radius:16px;
-    padding:18px;
-    box-shadow:0 12px 30px rgba(0,0,0,.08);
-    border:1px solid #eef2f7;
-}
-
-.title{
-    font-weight:900;
-    font-size:17px;
-}
-
-.meta{
-    font-size:13px;
-    margin-top:6px;
-    color:#444;
-}
-
-.badge{
-    padding:5px 12px;
-    border-radius:20px;
-    font-size:11px;
-    font-weight:800;
-    margin-right:6px;
-}
-
-.blue{background:#dbeafe;color:#1d4ed8;}
-.green{background:#dcfce7;color:#166534;}
-.red{background:#fee2e2;color:#991b1b;}
-.gray{background:#f3f4f6;color:#111827;}
-
-.block{
-    margin-top:14px;
-    padding:12px;
-    border-radius:12px;
-    background:#f9fafb;
-    border:1px solid #e5e7eb;
-}
-
-.actions{
-    margin-top:16px;
-}
-
-.actions a{
-    padding:8px 14px;
-    border-radius:20px;
-    text-decoration:none;
-    font-size:12px;
-    font-weight:700;
-}
-
-.call {background:#16a34a;color:#fff;}
-.whatsapp {background:#25D366;color:#fff;}
-.edit {background:#111;color:#fff;}
-.play {background:#2563eb;color:#fff;}
-</style>
-{% endblock %}
-
-
 {% block result_list %}
 <div class="cards">
 
 {% for obj in cl.result_list %}
-{% with obj.company as r %}
+
+    {% if obj.form_type == "Company" %}
+        {% with obj.company as e %}
+        {% with "Company" as type %}
 
 <div class="card">
 
-    <!-- RESPONSE -->
-    <div class="block">
-
-        <div class="title">
-            <span class="badge blue">MR{{ r.id|stringformat:"03d" }}</span>
-            {{ r.business_name|default:"No Name" }}
-        </div>
-
-        <div class="meta">
-            👤 {{ r.contact_persone|default:"—" }} |
-            📞 {{ r.contact_no|default:"—" }}
-        </div>
-
-        <div class="meta">
-            📍 {{ r.locality|default:"—" }}
-        </div>
-
-        <div class="meta">
-            🎯 {{ r.status }} | {{ r.lead_source }}
-        </div>
-
-        👤 Assigned: {{ r.assigned_to|default:"—" }} <br>
-        🧑‍💻 Created By: {{ r.created_by|default:"—" }}  
-        🕒 {{ r.create_at|date:"d M Y, h:i A" }}<br>
-
-        ✏️ Updated By: {{ r.updated_by|default:"—" }}  
-        🔄 {{ r.update_at|date:"d M Y, h:i A" }}<br>
-
-        ⏱ Converted: {{ r.is_converted|yesno:"Yes,No" }}
-
+    <!-- 🔥 HEADER -->
+    <div class="title">
+        <b>{{ type }}</b> |
+        VR{{ obj.id|stringformat:"03d" }} -
+        {{ e.company_name|default:"No Name" }}
     </div>
 
-    <!-- VOICE RECORDING BLOCK -->
+    <!-- 🔥 BASIC -->
     <div class="block">
-        <b>🎤 Voice Recording</b><br><br>
+        👤 {{ e.contact_persone|default:"—" }} <br>
+        📞 {{ e.contact_no|default:"—" }} <br>
+        📍 {{ e.locality|default:"—" }} <br>
+        🎯 {{ e.status|default:"—" }}
+    </div>
 
+    <!-- 🔥 COMPANY EXTRA -->
+    <div class="block">
+        ⭐ {{ e.rating|default:"—" }} <br>
+        📊 {{ e.reviews_count|default:"—" }} <br>
+        🌐 {{ e.website|default:"—" }}
+    </div>
+
+    <!-- 🔥 VOICE -->
+    <div class="block">
         {% if obj.file %}
-            <a href="{{ obj.file.url }}" target="_blank" class="play">
-                ▶ Play Recording
-            </a><br><br>
-        {% else %}
-            No file uploaded<br><br>
-        {% endif %}
-
-        Uploaded By: {{ obj.uploaded_by|default:"—" }} <br>
-        Time: {{ obj.uploaded_at|date:"d M Y, h:i A"|default:"—" }}
-    </div>
-
-    <!-- ACTIONS -->
-    <div class="actions">
-
-        {% if r.contact_no %}
-
-        <a href="tel:+91{{ r.contact_no }}" class="call">
-            📞 Call
-        </a>
-&nbsp;&nbsp;
-        <a class="whatsapp"
-           href="https://wa.me/91{{ r.contact_no }}"
-           target="_blank">
-            💬 WhatsApp
-        </a>
-
-        {% endif %}
-&nbsp;&nbsp;
-
-        <!-- VOICE EDIT -->
-        <a href="{% url opts|admin_urlname:'change' obj.pk %}" class="edit">
-            🎤 Edit Voice
-        </a>
-
-&nbsp;&nbsp;
-
-        <!-- RESPONSE EDIT -->
-        <a href="{% url 'admin:'|add:cl.opts.app_label|add:'_ahmedabadresponse_change' r.pk %}" class="edit">
-            ✏️ Edit Response
-        </a>
-
+        <audio controls src="{{ obj.file.url }}"></audio>
+        {% else %} No Recording {% endif %}
     </div>
 
 </div>
 
-{% endwith %}
+        {% endwith %}
+        {% endwith %}
+
+    {% else %}
+        {% with obj.response as e %}
+        {% with "Response" as type %}
+
+<div class="card">
+
+    <!-- 🔥 HEADER -->
+    <div class="title">
+        <b>{{ type }}</b> |
+        VR{{ obj.id|stringformat:"03d" }} -
+        {{ e.business_name|default:"No Name" }}
+    </div>
+
+    <!-- 🔥 BASIC -->
+    <div class="block">
+        👤 {{ e.contact_persone|default:"—" }} <br>
+        📞 {{ e.contact_no|default:"—" }} <br>
+        📍 {{ e.locality|default:"—" }} <br>
+        🎯 {{ e.status|default:"—" }}
+    </div>
+
+    <!-- 🔥 VOICE -->
+    <div class="block">
+        {% if obj.file %}
+        <audio controls src="{{ obj.file.url }}"></audio>
+        {% else %} No Recording {% endif %}
+    </div>
+
+</div>
+
+        {% endwith %}
+        {% endwith %}
+    {% endif %}
+
 {% endfor %}
 
 </div>

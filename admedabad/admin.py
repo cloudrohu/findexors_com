@@ -6,12 +6,19 @@ from .models import (
     Visit,
     Followup,
     Meeting,
-    Staff
+    Staff,
+    AhmedabadCompany,
 )
 
-# =======================
-# AUTO USER MIXIN
-# =======================
+from utility.models import (
+    Locality
+)
+
+
+@admin.register(Staff)
+class StaffAdmin(admin.ModelAdmin):
+    list_display = ("user",)
+
 class AutoUserAdminMixin:
     def save_model(self, request, obj, form, change):
         if hasattr(obj, "created_by") and not obj.created_by:
@@ -55,42 +62,257 @@ class AutoUserAdminMixin:
         formset.save_m2m()
 
 
-# =======================
-# INLINE MODELS (WORKING)
-# =======================
-class CommentInline(admin.StackedInline):
+class CommentResponseInline(admin.StackedInline):
     model = Comment
     extra = 1
+
+    def get_formset(self, request, obj=None, **kwargs):
+        formset = super().get_formset(request, obj, **kwargs)
+
+        class CustomFormset(formset):
+            def save_new(self, form, commit=True):
+                obj = super().save_new(form, commit=False)
+                obj.form_type = "Response"
+                if commit:
+                    obj.save()
+                return obj
+
+        return CustomFormset
     readonly_fields = ("created_by", "updated_by", "create_at", "update_at")
+class CommentCompanyInline(admin.StackedInline):
+    model = Comment
+    extra = 1
 
+    def get_formset(self, request, obj=None, **kwargs):
+        formset = super().get_formset(request, obj, **kwargs)
 
-class VoiceRecordingInline(admin.StackedInline):
+        class CustomFormset(formset):
+            def save_new(self, form, commit=True):
+                obj = super().save_new(form, commit=False)
+                obj.form_type = "Company"
+                if commit:
+                    obj.save()
+                return obj
+
+        return CustomFormset
+    readonly_fields = ("created_by", "updated_by", "create_at", "update_at")
+ 
+class VoiceResponseInline(admin.StackedInline):
     model = VoiceRecording
     extra = 1
-    readonly_fields = ("uploaded_by", "uploaded_at")
+    exclude = ("form_type", "company")
+
+    readonly_fields = ("uploaded_by", "updated_by", "create_at", "update_at")
+
+    def get_formset(self, request, obj=None, **kwargs):
+        formset = super().get_formset(request, obj, **kwargs)
+
+        class CustomFormset(formset):
+            def save_new(self, form, commit=True):
+                obj = super().save_new(form, commit=False)
+                obj.form_type = "Response"
+                obj.response = obj.response or form.instance
+
+                if hasattr(obj, "uploaded_by") and not obj.uploaded_by:
+                    obj.uploaded_by = request.user
+
+                if commit:
+                    obj.save()
+                return obj
+
+        return CustomFormset
+
+class VoiceCompanyInline(admin.StackedInline):
+    model = VoiceRecording
+    extra = 1
+    exclude = ("form_type", "response")
+
+    readonly_fields = ("uploaded_by", "updated_by", "create_at", "update_at")
+
+    def get_formset(self, request, obj=None, **kwargs):
+        formset = super().get_formset(request, obj, **kwargs)
+
+        class CustomFormset(formset):
+            def save_new(self, form, commit=True):
+                obj = super().save_new(form, commit=False)
+                obj.form_type = "Company"
+                obj.company = obj.company or form.instance
+
+                if hasattr(obj, "uploaded_by") and not obj.uploaded_by:
+                    obj.uploaded_by = request.user
+
+                if commit:
+                    obj.save()
+                return obj
+
+        return CustomFormset
 
 
-class VisitInline(admin.StackedInline):
+class VisitCompanyInline(admin.StackedInline):
     model = Visit
-    extra = 1
-    readonly_fields = ("uploaded_by", "uploaded_at",)
-    
-class FollowupInline(admin.StackedInline):
+    extra = 0
+
+    readonly_fields = (
+        "created_by",   # ❌ uploaded_by हटाओ
+        "updated_by",
+        "create_at",
+        "update_at",
+    )
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        return qs.filter(form_type="Company")
+class VisitResponseInline(admin.StackedInline):
+    model = Visit
+    extra = 0
+
+    readonly_fields = (
+        "created_by",
+        "updated_by",
+        "create_at",
+        "update_at",
+    )
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        return qs.filter(form_type="Response")
+
+class FollowupResponseInline(admin.StackedInline):
     model = Followup
-    extra = 1
-    readonly_fields = ("created_by", "updated_by", "create_at", "update_at")
+    extra = 0
+    fk_name = "response"   # 🔥 VERY IMPORTANT
+
+    readonly_fields = (
+        "created_by",
+        "updated_by",
+        "create_at",
+        "update_at",
+    )
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        return qs.filter(form_type="Response")
+
+    def save_model(self, request, obj, form, change):
+        obj.form_type = "Response"
+        if not obj.created_by:
+            obj.created_by = request.user
+        obj.updated_by = request.user
+        super().save_model(request, obj, form, change)
+class FollowupCompanyInline(admin.StackedInline):
+    model = Followup
+    extra = 0
+    fk_name = "company"   # 🔥 VERY IMPORTANT
+
+    readonly_fields = (
+        "created_by",
+        "updated_by",
+        "create_at",
+        "update_at",
+    )
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        return qs.filter(form_type="Company")
+
+    def save_model(self, request, obj, form, change):
+        obj.form_type = "Company"
+        if not obj.created_by:
+            obj.created_by = request.user
+        obj.updated_by = request.user
+        super().save_model(request, obj, form, change)
 
 
-class MeetingInline(admin.StackedInline):
+class MeetingCompanyInline(admin.StackedInline):
     model = Meeting
-    extra = 1
-    readonly_fields = ("created_by", "updated_by", "create_at", "update_at")
-# =======================
-# STAFF ADMIN
-# =======================
-@admin.register(Staff)
-class StaffAdmin(admin.ModelAdmin):
-    list_display = ("user",)
+    extra = 0
+    fk_name = "company"   # 🔥 IMPORTANT
+
+    readonly_fields = (
+        "created_by",
+        "updated_by",
+        "create_at",
+        "update_at",
+    )
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        return qs.filter(form_type="Company")
+
+    def save_model(self, request, obj, form, change):
+        obj.form_type = "Company"
+        if not obj.created_by:
+            obj.created_by = request.user
+        obj.updated_by = request.user
+        super().save_model(request, obj, form, change)
+
+class MeetingResponseInline(admin.StackedInline):
+    model = Meeting
+    extra = 0
+    fk_name = "response"   # 🔥 IMPORTANT
+
+    readonly_fields = (
+        "created_by",
+        "updated_by",
+        "create_at",
+        "update_at",
+    )
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        return qs.filter(form_type="Response")
+
+    def save_model(self, request, obj, form, change):
+        obj.form_type = "Response"
+        if not obj.created_by:
+            obj.created_by = request.user
+        obj.updated_by = request.user
+        super().save_model(request, obj, form, change)
+
+
+# =====================================================
+# ✅ COMPANY ADMIN (CARD UI)
+# =====================================================
+@admin.register(AhmedabadCompany)
+class AhmedabadCompanyAdmin(AutoUserAdminMixin, admin.ModelAdmin):
+
+    change_list_template = "admin/business/company_card_list.html"
+    list_per_page = 20
+    preserve_filters = True
+
+    inlines = [CommentCompanyInline,
+               VoiceCompanyInline,
+               VisitCompanyInline,
+               FollowupCompanyInline,
+               MeetingCompanyInline,
+               ]
+
+    list_display = (
+        "id", "status", "company_name", "contact_no",
+        "category", "locality", "assigned_to",
+        "rating", "reviews_count", "updated_at",
+    )
+
+    search_fields = ("company_name", "contact_no", "email", "website", "address")
+
+    list_filter = (
+        "status", "category","locality",
+        "assigned_to", "is_active", "is_verified", "is_featured",
+    )
+
+    readonly_fields = (
+        "created_at", "updated_at",
+        "created_by", "updated_by",
+        "logo_preview",
+    )
+
+    ordering = ("-created_at",)
+
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == "locality":
+            kwargs["queryset"] = Locality.objects.filter(city__name="Ahmedabad")
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
+
 
 
 # =======================
@@ -123,11 +345,12 @@ class AhmedabadResponseAdmin(AutoUserAdminMixin, admin.ModelAdmin):
 
     # ✅ THIS IS IMPORTANT
     inlines = [
-        CommentInline,
-        VoiceRecordingInline,
-        VisitInline,
-        FollowupInline,
-        MeetingInline
+        CommentResponseInline,
+        VoiceResponseInline,
+        VisitResponseInline,
+        FollowupResponseInline,
+        MeetingResponseInline,
+        
     ]
 
     fieldsets = (
@@ -152,34 +375,137 @@ class AhmedabadResponseAdmin(AutoUserAdminMixin, admin.ModelAdmin):
 
 
 @admin.register(Comment)
-class CommentAdmin(AutoUserAdminMixin, admin.ModelAdmin):
-    list_display = ("id", "company", "comment", "created_by", "create_at")
+class CommentAdmin(admin.ModelAdmin):
+
+    list_display = (
+        "id",
+        "form_type",
+        "response",
+        "company",
+        "comment",
+        "create_at",
+    )
+
+    list_filter = ("form_type",)
     search_fields = ("comment",)
 
-
 @admin.register(VoiceRecording)
-class VoiceRecordingAdmin(AutoUserAdminMixin, admin.ModelAdmin):
-    change_list_template = "admin/ahmedabad/voicerecording/change_list.html"
+class VoiceRecordingAdmin(admin.ModelAdmin):
+    change_list_template = "admin/ahmedabad/voicerecording/change_form.html"
 
-    list_display = ("id", "company", "uploaded_by", "uploaded_at")
 
+    list_display = (
+        "id",
+        "form_type",
+        "response",
+        "company",
+        "uploaded_by",
+        "create_at",
+    )
+
+    list_filter = ("form_type",)
+    search_fields = ("file",)
 
 @admin.register(Visit)
-class VisitAdmin(AutoUserAdminMixin, admin.ModelAdmin):
-    change_list_template = "admin/ahmedabad/visit/change_list.html"
+class VisitAdmin(admin.ModelAdmin):
 
-    list_display = ("id", "company", "visit_type", "visit_status", "uploaded_by")
+    list_display = (
+        "id",
+        "form_type",
+        "response",
+        "company",
+        "visit_type",
+        "visit_status",
+        "created_by",   # ✅ FIXED
+        "create_at",    # ✅ FIXED
+    )
+
+    list_filter = ("form_type", "visit_status", "visit_type")
+
+    readonly_fields = (
+        "created_by",   # ✅ FIXED
+        "updated_by",
+        "create_at",
+        "update_at",
+    )
 
 
 @admin.register(Followup)
-class FollowupAdmin(AutoUserAdminMixin, admin.ModelAdmin):
-    change_list_template = "admin/ahmedabad/followup/change_list.html"
+class FollowupAdmin(admin.ModelAdmin):
 
-    list_display = ("id", "company", "status", "assigned_to", "followup_date")
+    list_display = (
+        "id",
+        "form_type",
+        "response",
+        "company",
+        "status",
+        "followup_date",
+        "assigned_to",
+        "created_by",
+        "create_at",
+    )
+
+    list_filter = (
+        "form_type",
+        "status",
+        "followup_date",
+    )
+
+    search_fields = (
+        "response__business_name",
+        "company__company_name",
+        "assigned_to__name",
+    )
+
+    readonly_fields = (
+        "created_by",
+        "updated_by",
+        "create_at",
+        "update_at",
+    )
+
+    def save_model(self, request, obj, form, change):
+        if not obj.created_by:
+            obj.created_by = request.user
+        obj.updated_by = request.user
+        super().save_model(request, obj, form, change)
 
 
 @admin.register(Meeting)
-class MeetingAdmin(AutoUserAdminMixin, admin.ModelAdmin):
-    change_list_template = "admin/ahmedabad/meeting/change_list.html"
+class MeetingAdmin(admin.ModelAdmin):
 
-    list_display = ("id", "company", "status", "assigned_to", "meeting_date")
+    list_display = (
+        "id",
+        "form_type",
+        "response",
+        "company",
+        "status",
+        "meeting_date",
+        "assigned_to",
+        "created_by",
+        "create_at",
+    )
+
+    list_filter = (
+        "form_type",
+        "status",
+        "meeting_date",
+    )
+
+    search_fields = (
+        "response__business_name",
+        "company__company_name",
+    )
+
+    readonly_fields = (
+        "created_by",
+        "updated_by",
+        "create_at",
+        "update_at",
+    )
+
+    def save_model(self, request, obj, form, change):
+        if not obj.created_by:
+            obj.created_by = request.user
+        obj.updated_by = request.user
+        super().save_model(request, obj, form, change)
