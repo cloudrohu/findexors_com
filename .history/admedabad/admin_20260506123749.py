@@ -284,6 +284,9 @@ class MeetingRealestateGMBInline(admin.StackedInline):
 #class AhmedabadRealEstateGMBAdmin(ImportExportModelAdmin):
 class AhmedabadRealEstateGMBAdmin(AutoUserAdminMixin, admin.ModelAdmin):
     change_list_template = "admin/ahmedabad/ahmedabadrealestategmb/change_list.html"
+
+
+
     resource_class = AhmedabadRealEstateGMBResource
 #class AhmedabadRealEstateGMBAdmin(admin.ModelAdmin):
 

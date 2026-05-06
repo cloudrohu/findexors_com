@@ -15,27 +15,6 @@ from utility.models import (
     Locality
 )
 
-# =====================================================
-# ✅ FILTER: Phone Status
-# =====================================================
-class PhoneFilter(admin.SimpleListFilter):
-    title = "Phone"
-    parameter_name = "phone_status"
-
-    def lookups(self, request, model_admin):
-        return (
-            ("yes", "Has Phone"),
-            ("no", "No Phone"),
-        )
-
-    def queryset(self, request, queryset):
-        if self.value() == "yes":
-            return queryset.exclude(phone__isnull=True).exclude(phone="")
-        if self.value() == "no":
-            return queryset.filter(models.Q(phone__isnull=True) | models.Q(phone=""))
-        return queryset
-
-
 
 from import_export.admin import ImportExportModelAdmin
 from .resources import AhmedabadRealEstateGMBResource
@@ -284,6 +263,9 @@ class MeetingRealestateGMBInline(admin.StackedInline):
 #class AhmedabadRealEstateGMBAdmin(ImportExportModelAdmin):
 class AhmedabadRealEstateGMBAdmin(AutoUserAdminMixin, admin.ModelAdmin):
     change_list_template = "admin/ahmedabad/ahmedabadrealestategmb/change_list.html"
+
+
+
     resource_class = AhmedabadRealEstateGMBResource
 #class AhmedabadRealEstateGMBAdmin(admin.ModelAdmin):
 
@@ -304,16 +286,13 @@ class AhmedabadRealEstateGMBAdmin(AutoUserAdminMixin, admin.ModelAdmin):
     # 🔥 FILTERS (right sidebar)
     list_filter = (
         "status",
-        "category",
+        "is_active",
+        "is_verified",
+        "is_featured",
+        "assigned_to",
         "city",
-        "locality",
-        'sub_locality',
-        'postal_code',
-        'business_status',
-        "rating",
-        "reviews",
-        "updated_at",
-        PhoneFilter,
+        "category",
+        "created_at",
     )
 
     # 🔥 SEARCH BAR

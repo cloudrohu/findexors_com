@@ -284,6 +284,9 @@ class MeetingRealestateGMBInline(admin.StackedInline):
 #class AhmedabadRealEstateGMBAdmin(ImportExportModelAdmin):
 class AhmedabadRealEstateGMBAdmin(AutoUserAdminMixin, admin.ModelAdmin):
     change_list_template = "admin/ahmedabad/ahmedabadrealestategmb/change_list.html"
+
+
+
     resource_class = AhmedabadRealEstateGMBResource
 #class AhmedabadRealEstateGMBAdmin(admin.ModelAdmin):
 
@@ -304,16 +307,13 @@ class AhmedabadRealEstateGMBAdmin(AutoUserAdminMixin, admin.ModelAdmin):
     # 🔥 FILTERS (right sidebar)
     list_filter = (
         "status",
-        "category",
+        "is_active",
+        "is_verified",
+        "is_featured",
+        "assigned_to",
         "city",
-        "locality",
-        'sub_locality',
-        'postal_code',
-        'business_status',
-        "rating",
-        "reviews",
-        "updated_at",
-        PhoneFilter,
+        "category",
+        "created_at",
     )
 
     # 🔥 SEARCH BAR
