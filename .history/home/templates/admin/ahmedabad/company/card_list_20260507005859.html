@@ -292,10 +292,7 @@ audio{
         🏷️ <strong>Category:</strong>
         {{ obj.category|default:"—" }}
     </div>
-    <div class="meta">
-            📌 <strong>Address:</strong>
-            {{ obj.address|default:"—" }}
-        </div>
+
     <div class="meta">
         📍 <strong>Locality:</strong>
         {{ obj.locality|default:"—" }}
@@ -336,7 +333,10 @@ audio{
         {{ obj.reviews_count|default:"0" }}
     </div>
 
-    
+    <div class="meta">
+        📌 <strong>Address:</strong>
+        {{ obj.address|default:"—" }}
+    </div>
 
     <div class="meta">
         🗺️ <strong>Google Status:</strong>
@@ -353,6 +353,10 @@ audio{
         {{ obj.assigned_to|default:"—" }}
     </div>
 
+    <div class="meta">
+        🔗 <strong>Slug:</strong>
+        {{ obj.slug|default:"—" }}
+    </div>
 
     <div class="meta">
         ✅ <strong>Active:</strong>

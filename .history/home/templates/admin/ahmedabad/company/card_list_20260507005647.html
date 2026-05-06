@@ -7,138 +7,6 @@
 
 <style>
 
-
-
-.cards{
-    display:grid;
-    grid-template-columns:repeat(auto-fill,minmax(450px,1fr));
-    gap:20px;
-    margin-top:20px;
-}
-
-.card{
-    background:#fff;
-    border-radius:18px;
-    padding:20px;
-    box-shadow:0 10px 25px rgba(0,0,0,.08);
-    border:1px solid #eef2f7;
-}
-
-.top{
-    display:flex;
-    gap:14px;
-    align-items:flex-start;
-}
-
-.logo{
-    width:70px;
-    height:70px;
-    border-radius:16px;
-    overflow:hidden;
-    background:#f3f4f6;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    flex-shrink:0;
-}
-
-.logo img{
-    width:100%;
-    height:100%;
-    object-fit:cover;
-}
-
-.logo span{
-    font-size:28px;
-}
-
-.title{
-    font-size:20px;
-    font-weight:800;
-    color:#111827;
-    line-height:1.5;
-}
-
-.id-badge{
-    display:inline-block;
-    padding:5px 10px;
-    border-radius:999px;
-    background:#e0f2fe;
-    color:#0369a1;
-    font-size:11px;
-    font-weight:700;
-    margin-right:8px;
-}
-
-.status{
-    display:inline-block;
-    padding:5px 10px;
-    border-radius:999px;
-    background:#dcfce7;
-    color:#166534;
-    font-size:11px;
-    font-weight:700;
-    margin-top:8px;
-}
-
-.meta{
-    font-size:14px;
-    color:#4b5563;
-    margin-top:8px;
-    line-height:1.9;
-    word-break:break-word;
-}
-
-.section-title{
-    font-size:15px;
-    font-weight:700;
-    color:#111827;
-    margin-bottom:10px;
-}
-
-.actions{
-    display:flex;
-    gap:10px;
-    margin-top:20px;
-    flex-wrap:wrap;
-}
-
-.actions a{
-    padding:10px 16px;
-    border-radius:999px;
-    color:#fff;
-    text-decoration:none;
-    font-size:12px;
-    font-weight:700;
-}
-
-.call{
-    background:#16a34a;
-}
-
-.whatsapp{
-    background:#22c55e;
-}
-
-.website{
-    background:#2563eb;
-}
-
-.edit{
-    background:#0f172a;
-}
-
-audio{
-    width:100%;
-    margin-top:5px;
-}
-
-hr{
-    margin:12px 0;
-    border:none;
-    border-top:1px solid #e5e7eb;
-}
-
 /* ================= CARD ================= */
 
 .card{
@@ -292,10 +160,7 @@ audio{
         🏷️ <strong>Category:</strong>
         {{ obj.category|default:"—" }}
     </div>
-    <div class="meta">
-            📌 <strong>Address:</strong>
-            {{ obj.address|default:"—" }}
-        </div>
+
     <div class="meta">
         📍 <strong>Locality:</strong>
         {{ obj.locality|default:"—" }}
@@ -336,7 +201,10 @@ audio{
         {{ obj.reviews_count|default:"0" }}
     </div>
 
-    
+    <div class="meta">
+        📌 <strong>Address:</strong>
+        {{ obj.address|default:"—" }}
+    </div>
 
     <div class="meta">
         🗺️ <strong>Google Status:</strong>
@@ -353,6 +221,10 @@ audio{
         {{ obj.assigned_to|default:"—" }}
     </div>
 
+    <div class="meta">
+        🔗 <strong>Slug:</strong>
+        {{ obj.slug|default:"—" }}
+    </div>
 
     <div class="meta">
         ✅ <strong>Active:</strong>

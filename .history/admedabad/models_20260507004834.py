@@ -674,9 +674,9 @@ class Followup(models.Model):
     ]
 
     FOLLOWUP_FROM_CHOICES = [
-        ("Response", "Response"),
-        ("Door_To_Door", "Door_To_Door"),
-        ("Data_Calling", "Data_Calling"),
+        ("Response", "Data Calling"),
+        ("Door_To_Door", "Data Calling Ads"),
+        ("Data_Calling", "Data Calling"),
     ]
 
     FOLLOWUP_STATUS_CHOICES = [

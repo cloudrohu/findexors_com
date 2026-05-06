@@ -1,13 +1,10 @@
 {% extends "admin/change_list.html" %}
 {% load static %}
-{% load admin_urls %}
 
 {% block extrastyle %}
 {{ block.super }}
 
 <style>
-
-/* ================= STATUS ================= */
 
 .status-badge{
     padding:4px 10px;
@@ -24,8 +21,6 @@
 .status-not-interested{ background:#fee2e2; color:#991b1b; }
 .status-deal-done{ background:#dcfce7; color:#166534; }
 
-/* ================= CARDS ================= */
-
 .cards{
     display:grid;
     grid-template-columns:repeat(auto-fill,minmax(420px,1fr));
@@ -38,52 +33,35 @@
     border-radius:14px;
     padding:14px;
     box-shadow:0 10px 25px rgba(0,0,0,.08);
-    border:1px solid #eef2f7;
 }
 
 .title{
     font-weight:800;
     font-size:16px;
-    color:#111827;
 }
 
 .meta{
     font-size:13px;
     color:#555;
     margin-top:6px;
-    line-height:1.7;
-    word-break:break-word;
 }
 
-/* ================= ACTIONS ================= */
-
 .actions{
-    margin-top:12px;
+    margin-top:10px;
     display:flex;
     gap:8px;
     flex-wrap:wrap;
 }
 
 .actions a{
-    padding:8px 14px;
-    border-radius:999px;
+    padding:7px 12px;
+    border-radius:20px;
     font-size:12px;
     text-decoration:none;
-    font-weight:700;
 }
 
 .call{
     background:#16a34a;
-    color:#fff;
-}
-
-.whatsapp{
-    background:#25D366;
-    color:#fff;
-}
-
-.edit{
-    background:#111827;
     color:#fff;
 }
 
@@ -92,41 +70,20 @@
     color:#fff;
 }
 
-.map{
-    background:#7c3aed;
+.edit{
+    background:#111;
     color:#fff;
 }
-
-/* ================= BADGE ================= */
 
 .badge{
     padding:3px 8px;
     background:#eef2ff;
     border-radius:12px;
     font-size:11px;
-    font-weight:700;
-}
-
-audio{
-    width:100%;
-    margin-top:10px;
-}
-
-/* ================= MOBILE ================= */
-
-@media(max-width:640px){
-
-    .cards{
-        grid-template-columns:1fr;
-    }
-
 }
 
 </style>
-
 {% endblock %}
-
-
 
 {% block result_list %}
 
@@ -136,17 +93,13 @@ audio{
 
 <div class="card">
 
-    <!-- ================= HEADER ================= -->
-
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+    <!-- HEADER -->
+    <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
 
         {% if obj.logo %}
-
             <img src="{{ obj.logo }}"
-                 style="width:45px;height:45px;object-fit:cover;border-radius:8px;">
-
+                 style="width:45px;height:45px;border-radius:8px;object-fit:cover;">
         {% else %}
-
             <div style="
                 width:45px;
                 height:45px;
@@ -159,15 +112,13 @@ audio{
             ">
                 🏢
             </div>
-
         {% endif %}
 
         <div>
-
             <div class="title">
 
                 <span class="badge">
-                    G{{ obj.id|stringformat:'03d' }}
+                    RE{{ obj.id|stringformat:"03d" }}
                 </span>
 
                 {{ obj.name }}
@@ -177,53 +128,32 @@ audio{
                 </span>
 
             </div>
-
         </div>
 
     </div>
 
-    <!-- ================= CATEGORY ================= -->
-
+    <!-- CATEGORY -->
     <div class="meta">
         🏢 {{ obj.category|default:"—" }}
     </div>
 
-    <!-- ================= TYPE ================= -->
-
-    {% if obj.type %}
+    <!-- LOCATION -->
     <div class="meta">
-        🏗 {{ obj.type }}
-    </div>
-    {% endif %}
-
-    <!-- ================= LOCATION ================= -->
-
-    <div class="meta">
-
-        📍 {{ obj.city|default:"—" }}
-
-        {% if obj.locality %}
-            • {{ obj.locality }}
-        {% endif %}
+        📍 {{ obj.city }} • {{ obj.locality }}
 
         {% if obj.sub_locality %}
             • {{ obj.sub_locality }}
         {% endif %}
-
     </div>
 
-    <!-- ================= CONTACT ================= -->
-
+    <!-- PHONE -->
     <div class="meta">
         📞 {{ obj.phone|default:"—" }}
     </div>
 
-    <!-- ================= WEBSITE ================= -->
-
+    <!-- WEBSITE -->
     <div class="meta">
-
         🌐
-
         {% if obj.website %}
             <a href="{{ obj.website }}" target="_blank">
                 {{ obj.website }}
@@ -231,77 +161,40 @@ audio{
         {% else %}
             —
         {% endif %}
-
     </div>
 
-    <!-- ================= ADDRESS ================= -->
-
+    <!-- ADDRESS -->
     <div class="meta">
         📌 {{ obj.address|default:"—" }}
     </div>
 
-    {% if obj.street %}
+    <!-- DESCRIPTION -->
     <div class="meta">
-        🛣 {{ obj.street }}
+        📝 {{ obj.description|default:"—"|truncatechars:120 }}
     </div>
-    {% endif %}
 
-    <!-- ================= DESCRIPTION ================= -->
-
-    {% if obj.description %}
-    <div class="meta">
-        📝 {{ obj.description|truncatechars:180 }}
-    </div>
-    {% endif %}
-
-    <!-- ================= RATING ================= -->
-
+    <!-- RATING -->
     {% if obj.rating %}
     <div class="meta">
         ⭐ {{ obj.rating }} ({{ obj.reviews|default:"0" }} Reviews)
     </div>
     {% endif %}
 
-    <!-- ================= BUSINESS STATUS ================= -->
-
-    {% if obj.business_status %}
-    <div class="meta">
-        🗺 {{ obj.business_status }}
-    </div>
-    {% endif %}
-
-    <!-- ================= ASSIGNED ================= -->
-
-    {% if obj.assigned_to %}
-    <div class="meta">
-        👤 Assigned To: {{ obj.assigned_to }}
-    </div>
-    {% endif %}
-
     <hr>
 
-    <!-- ================= FOLLOWUP ================= -->
-
+    <!-- FOLLOWUP -->
     {% if obj.followup %}
-
     <div class="meta">
 
         📌 <strong>Followup:</strong><br>
 
-        Status:
-        {{ obj.followup.status }}
-
-        <br>
+        Status: {{ obj.followup.status }} <br>
 
         Date:
-        {{ obj.followup.followup_date|date:"d M Y, h:i A" }}
-
-        <br>
+        {{ obj.followup.followup_date|date:"d M Y, h:i A" }} <br>
 
         Assigned:
-        {{ obj.followup.assigned_to|default:"—" }}
-
-        <br>
+        {{ obj.followup.assigned_to|default:"—" }} <br>
 
         Comment:
         {{ obj.followup.comment|default:"—" }}
@@ -309,49 +202,32 @@ audio{
     </div>
 
     <hr>
-
     {% endif %}
 
-    <!-- ================= MEETING ================= -->
-
-    {% with obj.ahmedabad_realestate_meetings.last as m %}
-
-    {% if m %}
-
+    <!-- MEETING -->
+    {% if obj.meeting %}
     <div class="meta">
 
         🤝 <strong>Meeting:</strong><br>
 
-        Status:
-        {{ m.status }}
-
-        <br>
+        Status: {{ obj.meeting.status }} <br>
 
         Date:
-        {{ m.meeting_date|date:"d M Y, h:i A" }}
-
-        <br>
+        {{ obj.meeting.meeting_date|date:"d M Y, h:i A" }} <br>
 
         Assigned:
-        {{ m.assigned_to|default:"—" }}
-
-        <br>
+        {{ obj.meeting.assigned_to|default:"—" }} <br>
 
         Comment:
-        {{ m.comment|default:"—" }}
+        {{ obj.meeting.comment|default:"—" }}
 
     </div>
 
     <hr>
-
     {% endif %}
 
-    {% endwith %}
-
-    <!-- ================= LAST COMMENT ================= -->
-
+    <!-- LAST COMMENT -->
     {% with obj.comments.last as c %}
-
     {% if c %}
 
     <div class="meta">
@@ -362,7 +238,7 @@ audio{
 
         <br>
 
-        👤 {{ c.created_by|default:"—" }}
+        👤 {{ c.created_by }}
 
         |
 
@@ -373,90 +249,57 @@ audio{
     <hr>
 
     {% endif %}
-
     {% endwith %}
 
-    <!-- ================= LAST VISIT ================= -->
-
+    <!-- LAST VISIT -->
     {% with obj.visits.last as v %}
-
     {% if v %}
 
     <div class="meta">
 
         🚗 <strong>Last Visit:</strong><br>
 
-        Visit Type:
-        {{ v.visit_type }}
+        Type: {{ v.visit_type }} <br>
 
-        <br>
+        Status: {{ v.visit_status }} <br>
 
-        Status:
-        {{ v.visit_status }}
-
-        <br>
-
-        By:
-        {{ v.created_by|default:"—" }}
+        By: {{ v.created_by }}
 
         |
 
         {{ v.create_at|date:"d M Y, h:i A" }}
 
-        {% if v.comment %}
-
-        <br>
-
-        Note:
-        {{ v.comment|truncatechars:100 }}
-
-        {% endif %}
-
     </div>
 
     <hr>
 
     {% endif %}
-
     {% endwith %}
 
-    <!-- ================= VOICE RECORDING ================= -->
-
+    <!-- VOICE -->
     {% with obj.voices.last as vr %}
-
     {% if vr %}
 
     <div class="meta">
 
-        🎤 <strong>Voice Recording:</strong>
+        🎤 <strong>Voice:</strong>
 
-        <audio controls>
-            <source src="{{ vr.file.url }}">
-        </audio>
-
-        <br>
-
-        By:
-        {{ vr.uploaded_by|default:"—" }}
-
-        |
-
-        {{ vr.create_at|date:"d M Y, h:i A" }}
+        <a href="{{ vr.file.url }}" target="_blank">
+            Play
+        </a>
 
     </div>
 
     <hr>
 
     {% endif %}
-
     {% endwith %}
 
-    <!-- ================= AUDIT ================= -->
-
+    <!-- CREATED -->
     <div class="meta">
 
         👤 Created:
-        {{ obj.created_by|default:"—" }}
+        {{ obj.created_by }}
 
         |
 
@@ -465,7 +308,7 @@ audio{
         <br>
 
         ✏️ Updated:
-        {{ obj.updated_by|default:"—" }}
+        {{ obj.updated_by }}
 
         |
 
@@ -473,56 +316,25 @@ audio{
 
     </div>
 
-    <!-- ================= ACTIONS ================= -->
-
+    <!-- ACTIONS -->
     <div class="actions">
 
         {% if obj.phone %}
-
         <a href="tel:{{ obj.phone }}" class="call">
             📞 Call
         </a>
-
-        <a href="https://wa.me/{{ obj.phone|cut:'+' }}"
-           target="_blank"
-           class="whatsapp">
-
-            💬 WhatsApp
-
-        </a>
-
         {% endif %}
 
         {% if obj.website %}
-
-        <a href="{{ obj.website }}"
-           target="_blank"
-           class="website">
-
+        <a href="{{ obj.website }}" target="_blank" class="website">
             🌐 Website
-
         </a>
-
-        {% endif %}
-
-        {% if obj.latitude and obj.longitude %}
-
-        <a href="https://www.google.com/maps?q={{ obj.latitude }},{{ obj.longitude }}"
-           target="_blank"
-           class="map">
-
-            📍 Map
-
-        </a>
-
         {% endif %}
 
         <a class="edit"
-           href="{% url opts|admin_urlname:'change' obj.pk %}?_changelist_filters={{ request.GET.urlencode }}">
-
-            ✏️ Edit
-
-        </a>
+   href="{% url 'admin:ahmedabad_ahmedabadrealestategmb_change' obj.id %}?_changelist_filters={{ request.GET.urlencode }}">
+    ✏️ Edit
+</a>
 
     </div>
 

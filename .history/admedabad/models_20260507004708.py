@@ -55,7 +55,7 @@ class AhmedabadCompany(models.Model):
         ("Call Tomorrow", "Call Tomorrow"),
         ("Switched Off", "Switched Off"),
         ("Invalid Number", "Invalid Number"),
-        ("Meeting_Follow_Up", "Meeting-Follow Up"),
+        ("Meeting_Follow_Up", "Meeting Follow Up"),
 
     ]
 
@@ -166,7 +166,7 @@ class AhmedabadResponse(models.Model):
         ("Training", "Training"),
         ("Fake_lead", "Fake Lead"),
         ("Deal_close", "Deal Close"),
-        ("Meeting_FollowUp", "Meeting-Follow Up"),
+        ("Meeting_FollowUp", "Meeting / Follow Up"),
 
     ]
 
@@ -376,8 +376,6 @@ class AhmedabadRealEstateGMB(models.Model):
         ("Not Received", "Not Received"),
         ("Not Interested", "Not Interested"),
         ("Deal Done", "Deal Done"),
-        ("Meetin_Follow_Up", "Meeting-Follow Up"),
-
     ]
 
     status = models.CharField(max_length=25, choices=STATUS_CHOICES, default="New")
@@ -674,9 +672,9 @@ class Followup(models.Model):
     ]
 
     FOLLOWUP_FROM_CHOICES = [
-        ("Response", "Response"),
-        ("Door_To_Door", "Door_To_Door"),
-        ("Data_Calling", "Data_Calling"),
+        ("Response", "Data Calling"),
+        ("Door_To_Door", "Data Calling Ads"),
+        ("Data_Calling", "Data Calling"),
     ]
 
     FOLLOWUP_STATUS_CHOICES = [

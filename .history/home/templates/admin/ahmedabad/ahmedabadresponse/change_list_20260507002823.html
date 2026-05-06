@@ -19,10 +19,14 @@
 
 .status-new{ background:#e0f2fe; color:#0369a1; }
 .status-meeting{ background:#dcfce7; color:#166534; }
-.status-follow-up{ background:#fef9c3; color:#854d0e; }
-.status-not-received{ background:#fee2e2; color:#991b1b; }
-.status-not-interested{ background:#fee2e2; color:#991b1b; }
-.status-deal-done{ background:#dcfce7; color:#166534; }
+.status-followup{ background:#fef9c3; color:#854d0e; }
+.status-not_received{ background:#fee2e2; color:#991b1b; }
+.status-software_company{ background:#ede9fe; color:#5b21b6; }
+.status-for_job{ background:#dbeafe; color:#1d4ed8; }
+.status-training{ background:#fef3c7; color:#92400e; }
+.status-fake_lead{ background:#fee2e2; color:#991b1b; }
+.status-deal_close{ background:#dcfce7; color:#166534; }
+.status-meeting_followup{ background:#cffafe; color:#155e75; }
 
 /* ================= CARDS ================= */
 
@@ -87,16 +91,6 @@
     color:#fff;
 }
 
-.website{
-    background:#2563eb;
-    color:#fff;
-}
-
-.map{
-    background:#7c3aed;
-    color:#fff;
-}
-
 /* ================= BADGE ================= */
 
 .badge{
@@ -140,37 +134,28 @@ audio{
 
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
 
-        {% if obj.logo %}
-
-            <img src="{{ obj.logo }}"
-                 style="width:45px;height:45px;object-fit:cover;border-radius:8px;">
-
-        {% else %}
-
-            <div style="
-                width:45px;
-                height:45px;
-                background:#f3f4f6;
-                border-radius:8px;
-                display:flex;
-                align-items:center;
-                justify-content:center;
-                font-size:18px;
-            ">
-                🏢
-            </div>
-
-        {% endif %}
+        <div style="
+            width:45px;
+            height:45px;
+            background:#f3f4f6;
+            border-radius:8px;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            font-size:18px;
+        ">
+            📞
+        </div>
 
         <div>
 
             <div class="title">
 
                 <span class="badge">
-                    G{{ obj.id|stringformat:'03d' }}
+                    R{{ obj.id|stringformat:'03d' }}
                 </span>
 
-                {{ obj.name }}
+                {{ obj.business_name|default:"No Business Name" }}
 
                 <span class="status-badge status-{{ obj.status|slugify }}">
                     {{ obj.status }}
@@ -182,93 +167,83 @@ audio{
 
     </div>
 
-    <!-- ================= CATEGORY ================= -->
+    <!-- ================= CONTACT PERSON ================= -->
 
     <div class="meta">
-        🏢 {{ obj.category|default:"—" }}
-    </div>
-
-    <!-- ================= TYPE ================= -->
-
-    {% if obj.type %}
-    <div class="meta">
-        🏗 {{ obj.type }}
-    </div>
-    {% endif %}
-
-    <!-- ================= LOCATION ================= -->
-
-    <div class="meta">
-
-        📍 {{ obj.city|default:"—" }}
-
-        {% if obj.locality %}
-            • {{ obj.locality }}
-        {% endif %}
-
-        {% if obj.sub_locality %}
-            • {{ obj.sub_locality }}
-        {% endif %}
-
+        👤 {{ obj.contact_persone|default:"—" }}
     </div>
 
     <!-- ================= CONTACT ================= -->
 
     <div class="meta">
-        📞 {{ obj.phone|default:"—" }}
+        📞 {{ obj.contact_no|default:"—" }}
     </div>
 
-    <!-- ================= WEBSITE ================= -->
+    <!-- ================= CATEGORY ================= -->
+
+    {% if obj.business_category %}
+    <div class="meta">
+        🏢 {{ obj.business_category }}
+    </div>
+    {% endif %}
+
+    <!-- ================= LOCALITY ================= -->
+
+    {% if obj.locality %}
+    <div class="meta">
+        📍 {{ obj.locality }}
+    </div>
+    {% endif %}
+
+    <!-- ================= LEAD SOURCE ================= -->
+
+    <div class="meta">
+        🚀 Lead Source: {{ obj.lead_source }}
+    </div>
+
+    <!-- ================= REQUIREMENTS ================= -->
+
+    {% if obj.requirement_types.all %}
 
     <div class="meta">
 
-        🌐
+        📋 Requirements:
 
-        {% if obj.website %}
-            <a href="{{ obj.website }}" target="_blank">
-                {{ obj.website }}
-            </a>
+        {% for req in obj.requirement_types.all %}
+            <span class="badge">{{ req }}</span>
+        {% endfor %}
+
+    </div>
+
+    {% endif %}
+
+    <!-- ================= COMMENT ================= -->
+
+    {% if obj.comment %}
+    <div class="meta">
+        💬 {{ obj.comment|truncatechars:150 }}
+    </div>
+    {% endif %}
+
+    <!-- ================= CONVERTED ================= -->
+
+    <div class="meta">
+
+        {% if obj.is_converted %}
+
+            ✅ Converted
+
+            {% if obj.converted_at %}
+                • {{ obj.converted_at|date:"d M Y, h:i A" }}
+            {% endif %}
+
         {% else %}
-            —
+
+            ❌ Not Converted
+
         {% endif %}
 
     </div>
-
-    <!-- ================= ADDRESS ================= -->
-
-    <div class="meta">
-        📌 {{ obj.address|default:"—" }}
-    </div>
-
-    {% if obj.street %}
-    <div class="meta">
-        🛣 {{ obj.street }}
-    </div>
-    {% endif %}
-
-    <!-- ================= DESCRIPTION ================= -->
-
-    {% if obj.description %}
-    <div class="meta">
-        📝 {{ obj.description|truncatechars:180 }}
-    </div>
-    {% endif %}
-
-    <!-- ================= RATING ================= -->
-
-    {% if obj.rating %}
-    <div class="meta">
-        ⭐ {{ obj.rating }} ({{ obj.reviews|default:"0" }} Reviews)
-    </div>
-    {% endif %}
-
-    <!-- ================= BUSINESS STATUS ================= -->
-
-    {% if obj.business_status %}
-    <div class="meta">
-        🗺 {{ obj.business_status }}
-    </div>
-    {% endif %}
 
     <!-- ================= ASSIGNED ================= -->
 
@@ -279,42 +254,42 @@ audio{
     {% endif %}
 
     <hr>
+<!-- ================= FOLLOWUP ================= -->
 
-    <!-- ================= FOLLOWUP ================= -->
+{% if obj.followup %}
 
-    {% if obj.followup %}
+<hr>
 
-    <div class="meta">
+<div class="meta">
 
-        📌 <strong>Followup:</strong><br>
+    📌 <strong>Followup</strong>
 
-        Status:
-        {{ obj.followup.status }}
+    <br><br>
 
-        <br>
+    Status:
+    {{ obj.followup.status|default:"—" }}
 
-        Date:
-        {{ obj.followup.followup_date|date:"d M Y, h:i A" }}
+    <br>
 
-        <br>
+    Date:
+    {{ obj.followup.followup_date|date:"d M Y, h:i A"|default:"—" }}
 
-        Assigned:
-        {{ obj.followup.assigned_to|default:"—" }}
+    <br>
 
-        <br>
+    Assigned:
+    {{ obj.followup.assigned_to|default:"—" }}
 
-        Comment:
-        {{ obj.followup.comment|default:"—" }}
+    <br>
 
-    </div>
+    Comment:
+    {{ obj.followup.comment|default:"—" }}
 
-    <hr>
+</div>
 
-    {% endif %}
-
+{% endif %}
     <!-- ================= MEETING ================= -->
 
-    {% with obj.ahmedabad_realestate_meetings.last as m %}
+    {% with obj.ahmedabad_response_meetings.last as m %}
 
     {% if m %}
 
@@ -422,7 +397,7 @@ audio{
 
     <!-- ================= VOICE RECORDING ================= -->
 
-    {% with obj.voices.last as vr %}
+    {% with obj.voice_recordings.last as vr %}
 
     {% if vr %}
 
@@ -460,7 +435,7 @@ audio{
 
         |
 
-        {{ obj.created_at|date:"d M Y, h:i A" }}
+        {{ obj.create_at|date:"d M Y, h:i A" }}
 
         <br>
 
@@ -469,7 +444,7 @@ audio{
 
         |
 
-        {{ obj.updated_at|date:"d M Y, h:i A" }}
+        {{ obj.update_at|date:"d M Y, h:i A" }}
 
     </div>
 
@@ -477,41 +452,17 @@ audio{
 
     <div class="actions">
 
-        {% if obj.phone %}
+        {% if obj.contact_no %}
 
-        <a href="tel:{{ obj.phone }}" class="call">
+        <a href="tel:{{ obj.contact_no }}" class="call">
             📞 Call
         </a>
 
-        <a href="https://wa.me/{{ obj.phone|cut:'+' }}"
+        <a href="https://wa.me/{{ obj.contact_no|cut:'+' }}"
            target="_blank"
            class="whatsapp">
 
             💬 WhatsApp
-
-        </a>
-
-        {% endif %}
-
-        {% if obj.website %}
-
-        <a href="{{ obj.website }}"
-           target="_blank"
-           class="website">
-
-            🌐 Website
-
-        </a>
-
-        {% endif %}
-
-        {% if obj.latitude and obj.longitude %}
-
-        <a href="https://www.google.com/maps?q={{ obj.latitude }},{{ obj.longitude }}"
-           target="_blank"
-           class="map">
-
-            📍 Map
 
         </a>
 

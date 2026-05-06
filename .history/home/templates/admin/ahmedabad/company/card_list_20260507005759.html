@@ -130,7 +130,7 @@
 
 audio{
     width:100%;
-    margin-top:5px;
+    margin-top:10px;
 }
 
 hr{
@@ -139,99 +139,6 @@ hr{
     border-top:1px solid #e5e7eb;
 }
 
-/* ================= CARD ================= */
-
-.card{
-    background:#fff;
-    border-radius:14px;
-    padding:14px;
-    box-shadow:0 6px 18px rgba(0,0,0,.06);
-    border:1px solid #eef2f7;
-}
-
-/* ================= TOP ================= */
-
-.top{
-    display:flex;
-    gap:10px;
-    align-items:flex-start;
-    margin-bottom:6px;
-}
-
-.logo{
-    width:48px;
-    height:48px;
-    border-radius:10px;
-}
-
-.logo span{
-    font-size:20px;
-}
-
-.title{
-    font-size:15px;
-    font-weight:800;
-    line-height:1.3;
-}
-
-.id-badge{
-    padding:3px 7px;
-    font-size:9px;
-    margin-right:5px;
-}
-
-.status{
-    padding:3px 8px;
-    font-size:9px;
-    margin-top:4px;
-}
-
-/* ================= META ================= */
-
-.meta{
-    font-size:11px;
-    margin-top:3px;
-    line-height:1.5;
-}
-
-/* ================= SECTION ================= */
-
-.section-title{
-    font-size:12px;
-    margin-bottom:5px;
-}
-
-/* ================= HR ================= */
-
-hr{
-    margin:10px 0;
-}
-
-/* ================= BUTTONS ================= */
-
-.actions{
-    gap:6px;
-    margin-top:12px;
-}
-
-.actions a{
-    padding:7px 12px;
-    font-size:10px;
-}
-
-/* ================= AUDIO ================= */
-
-audio{
-    height:30px;
-    margin-top:6px;
-}
-
-/* ================= GRID ================= */
-
-.cards{
-    grid-template-columns:repeat(auto-fill,minmax(340px,1fr));
-    gap:14px;
-}
 </style>
 
 {% endblock %}
@@ -292,10 +199,7 @@ audio{
         🏷️ <strong>Category:</strong>
         {{ obj.category|default:"—" }}
     </div>
-    <div class="meta">
-            📌 <strong>Address:</strong>
-            {{ obj.address|default:"—" }}
-        </div>
+
     <div class="meta">
         📍 <strong>Locality:</strong>
         {{ obj.locality|default:"—" }}
@@ -336,7 +240,10 @@ audio{
         {{ obj.reviews_count|default:"0" }}
     </div>
 
-    
+    <div class="meta">
+        📌 <strong>Address:</strong>
+        {{ obj.address|default:"—" }}
+    </div>
 
     <div class="meta">
         🗺️ <strong>Google Status:</strong>
@@ -353,6 +260,10 @@ audio{
         {{ obj.assigned_to|default:"—" }}
     </div>
 
+    <div class="meta">
+        🔗 <strong>Slug:</strong>
+        {{ obj.slug|default:"—" }}
+    </div>
 
     <div class="meta">
         ✅ <strong>Active:</strong>

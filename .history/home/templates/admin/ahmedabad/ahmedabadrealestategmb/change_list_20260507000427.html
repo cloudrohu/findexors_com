@@ -7,7 +7,7 @@
 
 <style>
 
-/* ================= STATUS ================= */
+/* ================= STATUS BADGES ================= */
 
 .status-badge{
     padding:4px 10px;
@@ -24,7 +24,7 @@
 .status-not-interested{ background:#fee2e2; color:#991b1b; }
 .status-deal-done{ background:#dcfce7; color:#166534; }
 
-/* ================= CARDS ================= */
+/* ================= CARD ================= */
 
 .cards{
     display:grid;
@@ -38,38 +38,32 @@
     border-radius:14px;
     padding:14px;
     box-shadow:0 10px 25px rgba(0,0,0,.08);
-    border:1px solid #eef2f7;
 }
 
 .title{
     font-weight:800;
     font-size:16px;
-    color:#111827;
 }
 
 .meta{
     font-size:13px;
     color:#555;
     margin-top:6px;
-    line-height:1.7;
-    word-break:break-word;
+    line-height:1.6;
 }
 
-/* ================= ACTIONS ================= */
-
 .actions{
-    margin-top:12px;
+    margin-top:10px;
     display:flex;
     gap:8px;
     flex-wrap:wrap;
 }
 
 .actions a{
-    padding:8px 14px;
-    border-radius:999px;
+    padding:7px 12px;
+    border-radius:20px;
     font-size:12px;
     text-decoration:none;
-    font-weight:700;
 }
 
 .call{
@@ -83,21 +77,14 @@
 }
 
 .edit{
-    background:#111827;
-    color:#fff;
-}
-
-.website{
-    background:#2563eb;
+    background:#111;
     color:#fff;
 }
 
 .map{
-    background:#7c3aed;
+    background:#2563eb;
     color:#fff;
 }
-
-/* ================= BADGE ================= */
 
 .badge{
     padding:3px 8px;
@@ -109,23 +96,12 @@
 
 audio{
     width:100%;
-    margin-top:10px;
-}
-
-/* ================= MOBILE ================= */
-
-@media(max-width:640px){
-
-    .cards{
-        grid-template-columns:1fr;
-    }
-
+    margin-top:8px;
 }
 
 </style>
 
 {% endblock %}
-
 
 
 {% block result_list %}
@@ -136,9 +112,9 @@ audio{
 
 <div class="card">
 
-    <!-- ================= HEADER ================= -->
+    <!-- ================= LOGO ================= -->
 
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+    <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
 
         {% if obj.logo %}
 
@@ -167,7 +143,7 @@ audio{
             <div class="title">
 
                 <span class="badge">
-                    G{{ obj.id|stringformat:'03d' }}
+                    G{{ obj.id|stringformat:"03d" }}
                 </span>
 
                 {{ obj.name }}
@@ -188,23 +164,17 @@ audio{
         🏢 {{ obj.category|default:"—" }}
     </div>
 
-    <!-- ================= TYPE ================= -->
-
-    {% if obj.type %}
-    <div class="meta">
-        🏗 {{ obj.type }}
-    </div>
-    {% endif %}
-
     <!-- ================= LOCATION ================= -->
 
     <div class="meta">
 
-        📍 {{ obj.city|default:"—" }}
+        📍
 
-        {% if obj.locality %}
-            • {{ obj.locality }}
-        {% endif %}
+        {{ obj.city|default:"—" }}
+
+        •
+
+        {{ obj.locality|default:"—" }}
 
         {% if obj.sub_locality %}
             • {{ obj.sub_locality }}
@@ -240,17 +210,11 @@ audio{
         📌 {{ obj.address|default:"—" }}
     </div>
 
-    {% if obj.street %}
-    <div class="meta">
-        🛣 {{ obj.street }}
-    </div>
-    {% endif %}
-
     <!-- ================= DESCRIPTION ================= -->
 
     {% if obj.description %}
     <div class="meta">
-        📝 {{ obj.description|truncatechars:180 }}
+        📝 {{ obj.description|truncatechars:150 }}
     </div>
     {% endif %}
 
@@ -258,23 +222,7 @@ audio{
 
     {% if obj.rating %}
     <div class="meta">
-        ⭐ {{ obj.rating }} ({{ obj.reviews|default:"0" }} Reviews)
-    </div>
-    {% endif %}
-
-    <!-- ================= BUSINESS STATUS ================= -->
-
-    {% if obj.business_status %}
-    <div class="meta">
-        🗺 {{ obj.business_status }}
-    </div>
-    {% endif %}
-
-    <!-- ================= ASSIGNED ================= -->
-
-    {% if obj.assigned_to %}
-    <div class="meta">
-        👤 Assigned To: {{ obj.assigned_to }}
+        ⭐ {{ obj.rating }} ({{ obj.reviews|default:"0" }})
     </div>
     {% endif %}
 
@@ -314,39 +262,35 @@ audio{
 
     <!-- ================= MEETING ================= -->
 
-    {% with obj.ahmedabad_realestate_meetings.last as m %}
-
-    {% if m %}
+    {% if obj.meeting %}
 
     <div class="meta">
 
         🤝 <strong>Meeting:</strong><br>
 
         Status:
-        {{ m.status }}
+        {{ obj.meeting.status }}
 
         <br>
 
         Date:
-        {{ m.meeting_date|date:"d M Y, h:i A" }}
+        {{ obj.meeting.meeting_date|date:"d M Y, h:i A" }}
 
         <br>
 
         Assigned:
-        {{ m.assigned_to|default:"—" }}
+        {{ obj.meeting.assigned_to|default:"—" }}
 
         <br>
 
         Comment:
-        {{ m.comment|default:"—" }}
+        {{ obj.meeting.comment|default:"—" }}
 
     </div>
 
     <hr>
 
     {% endif %}
-
-    {% endwith %}
 
     <!-- ================= LAST COMMENT ================= -->
 
@@ -362,7 +306,7 @@ audio{
 
         <br>
 
-        👤 {{ c.created_by|default:"—" }}
+        👤 {{ c.created_by }}
 
         |
 
@@ -386,7 +330,7 @@ audio{
 
         🚗 <strong>Last Visit:</strong><br>
 
-        Visit Type:
+        Type:
         {{ v.visit_type }}
 
         <br>
@@ -397,19 +341,16 @@ audio{
         <br>
 
         By:
-        {{ v.created_by|default:"—" }}
+        {{ v.created_by }}
 
         |
 
         {{ v.create_at|date:"d M Y, h:i A" }}
 
-        {% if v.comment %}
-
         <br>
 
-        Note:
-        {{ v.comment|truncatechars:100 }}
-
+        {% if v.comment %}
+            Note: {{ v.comment|truncatechars:100 }}
         {% endif %}
 
     </div>
@@ -420,7 +361,7 @@ audio{
 
     {% endwith %}
 
-    <!-- ================= VOICE RECORDING ================= -->
+    <!-- ================= VOICE ================= -->
 
     {% with obj.voices.last as vr %}
 
@@ -437,7 +378,7 @@ audio{
         <br>
 
         By:
-        {{ vr.uploaded_by|default:"—" }}
+        {{ vr.uploaded_by }}
 
         |
 
@@ -456,7 +397,7 @@ audio{
     <div class="meta">
 
         👤 Created:
-        {{ obj.created_by|default:"—" }}
+        {{ obj.created_by }}
 
         |
 
@@ -465,7 +406,7 @@ audio{
         <br>
 
         ✏️ Updated:
-        {{ obj.updated_by|default:"—" }}
+        {{ obj.updated_by }}
 
         |
 
@@ -493,18 +434,6 @@ audio{
 
         {% endif %}
 
-        {% if obj.website %}
-
-        <a href="{{ obj.website }}"
-           target="_blank"
-           class="website">
-
-            🌐 Website
-
-        </a>
-
-        {% endif %}
-
         {% if obj.latitude and obj.longitude %}
 
         <a href="https://www.google.com/maps?q={{ obj.latitude }},{{ obj.longitude }}"
@@ -516,6 +445,8 @@ audio{
         </a>
 
         {% endif %}
+
+        <!-- ✅ SAFE EDIT BUTTON -->
 
         <a class="edit"
            href="{% url opts|admin_urlname:'change' obj.pk %}?_changelist_filters={{ request.GET.urlencode }}">
