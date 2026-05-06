@@ -7,6 +7,7 @@ from django.utils.html import mark_safe
 from django.utils.text import slugify
 from ckeditor_uploader.fields import RichTextUploadingField
 from django.db.models import Q
+from django.contrib.auth.models import User
 # Utility aur Response app ke imports
 
 
@@ -38,6 +39,8 @@ class Staff(models.Model):
 
     def __str__(self):
         return self.user.get_full_name() or self.user.username
+
+
 
 
 
@@ -146,6 +149,9 @@ class AhmedabadCompany(models.Model):
         return "No Image"
 
     logo_preview.short_description = "Logo"
+
+
+
 
 # =======================
 # AhmedabadResponse

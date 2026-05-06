@@ -7,9 +7,14 @@ from django.utils.html import mark_safe
 from django.utils.text import slugify
 from ckeditor_uploader.fields import RichTextUploadingField
 from django.db.models import Q
+
+# =======================
+# Comment
+# =======================
+
+from django.core.exceptions import ValidationError
+from django.contrib.auth.models import User
 # Utility aur Response app ke imports
-
-
 from utility.models import (
     Find_Form, Call_Status, SocialSite, Googlemap_Status,
     City, Locality, Category, Sub_Locality,RequirementType
@@ -17,6 +22,9 @@ from utility.models import (
 
 from response.models import Staff
 from projects.models import Project  # Project Import
+
+
+from django.core.exceptions import ValidationError
 
 def clean_phone_last10(phone: str):
     if not phone:
@@ -38,6 +46,8 @@ class Staff(models.Model):
 
     def __str__(self):
         return self.user.get_full_name() or self.user.username
+
+
 
 
 
@@ -147,6 +157,9 @@ class AhmedabadCompany(models.Model):
 
     logo_preview.short_description = "Logo"
 
+
+
+
 # =======================
 # AhmedabadResponse
 # =======================
@@ -154,16 +167,13 @@ class AhmedabadResponse(models.Model):
 
     STATUS_CHOICES = [
         ("New", "New"),
-        ("Meeting", "Meeting"),
-        ("FollowUp", "Follow Up"),
+        ("Meeting_FollowUp", "Meeting / Follow Up"),
         ("Not_received", "Not Received"),
         ("Software_company", "Software Company"),
         ("For_job", "For Job"),
         ("Training", "Training"),
         ("Fake_lead", "Fake Lead"),
         ("Deal_close", "Deal Close"),
-        ("Meeting_FollowUp", "Meeting / Follow Up"),
-
     ]
 
     LEAD_SOURCE_CHOICES = [
@@ -253,32 +263,17 @@ class AhmedabadResponse(models.Model):
         if self.contact_no:
             self.contact_no = clean_phone_last10(self.contact_no)
 
-        if self.pk:
+        # 🔥 AUTO STATUS LOGIC
+        if self.pk:  # object already exists
 
-            has_meeting = False
-            has_followup = False
-
-            try:
-                has_meeting = self.meeting is not None
-            except:
-                pass
-
-            try:
-                has_followup = self.followup is not None
-            except:
-                pass
+            has_meeting = hasattr(self, "meeting")
+            has_followup = hasattr(self, "followup")
 
             if not self.is_converted:
-
-                if has_meeting and has_followup:
+                if has_meeting or has_followup:
                     self.status = "Meeting_FollowUp"
 
-                elif has_meeting:
-                    self.status = "Meeting"
-
-                elif has_followup:
-                    self.status = "FollowUp"
-
+        # 🔥 CONVERSION LOGIC
         if self.is_converted and not self.converted_at:
             self.converted_at = timezone.now()
 
@@ -286,6 +281,7 @@ class AhmedabadResponse(models.Model):
             self.converted_at = None
 
         super().save(*args, **kwargs)
+
 
 class AhmedabadRealEstateGMB(models.Model):
     name = models.CharField(max_length=255)
@@ -325,6 +321,14 @@ class AhmedabadRealEstateGMB(models.Model):
         null=True,
         blank=True,
         related_name="ahmedabad_gmb_sublocalities"
+    )
+
+    project = models.ForeignKey(
+        Project,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="ahmedabad_gmb_projects"
     )
 
     # ===========================
@@ -412,11 +416,14 @@ class AhmedabadRealEstateGMB(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        verbose_name_plural = "0.Real Estate"
+        verbose_name_plural = "0. Google Companies"
         ordering = ["-created_at"]
 
     def __str__(self):
         return f"{self.name} ({self.city_text})"
+
+
+
 
 
 
@@ -425,8 +432,6 @@ class Comment(models.Model):
     FORM_CHOICES = [
         ("Response", "Response"),
         ("Company", "Company"),
-        ("Real_Estate", "Real Estate"),
-
     ]
 
     form_type = models.CharField(
@@ -451,14 +456,6 @@ class Comment(models.Model):
         related_name="comments"
     )
 
-    real_estate = models.ForeignKey(
-        "AhmedabadRealEstateGMB",
-        on_delete=models.CASCADE,
-        null=True,
-        blank=True,
-        related_name="comments"
-    )
-
     comment = models.CharField(max_length=500, null=True, blank=True)
 
     # 🔥 ADD THESE
@@ -473,8 +470,6 @@ class VoiceRecording(models.Model):
     FORM_CHOICES = [
         ("Response", "Response"),
         ("Company", "Company"),
-        ("Real_Estate", "Real Estate"),
-
     ]
 
     form_type = models.CharField(
@@ -497,14 +492,6 @@ class VoiceRecording(models.Model):
         null=True,
         blank=True,
         related_name="voice_recordings"
-    )
-
-    real_estate = models.ForeignKey(
-        "AhmedabadRealEstateGMB",
-        on_delete=models.CASCADE,
-        null=True,
-        blank=True,
-        related_name="voices"
     )
 
     file = models.FileField(upload_to="call_recordings/")
@@ -551,8 +538,6 @@ class Visit(models.Model):
     FORM_CHOICES = [
         ("Response", "Response"),
         ("Company", "Company"),
-        ("Real_Estate", "Real Estate"),
-
     ]
 
     VISIT_FOR_CHOICES = [
@@ -598,14 +583,6 @@ class Visit(models.Model):
 
     company = models.ForeignKey(
         "AhmedabadCompany",
-        on_delete=models.CASCADE,
-        null=True,
-        blank=True,
-        related_name="visits"
-    )
-
-    real_estate = models.ForeignKey(
-        "AhmedabadRealEstateGMB",
         on_delete=models.CASCADE,
         null=True,
         blank=True,
@@ -662,8 +639,6 @@ class Followup(models.Model):
     FORM_CHOICES = [
         ("Response", "Response"),
         ("Company", "Company"),
-        ("Real_Estate", "Real Estate"),
-
     ]
 
     FOLLOWUP_FROM_CHOICES = [
@@ -697,14 +672,6 @@ class Followup(models.Model):
 
     company = models.OneToOneField(
         "AhmedabadCompany",
-        on_delete=models.CASCADE,
-        null=True,
-        blank=True,
-        related_name="followup"
-    )
-
-    real_estate = models.OneToOneField(
-        "AhmedabadRealEstateGMB",
         on_delete=models.CASCADE,
         null=True,
         blank=True,
@@ -768,13 +735,13 @@ class Followup(models.Model):
         super().save(*args, **kwargs)
 
 
+from django.core.exceptions import ValidationError
 
 class Meeting(models.Model):
 
     FORM_CHOICES = [
         ("Response", "Response"),
         ("Company", "Company"),
-        ("Real_Estate", "Real Estate"),
     ]
 
     MEETING_STATUS_CHOICES = [
@@ -809,14 +776,6 @@ class Meeting(models.Model):
 
     company = models.OneToOneField(
         "AhmedabadCompany",
-        on_delete=models.CASCADE,
-        null=True,
-        blank=True,
-        related_name="meeting"
-    )
-
-    real_estate = models.OneToOneField(
-        "AhmedabadRealEstateGMB",
         on_delete=models.CASCADE,
         null=True,
         blank=True,
@@ -873,12 +832,12 @@ class Meeting(models.Model):
 
     # 🔥 VALIDATION
     def clean(self):
+        if self.form_type == "Response" and not self.response:
+            raise ValidationError("Response required")
 
-        if self.form_type == "Response" and not self.response_id:
-            return
+        if self.form_type == "Company" and not self.company:
+            raise ValidationError("Company required")
 
-        if self.form_type == "Company" and not self.company_id:
-            return
-
-        if self.form_type == "Real_Estate" and not self.real_estate_id:
-            return
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super().save(*args, **kwargs)

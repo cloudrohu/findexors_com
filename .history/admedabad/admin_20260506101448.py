@@ -23,47 +23,7 @@ from .resources import AhmedabadRealEstateGMBResource
 class StaffAdmin(admin.ModelAdmin):
     list_display = ("user",)
 
-class AutoUserAdminMixin:
-    def save_model(self, request, obj, form, change):
-        if hasattr(obj, "created_by") and not obj.created_by:
-            obj.created_by = request.user
 
-        if hasattr(obj, "updated_by"):
-            obj.updated_by = request.user
-
-        super().save_model(request, obj, form, change)
-
-    def save_formset(self, request, form, formset, change):
-        instances = formset.save(commit=False)
-
-        parent = form.instance  # AhmedabadResponse object
-
-        for obj in instances:
-            # USER AUTO SET
-            if hasattr(obj, "created_by") and not obj.created_by:
-                obj.created_by = request.user
-
-            if hasattr(obj, "updated_by"):
-                obj.updated_by = request.user
-
-            if hasattr(obj, "uploaded_by") and not obj.uploaded_by:
-                obj.uploaded_by = request.user
-
-            obj.save()
-
-            # 🔥 MAIN LOGIC (IMPORTANT)
-            if isinstance(obj, (Meeting, Followup)):
-                if parent.status != "Deal_close":
-                    parent.status = "Meeting_FollowUp"
-
-                    # optional: deal done check
-                    if getattr(obj, "status", None) == "Deal Done":
-                        parent.status = "Deal_close"
-                        parent.is_converted = True
-
-                    parent.save()
-
-        formset.save_m2m()
 
 
 class CommentResponseInline(admin.StackedInline):

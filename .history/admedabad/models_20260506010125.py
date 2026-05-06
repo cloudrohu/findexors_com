@@ -7,9 +7,14 @@ from django.utils.html import mark_safe
 from django.utils.text import slugify
 from ckeditor_uploader.fields import RichTextUploadingField
 from django.db.models import Q
+
+# =======================
+# Comment
+# =======================
+
+from django.core.exceptions import ValidationError
+from django.contrib.auth.models import User
 # Utility aur Response app ke imports
-
-
 from utility.models import (
     Find_Form, Call_Status, SocialSite, Googlemap_Status,
     City, Locality, Category, Sub_Locality,RequirementType
@@ -17,6 +22,9 @@ from utility.models import (
 
 from response.models import Staff
 from projects.models import Project  # Project Import
+
+
+from django.core.exceptions import ValidationError
 
 def clean_phone_last10(phone: str):
     if not phone:
@@ -38,6 +46,8 @@ class Staff(models.Model):
 
     def __str__(self):
         return self.user.get_full_name() or self.user.username
+
+
 
 
 
@@ -146,6 +156,9 @@ class AhmedabadCompany(models.Model):
         return "No Image"
 
     logo_preview.short_description = "Logo"
+
+
+
 
 # =======================
 # AhmedabadResponse
@@ -768,6 +781,7 @@ class Followup(models.Model):
         super().save(*args, **kwargs)
 
 
+from django.core.exceptions import ValidationError
 
 class Meeting(models.Model):
 

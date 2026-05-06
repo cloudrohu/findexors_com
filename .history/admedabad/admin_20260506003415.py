@@ -16,9 +16,6 @@ from utility.models import (
 )
 
 
-from import_export.admin import ImportExportModelAdmin
-from .resources import AhmedabadRealEstateGMBResource
-
 @admin.register(Staff)
 class StaffAdmin(admin.ModelAdmin):
     list_display = ("user",)
@@ -69,173 +66,208 @@ class AutoUserAdminMixin:
 class CommentResponseInline(admin.StackedInline):
     model = Comment
     extra = 1
-    fk_name = "response"
 
+    def get_formset(self, request, obj=None, **kwargs):
+        formset = super().get_formset(request, obj, **kwargs)
+
+        class CustomFormset(formset):
+            def save_new(self, form, commit=True):
+                obj = super().save_new(form, commit=False)
+                obj.form_type = "Response"
+                if commit:
+                    obj.save()
+                return obj
+
+        return CustomFormset
     readonly_fields = ("created_by", "updated_by", "create_at", "update_at")
-
-    def save_model(self, request, obj, form, change):
-        set_common_fields(obj, request, "Response")
-        super().save_model(request, obj, form, change)
-
-
 class CommentCompanyInline(admin.StackedInline):
     model = Comment
     extra = 1
-    fk_name = "company"
 
+    def get_formset(self, request, obj=None, **kwargs):
+        formset = super().get_formset(request, obj, **kwargs)
+
+        class CustomFormset(formset):
+            def save_new(self, form, commit=True):
+                obj = super().save_new(form, commit=False)
+                obj.form_type = "Company"
+                if commit:
+                    obj.save()
+                return obj
+
+        return CustomFormset
     readonly_fields = ("created_by", "updated_by", "create_at", "update_at")
-
-    def save_model(self, request, obj, form, change):
-        set_common_fields(obj, request, "Company")
-        super().save_model(request, obj, form, change)
-
-
-class CommentRealestateGMBInline(admin.StackedInline):
-    model = Comment
-    extra = 1
-    fk_name = "real_estate"
-
-    readonly_fields = ("created_by", "updated_by", "create_at", "update_at")
-
-    def save_model(self, request, obj, form, change):
-        set_common_fields(obj, request, "Real_Estate")
-        super().save_model(request, obj, form, change)
-
-
-
-
+ 
 class VoiceResponseInline(admin.StackedInline):
     model = VoiceRecording
     extra = 1
-    fk_name = "response"
+    exclude = ("form_type", "company")
 
     readonly_fields = ("uploaded_by", "updated_by", "create_at", "update_at")
 
-    def save_model(self, request, obj, form, change):
-        set_common_fields(obj, request, "Response")
-        super().save_model(request, obj, form, change)
+    def get_formset(self, request, obj=None, **kwargs):
+        formset = super().get_formset(request, obj, **kwargs)
 
+        class CustomFormset(formset):
+            def save_new(self, form, commit=True):
+                obj = super().save_new(form, commit=False)
+                obj.form_type = "Response"
+                obj.response = obj.response or form.instance
+
+                if hasattr(obj, "uploaded_by") and not obj.uploaded_by:
+                    obj.uploaded_by = request.user
+
+                if commit:
+                    obj.save()
+                return obj
+
+        return CustomFormset
 
 class VoiceCompanyInline(admin.StackedInline):
     model = VoiceRecording
     extra = 1
-    fk_name = "company"
+    exclude = ("form_type", "response")
 
     readonly_fields = ("uploaded_by", "updated_by", "create_at", "update_at")
 
-    def save_model(self, request, obj, form, change):
-        set_common_fields(obj, request, "Company")
-        super().save_model(request, obj, form, change)
+    def get_formset(self, request, obj=None, **kwargs):
+        formset = super().get_formset(request, obj, **kwargs)
 
+        class CustomFormset(formset):
+            def save_new(self, form, commit=True):
+                obj = super().save_new(form, commit=False)
+                obj.form_type = "Company"
+                obj.company = obj.company or form.instance
 
-class VoiceRealestateGMBInline(admin.StackedInline):
-    model = VoiceRecording
-    extra = 1
-    fk_name = "real_estate"
+                if hasattr(obj, "uploaded_by") and not obj.uploaded_by:
+                    obj.uploaded_by = request.user
 
-    readonly_fields = ("uploaded_by", "updated_by", "create_at", "update_at")
+                if commit:
+                    obj.save()
+                return obj
 
-    def save_model(self, request, obj, form, change):
-        set_common_fields(obj, request, "Real_Estate")
-        super().save_model(request, obj, form, change)
-
-
-
-
-class VisitResponseInline(admin.StackedInline):
-    model = Visit
-    extra = 0
-    fk_name = "response"
-
-    readonly_fields = ("created_by", "updated_by", "create_at", "update_at")
-
-    def save_model(self, request, obj, form, change):
-        set_common_fields(obj, request, "Response")
-        super().save_model(request, obj, form, change)
+        return CustomFormset
 
 
 class VisitCompanyInline(admin.StackedInline):
     model = Visit
     extra = 0
-    fk_name = "company"
 
-    readonly_fields = ("created_by", "updated_by", "create_at", "update_at")
+    readonly_fields = (
+        "created_by",   # ❌ uploaded_by हटाओ
+        "updated_by",
+        "create_at",
+        "update_at",
+    )
 
-    def save_model(self, request, obj, form, change):
-        set_common_fields(obj, request, "Company")
-        super().save_model(request, obj, form, change)
-
-
-class VisitRealestateGMBInline(admin.StackedInline):
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        return qs.filter(form_type="Company")
+class VisitResponseInline(admin.StackedInline):
     model = Visit
     extra = 0
-    fk_name = "real_estate"
 
-    readonly_fields = ("created_by", "updated_by", "create_at", "update_at")
+    readonly_fields = (
+        "created_by",
+        "updated_by",
+        "create_at",
+        "update_at",
+    )
 
-    def save_model(self, request, obj, form, change):
-        set_common_fields(obj, request, "Real_Estate")
-        super().save_model(request, obj, form, change)
-
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        return qs.filter(form_type="Response")
 
 class FollowupResponseInline(admin.StackedInline):
     model = Followup
     extra = 0
-    fk_name = "response"
+    fk_name = "response"   # 🔥 VERY IMPORTANT
 
-    readonly_fields = ("created_by", "updated_by", "create_at", "update_at")
+    readonly_fields = (
+        "created_by",
+        "updated_by",
+        "create_at",
+        "update_at",
+    )
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        return qs.filter(form_type="Response")
 
     def save_model(self, request, obj, form, change):
-        set_common_fields(obj, request, "Response")
+        obj.form_type = "Response"
+        if not obj.created_by:
+            obj.created_by = request.user
+        obj.updated_by = request.user
         super().save_model(request, obj, form, change)
-
-
 class FollowupCompanyInline(admin.StackedInline):
     model = Followup
     extra = 0
-    fk_name = "company"
+    fk_name = "company"   # 🔥 VERY IMPORTANT
 
-    readonly_fields = ("created_by", "updated_by", "create_at", "update_at")
+    readonly_fields = (
+        "created_by",
+        "updated_by",
+        "create_at",
+        "update_at",
+    )
 
-    def save_model(self, request, obj, form, change):
-        set_common_fields(obj, request, "Company")
-        super().save_model(request, obj, form, change)
-
-
-class FollowupRealestateGMBInline(admin.StackedInline):
-    model = Followup
-    extra = 0
-    fk_name = "real_estate"
-
-    readonly_fields = ("created_by", "updated_by", "create_at", "update_at")
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        return qs.filter(form_type="Company")
 
     def save_model(self, request, obj, form, change):
-        set_common_fields(obj, request, "Real_Estate")
-        super().save_model(request, obj, form, change)
-
-
-
-class MeetingResponseInline(admin.StackedInline):
-    model = Meeting
-    extra = 0
-    fk_name = "response"
-
-    readonly_fields = ("created_by", "updated_by", "create_at", "update_at")
-
-    def save_model(self, request, obj, form, change):
-        set_common_fields(obj, request, "Response")
+        obj.form_type = "Company"
+        if not obj.created_by:
+            obj.created_by = request.user
+        obj.updated_by = request.user
         super().save_model(request, obj, form, change)
 
 
 class MeetingCompanyInline(admin.StackedInline):
     model = Meeting
     extra = 0
-    fk_name = "company"
+    fk_name = "company"   # 🔥 IMPORTANT
 
-    readonly_fields = ("created_by", "updated_by", "create_at", "update_at")
+    readonly_fields = (
+        "created_by",
+        "updated_by",
+        "create_at",
+        "update_at",
+    )
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        return qs.filter(form_type="Company")
 
     def save_model(self, request, obj, form, change):
-        set_common_fields(obj, request, "Company")
+        obj.form_type = "Company"
+        if not obj.created_by:
+            obj.created_by = request.user
+        obj.updated_by = request.user
+        super().save_model(request, obj, form, change)
+
+class MeetingResponseInline(admin.StackedInline):
+    model = Meeting
+    extra = 0
+    fk_name = "response"   # 🔥 IMPORTANT
+
+    readonly_fields = (
+        "created_by",
+        "updated_by",
+        "create_at",
+        "update_at",
+    )
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        return qs.filter(form_type="Response")
+
+    def save_model(self, request, obj, form, change):
+        obj.form_type = "Response"
+        if not obj.created_by:
+            obj.created_by = request.user
+        obj.updated_by = request.user
         super().save_model(request, obj, form, change)
 
 
@@ -246,24 +278,124 @@ class MeetingRealestateGMBInline(admin.StackedInline):
 
     readonly_fields = ("created_by", "updated_by", "create_at", "update_at")
 
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        return qs.filter(form_type="GMB")
+
     def save_model(self, request, obj, form, change):
-        set_common_fields(obj, request, "Real_Estate")
+        obj.form_type = "GMB"
+
+        if not obj.created_by:
+            obj.created_by = request.user
+
+        obj.updated_by = request.user
         super().save_model(request, obj, form, change)
 
 
+class FollowupRealestateGMBInline(admin.StackedInline):
+    model = Followup
+    extra = 0
+    fk_name = "real_estate"
+
+    readonly_fields = ("created_by", "updated_by", "create_at", "update_at")
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        return qs.filter(form_type="GMB")
+
+    def save_model(self, request, obj, form, change):
+        obj.form_type = "GMB"
+
+        if not obj.created_by:
+            obj.created_by = request.user
+
+        obj.updated_by = request.user
+        super().save_model(request, obj, form, change)
 
 
+class FollowupRealestateGMBInline(admin.StackedInline):
+    model = Followup
+    extra = 0
+    fk_name = "real_estate"
+
+    readonly_fields = ("created_by", "updated_by", "create_at", "update_at")
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        return qs.filter(form_type="GMB")
+
+    def save_model(self, request, obj, form, change):
+        obj.form_type = "GMB"
+
+        if not obj.created_by:
+            obj.created_by = request.user
+
+        obj.updated_by = request.user
+        super().save_model(request, obj, form, change)
 
 
+class VisitRealestateGMBInline(admin.StackedInline):
+    model = Visit
+    extra = 0
+    fk_name = "real_estate"
+
+    readonly_fields = ("created_by", "updated_by", "create_at", "update_at")
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        return qs.filter(form_type="GMB")
+
+    def save_model(self, request, obj, form, change):
+        obj.form_type = "GMB"
+
+        if not obj.created_by:
+            obj.created_by = request.user
+
+        obj.updated_by = request.user
+        super().save_model(request, obj, form, change)
 
 
+class VoiceRealestateGMBInline(admin.StackedInline):
+    model = VoiceRecording
+    extra = 1
+    fk_name = "real_estate"
 
+    readonly_fields = ("uploaded_by", "updated_by", "create_at", "update_at")
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        return qs.filter(form_type="GMB")
+
+    def save_model(self, request, obj, form, change):
+        obj.form_type = "GMB"
+
+        if hasattr(obj, "uploaded_by") and not obj.uploaded_by:
+            obj.uploaded_by = request.user
+
+        obj.updated_by = request.user
+        super().save_model(request, obj, form, change)
+
+
+class CommentRealestateGMBInline(admin.StackedInline):
+    model = Comment
+    extra = 1
+    fk_name = "real_estate"
+
+    readonly_fields = ("created_by", "updated_by", "create_at", "update_at")
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        return qs.filter(form_type="GMB")
+
+    def save_model(self, request, obj, form, change):
+        obj.form_type = "GMB"
+        if not obj.created_by:
+            obj.created_by = request.user
+        obj.updated_by = request.user
+        super().save_model(request, obj, form, change)
 
 @admin.register(AhmedabadRealEstateGMB)
-class AhmedabadRealEstateGMBAdmin(ImportExportModelAdmin):
-
-    resource_class = AhmedabadRealEstateGMBResource
-#class AhmedabadRealEstateGMBAdmin(admin.ModelAdmin):
+class AhmedabadRealEstateGMBAdmin(admin.ModelAdmin):
 
     # 🔥 LIST VIEW (table columns)
     list_display = (

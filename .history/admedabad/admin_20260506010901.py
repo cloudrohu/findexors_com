@@ -65,7 +65,6 @@ class AutoUserAdminMixin:
 
         formset.save_m2m()
 
-
 class CommentResponseInline(admin.StackedInline):
     model = Comment
     extra = 1
@@ -100,7 +99,6 @@ class CommentRealestateGMBInline(admin.StackedInline):
     def save_model(self, request, obj, form, change):
         set_common_fields(obj, request, "Real_Estate")
         super().save_model(request, obj, form, change)
-
 
 
 
@@ -140,8 +138,6 @@ class VoiceRealestateGMBInline(admin.StackedInline):
         super().save_model(request, obj, form, change)
 
 
-
-
 class VisitResponseInline(admin.StackedInline):
     model = Visit
     extra = 0
@@ -176,6 +172,8 @@ class VisitRealestateGMBInline(admin.StackedInline):
     def save_model(self, request, obj, form, change):
         set_common_fields(obj, request, "Real_Estate")
         super().save_model(request, obj, form, change)
+
+
 
 
 class FollowupResponseInline(admin.StackedInline):
@@ -213,8 +211,6 @@ class FollowupRealestateGMBInline(admin.StackedInline):
         set_common_fields(obj, request, "Real_Estate")
         super().save_model(request, obj, form, change)
 
-
-
 class MeetingResponseInline(admin.StackedInline):
     model = Meeting
     extra = 0
@@ -249,11 +245,6 @@ class MeetingRealestateGMBInline(admin.StackedInline):
     def save_model(self, request, obj, form, change):
         set_common_fields(obj, request, "Real_Estate")
         super().save_model(request, obj, form, change)
-
-
-
-
-
 
 
 
