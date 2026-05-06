@@ -659,12 +659,13 @@ class Visit(models.Model):
 # =======================
 # Followup
 # =======================
-class Followup(models.Model):
 
+class Followup(models.Model):
     FORM_CHOICES = [
         ("Response", "Response"),
         ("Company", "Company"),
         ("Real_Estate", "Real Estate"),
+
     ]
 
     FOLLOWUP_FROM_CHOICES = [
@@ -680,20 +681,14 @@ class Followup(models.Model):
         ("Deal Done", "Deal Done"),
     ]
 
-    # =====================================
-    # AUTO TYPE
-    # =====================================
-
+    # 🔥 CONTROL FIELD
     form_type = models.CharField(
         max_length=20,
         choices=FORM_CHOICES,
         default="Response"
     )
 
-    # =====================================
-    # LINKS
-    # =====================================
-
+    # 🔥 BOTH LINKS (IMPORTANT)
     response = models.OneToOneField(
         "AhmedabadResponse",
         on_delete=models.CASCADE,
@@ -718,15 +713,7 @@ class Followup(models.Model):
         related_name="followup"
     )
 
-    # =====================================
-    # STATUS
-    # =====================================
-
-    status = models.CharField(
-        max_length=25,
-        choices=FOLLOWUP_STATUS_CHOICES,
-        default="New Followup"
-    )
+    status = models.CharField(max_length=25, choices=FOLLOWUP_STATUS_CHOICES)
 
     followup_from = models.CharField(
         max_length=25,
@@ -735,10 +722,7 @@ class Followup(models.Model):
         choices=FOLLOWUP_FROM_CHOICES
     )
 
-    followup_date = models.DateTimeField(
-        null=True,
-        blank=True
-    )
+    followup_date = models.DateTimeField(null=True, blank=True)
 
     assigned_to = models.ForeignKey(
         Staff,
@@ -748,22 +732,15 @@ class Followup(models.Model):
         related_name="followup_assigned"
     )
 
-    comment = models.CharField(
-        max_length=500,
-        null=True,
-        blank=True
-    )
+    comment = models.CharField(max_length=500, null=True, blank=True)
 
-    # =====================================
-    # TRACKING
-    # =====================================
-
+    # 🔥 TRACKING
     created_by = models.ForeignKey(
         User,
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        related_name="ahmedabad_followup_created"
+        related_name="ahmedabad_followup_created"   # 🔥 FIXED
     )
 
     updated_by = models.ForeignKey(
@@ -777,56 +754,29 @@ class Followup(models.Model):
     create_at = models.DateTimeField(auto_now_add=True)
     update_at = models.DateTimeField(auto_now=True)
 
-    # =====================================
-    # STRING
-    # =====================================
-
     def __str__(self):
         return f"{self.form_type} Followup {self.id}"
 
-    # =====================================
-    # VALIDATION
-    # =====================================
-
+    # 🔥 VALIDATION
+    # 🔥 VALIDATION
     def clean(self):
 
-        total_links = sum([
-            bool(self.response),
-            bool(self.company),
-            bool(self.real_estate),
-        ])
+        if self.form_type == "Response" and not self.response_id:
+            return
 
-        # ✅ Only one allowed
-        if total_links > 1:
-            from django.core.exceptions import ValidationError
+        if self.form_type == "Company" and not self.company_id:
+            return
 
-            raise ValidationError(
-                "Only one link allowed: Response, Company or Real Estate."
-            )
-
-    # =====================================
-    # SAVE
-    # =====================================
+        if self.form_type == "Real_Estate" and not self.real_estate_id:
+            return
 
     def save(self, *args, **kwargs):
-
-        # ✅ AUTO DETECT FORM TYPE
-
-        if self.response:
-            self.form_type = "Response"
-
-        elif self.company:
-            self.form_type = "Company"
-
-        elif self.real_estate:
-            self.form_type = "Real_Estate"
-
         self.full_clean()
-
         super().save(*args, **kwargs)
 
 
 
+class Meeting(models.Model):
 
     FORM_CHOICES = [
         ("Response", "Response"),
@@ -939,169 +889,3 @@ class Followup(models.Model):
 
         if self.form_type == "Real_Estate" and not self.real_estate_id:
             return
-        
-
-
-from django.db import models
-from django.contrib.auth.models import User
-from django.core.exceptions import ValidationError
-
-
-class Meeting(models.Model):
-
-    FORM_CHOICES = [
-        ("Response", "Response"),
-        ("Company", "Company"),
-        ("Real_Estate", "Real Estate"),
-    ]
-
-    MEETING_STATUS_CHOICES = [
-        ("New Meeting", "New Meeting"),
-        ("Re Meeting", "Re Meeting"),
-        ("Cancelled", "Cancelled"),
-        ("Deal Done", "Deal Done"),
-    ]
-
-    # =========================================
-    # FORM TYPE
-    # =========================================
-
-    form_type = models.CharField(
-        max_length=20,
-        choices=FORM_CHOICES,
-        default="Response"
-    )
-
-    # =========================================
-    # LINKS
-    # =========================================
-
-    response = models.ForeignKey(
-        "AhmedabadResponse",
-        on_delete=models.CASCADE,
-        null=True,
-        blank=True,
-        related_name="ahmedabad_response_meetings"
-    )
-
-    company = models.ForeignKey(
-        "AhmedabadCompany",
-        on_delete=models.CASCADE,
-        null=True,
-        blank=True,
-        related_name="ahmedabad_company_meetings"
-    )
-
-    real_estate = models.ForeignKey(
-        "AhmedabadRealEstateGMB",
-        on_delete=models.CASCADE,
-        null=True,
-        blank=True,
-        related_name="ahmedabad_realestate_meetings"
-    )
-
-    # =========================================
-    # DETAILS
-    # =========================================
-
-    status = models.CharField(
-        max_length=25,
-        choices=MEETING_STATUS_CHOICES,
-        default="New Meeting"
-    )
-
-    meeting_date = models.DateTimeField(
-        null=True,
-        blank=True
-    )
-
-    assigned_to = models.ForeignKey(
-        Staff,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name="ahmedabad_staff_meetings"
-    )
-
-    comment = models.CharField(
-        max_length=500,
-        null=True,
-        blank=True
-    )
-
-    # =========================================
-    # TRACKING
-    # =========================================
-
-    created_by = models.ForeignKey(
-        User,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name="ahmedabad_user_created_meetings"
-    )
-
-    updated_by = models.ForeignKey(
-        User,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name="ahmedabad_user_updated_meetings"
-    )
-
-    create_at = models.DateTimeField(auto_now_add=True)
-    update_at = models.DateTimeField(auto_now=True)
-
-    # =========================================
-    # STRING
-    # =========================================
-
-    def __str__(self):
-        return f"{self.form_type} Meeting {self.id}"
-
-    # =========================================
-    # VALIDATION
-    # =========================================
-
-    def clean(self):
-
-        total = sum([
-            bool(self.response),
-            bool(self.company),
-            bool(self.real_estate),
-        ])
-
-        # ✅ MINIMUM ONE REQUIRED
-
-        if total == 0:
-            raise ValidationError(
-                "Please select Response, Company or Real Estate."
-            )
-
-        # ✅ ONLY ONE ALLOWED
-
-        if total > 1:
-            raise ValidationError(
-                "Only one field allowed: Response, Company or Real Estate."
-            )
-
-    # =========================================
-    # SAVE
-    # =========================================
-
-    def save(self, *args, **kwargs):
-
-        # ✅ AUTO FORM TYPE
-
-        if self.response:
-            self.form_type = "Response"
-
-        elif self.company:
-            self.form_type = "Company"
-
-        elif self.real_estate:
-            self.form_type = "Real_Estate"
-
-        self.full_clean()
-
-        super().save(*args, **kwargs)

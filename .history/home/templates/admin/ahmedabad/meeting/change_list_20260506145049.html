@@ -421,12 +421,9 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
 
         {% if obj.response %}
 
-        <a href="/admin/ahmedabad/ahmedabadresponse/{{ obj.response.pk }}/change/"
-           class="response">
-
-            <i class="fas fa-pen"></i>
-            Edit Response
-
+        <!-- ✅ RESPONSE EDIT (dynamic safe) -->
+        <a href="{% url 'admin:'|add:cl.opts.app_label|add:'_ahmedabadresponse_change' r.pk %}" class="edit">
+            ✏️ Edit Response
         </a>
 
         {% endif %}

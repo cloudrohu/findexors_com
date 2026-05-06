@@ -14,6 +14,8 @@
     margin-top:20px;
 }
 
+/* ================= CARD ================= */
+
 .card{
     background:#fff;
     border-radius:18px;
@@ -21,6 +23,8 @@
     border:1px solid #e5e7eb;
     box-shadow:0 10px 25px rgba(0,0,0,.06);
 }
+
+/* ================= HEADER ================= */
 
 .top{
     padding:18px;
@@ -40,6 +44,8 @@
     margin-top:6px;
     line-height:1.7;
 }
+
+/* ================= BADGES ================= */
 
 .badges{
     margin-top:10px;
@@ -80,6 +86,8 @@
     color:#92400e;
 }
 
+/* ================= SECTION ================= */
+
 .section{
     padding:18px;
     border-bottom:1px solid #f3f4f6;
@@ -98,6 +106,8 @@
     color:#374151;
     line-height:1.6;
 }
+
+/* ================= ACTIONS ================= */
 
 .actions{
     padding:18px;
@@ -152,6 +162,8 @@
     color:#fff;
 }
 
+/* ================= MOBILE ================= */
+
 @media(max-width:640px){
 
     .cards{
@@ -186,7 +198,6 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
     <div class="top">
 
         <!-- RESPONSE -->
-
         {% if obj.response %}
 
             <div class="title">
@@ -226,7 +237,6 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
         {% endif %}
 
         <!-- COMPANY -->
-
         {% if obj.company %}
 
             <div class="title">
@@ -247,10 +257,17 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
                 📍 {{ obj.company.locality|default:"—" }}
             </div>
 
+            <div class="badges">
+
+                <span class="badge gray">
+                    {{ obj.company.status }}
+                </span>
+
+            </div>
+
         {% endif %}
 
         <!-- REAL ESTATE -->
-
         {% if obj.real_estate %}
 
             <div class="title">
@@ -269,6 +286,14 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
 
             <div class="meta">
                 📍 {{ obj.real_estate.city_text|default:"—" }}
+            </div>
+
+            <div class="badges">
+
+                <span class="badge gray">
+                    {{ obj.real_estate.status }}
+                </span>
+
             </div>
 
         {% endif %}
@@ -338,10 +363,9 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
 
     <div class="actions">
 
-        <!-- RESPONSE CALL -->
+        <!-- CALL -->
 
         {% if obj.response and obj.response.contact_no %}
-
         <a href="tel:+91{{ obj.response.contact_no }}"
            class="call">
 
@@ -358,13 +382,10 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
             WhatsApp
 
         </a>
-
         {% endif %}
 
-        <!-- COMPANY CALL -->
 
         {% if obj.company and obj.company.contact_no %}
-
         <a href="tel:+91{{ obj.company.contact_no }}"
            class="call">
 
@@ -381,13 +402,10 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
             WhatsApp
 
         </a>
-
         {% endif %}
 
-        <!-- REAL ESTATE CALL -->
 
         {% if obj.real_estate and obj.real_estate.phone %}
-
         <a href="tel:+91{{ obj.real_estate.phone }}"
            class="call">
 
@@ -404,7 +422,6 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
             WhatsApp
 
         </a>
-
         {% endif %}
 
         <!-- EDIT MEETING -->
@@ -420,42 +437,31 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
         <!-- EDIT RESPONSE -->
 
         {% if obj.response %}
-
-        <a href="/admin/ahmedabad/ahmedabadresponse/{{ obj.response.pk }}/change/"
+        <a href="{% url 'admin:ahmedabad_ahmedabadresponse_change' obj.response.pk %}"
            class="response">
 
             <i class="fas fa-pen"></i>
             Edit Response
 
         </a>
-
         {% endif %}
 
         <!-- EDIT COMPANY -->
 
         {% if obj.company %}
-
-        <a href="/admin/ahmedabad/ahmedabadcompany/{{ obj.company.pk }}/change/"
+        <a href="{% url 'admin:ahmedabad_ahmedabadcompany_change' obj.company.pk %}"
            class="company">
 
             <i class="fas fa-building"></i>
             Edit Company
 
         </a>
-
         {% endif %}
 
         <!-- EDIT REAL ESTATE -->
 
-        {% if obj.real_estate and obj.real_estate.pk %}
-<a href="/admin/ahmedabad/ahmedabadrealestategmb/{{ obj.real_estate.pk }}/change/"
-   class="realestate">
-
-    <i class="fas fa-home"></i>
-    Edit Real Estate
-
-</a>
-{% endif %}
+        
+        {% endif %}
 
     </div>
 

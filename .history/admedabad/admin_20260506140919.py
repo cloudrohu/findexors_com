@@ -647,10 +647,6 @@ class FollowupAdmin(admin.ModelAdmin):
 
 @admin.register(Meeting)
 class MeetingAdmin(admin.ModelAdmin):
-    change_list_template = "admin/ahmedabad/meeting/change_list.html"
-    
-    
-
 
     list_display = (
         "id",

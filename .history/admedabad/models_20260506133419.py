@@ -942,10 +942,6 @@ class Followup(models.Model):
         
 
 
-from django.db import models
-from django.contrib.auth.models import User
-from django.core.exceptions import ValidationError
-
 
 class Meeting(models.Model):
 
@@ -981,7 +977,7 @@ class Meeting(models.Model):
         on_delete=models.CASCADE,
         null=True,
         blank=True,
-        related_name="ahmedabad_response_meetings"
+        related_name="meetings"
     )
 
     company = models.ForeignKey(
@@ -989,7 +985,7 @@ class Meeting(models.Model):
         on_delete=models.CASCADE,
         null=True,
         blank=True,
-        related_name="ahmedabad_company_meetings"
+        related_name="meetings"
     )
 
     real_estate = models.ForeignKey(
@@ -997,7 +993,7 @@ class Meeting(models.Model):
         on_delete=models.CASCADE,
         null=True,
         blank=True,
-        related_name="ahmedabad_realestate_meetings"
+        related_name="meetings"
     )
 
     # =========================================
@@ -1020,7 +1016,7 @@ class Meeting(models.Model):
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        related_name="ahmedabad_staff_meetings"
+        related_name="meeting_assigned"
     )
 
     comment = models.CharField(
@@ -1038,7 +1034,7 @@ class Meeting(models.Model):
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        related_name="ahmedabad_user_created_meetings"
+        related_name="ahmedabad_meeting_created"
     )
 
     updated_by = models.ForeignKey(
@@ -1046,7 +1042,7 @@ class Meeting(models.Model):
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        related_name="ahmedabad_user_updated_meetings"
+        related_name="+"
     )
 
     create_at = models.DateTimeField(auto_now_add=True)
@@ -1071,14 +1067,12 @@ class Meeting(models.Model):
             bool(self.real_estate),
         ])
 
-        # ✅ MINIMUM ONE REQUIRED
+        # ✅ ONLY ONE FIELD ALLOWED
 
         if total == 0:
             raise ValidationError(
                 "Please select Response, Company or Real Estate."
             )
-
-        # ✅ ONLY ONE ALLOWED
 
         if total > 1:
             raise ValidationError(

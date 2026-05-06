@@ -450,7 +450,7 @@ class AhmedabadRealEstateGMBAdmin(AutoUserAdminMixin, admin.ModelAdmin):
 @admin.register(AhmedabadCompany)
 class AhmedabadCompanyAdmin(AutoUserAdminMixin, admin.ModelAdmin):
 
-    change_list_template = "admin/ahmedabad/company/card_list.html"
+    change_list_template = "admin/ahmedabad/ahmedabadrealestategmb/card_list.html"
     list_per_page = 20
     preserve_filters = True
 
@@ -647,10 +647,6 @@ class FollowupAdmin(admin.ModelAdmin):
 
 @admin.register(Meeting)
 class MeetingAdmin(admin.ModelAdmin):
-    change_list_template = "admin/ahmedabad/meeting/change_list.html"
-    
-    
-
 
     list_display = (
         "id",

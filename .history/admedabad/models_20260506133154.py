@@ -825,8 +825,10 @@ class Followup(models.Model):
 
         super().save(*args, **kwargs)
 
+from django.core.exceptions import ValidationError
 
 
+class Meeting(models.Model):
 
     FORM_CHOICES = [
         ("Response", "Response"),
@@ -836,26 +838,25 @@ class Followup(models.Model):
 
     MEETING_STATUS_CHOICES = [
         ("New Meeting", "New Meeting"),
-        ("Visit", "Visit"),
         ("Re Meeting", "Re Meeting"),
         ("Cancelled", "Cancelled"),
         ("Deal Done", "Deal Done"),
     ]
 
-    MEETING_FROM_CHOICES = [
-        ("Response", "Data Calling"),
-        ("Door_To_Door", "Data Calling Ads"),
-        ("Data_Calling", "Data Calling"),
-    ]
+    # =========================================
+    # AUTO TYPE
+    # =========================================
 
-    # 🔥 CONTROL FIELD
     form_type = models.CharField(
         max_length=20,
         choices=FORM_CHOICES,
         default="Response"
     )
 
-    # 🔥 BOTH LINKS
+    # =========================================
+    # LINKS
+    # =========================================
+
     response = models.OneToOneField(
         "AhmedabadResponse",
         on_delete=models.CASCADE,
@@ -880,128 +881,8 @@ class Followup(models.Model):
         related_name="meeting"
     )
 
-    status = models.CharField(
-        max_length=25,
-        choices=MEETING_STATUS_CHOICES,
-        default="New Meeting"
-    )
-
-    meeting_from = models.CharField(
-        max_length=25,
-        null=True,
-        blank=True,
-        choices=MEETING_FROM_CHOICES
-    )
-
-    meeting_date = models.DateTimeField(null=True, blank=True)
-
-    assigned_to = models.ForeignKey(
-        Staff,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name="meeting_assigned"
-    )
-
-    comment = models.CharField(max_length=500, null=True, blank=True)
-
-    # 🔥 TRACKING
-    created_by = models.ForeignKey(
-        User,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name="ahmedabad_meeting_created"   # UNIQUE
-    )
-
-    updated_by = models.ForeignKey(
-        User,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name="+"
-    )
-
-    create_at = models.DateTimeField(auto_now_add=True)
-    update_at = models.DateTimeField(auto_now=True)
-
-    def __str__(self):
-        return f"{self.form_type} Meeting {self.id}"
-
-    # 🔥 VALIDATION
-    def clean(self):
-
-        if self.form_type == "Response" and not self.response_id:
-            return
-
-        if self.form_type == "Company" and not self.company_id:
-            return
-
-        if self.form_type == "Real_Estate" and not self.real_estate_id:
-            return
-        
-
-
-from django.db import models
-from django.contrib.auth.models import User
-from django.core.exceptions import ValidationError
-
-
-class Meeting(models.Model):
-
-    FORM_CHOICES = [
-        ("Response", "Response"),
-        ("Company", "Company"),
-        ("Real_Estate", "Real Estate"),
-    ]
-
-    MEETING_STATUS_CHOICES = [
-        ("New Meeting", "New Meeting"),
-        ("Re Meeting", "Re Meeting"),
-        ("Cancelled", "Cancelled"),
-        ("Deal Done", "Deal Done"),
-    ]
-
     # =========================================
-    # FORM TYPE
-    # =========================================
-
-    form_type = models.CharField(
-        max_length=20,
-        choices=FORM_CHOICES,
-        default="Response"
-    )
-
-    # =========================================
-    # LINKS
-    # =========================================
-
-    response = models.ForeignKey(
-        "AhmedabadResponse",
-        on_delete=models.CASCADE,
-        null=True,
-        blank=True,
-        related_name="ahmedabad_response_meetings"
-    )
-
-    company = models.ForeignKey(
-        "AhmedabadCompany",
-        on_delete=models.CASCADE,
-        null=True,
-        blank=True,
-        related_name="ahmedabad_company_meetings"
-    )
-
-    real_estate = models.ForeignKey(
-        "AhmedabadRealEstateGMB",
-        on_delete=models.CASCADE,
-        null=True,
-        blank=True,
-        related_name="ahmedabad_realestate_meetings"
-    )
-
-    # =========================================
-    # DETAILS
+    # MEETING DETAILS
     # =========================================
 
     status = models.CharField(
@@ -1020,7 +901,7 @@ class Meeting(models.Model):
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        related_name="ahmedabad_staff_meetings"
+        related_name="meeting_assigned"
     )
 
     comment = models.CharField(
@@ -1038,7 +919,7 @@ class Meeting(models.Model):
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        related_name="ahmedabad_user_created_meetings"
+        related_name="ahmedabad_meeting_created"
     )
 
     updated_by = models.ForeignKey(
@@ -1046,7 +927,7 @@ class Meeting(models.Model):
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        related_name="ahmedabad_user_updated_meetings"
+        related_name="+"
     )
 
     create_at = models.DateTimeField(auto_now_add=True)
@@ -1065,25 +946,39 @@ class Meeting(models.Model):
 
     def clean(self):
 
+        # ✅ ONLY ONE LINK ALLOWED
+
         total = sum([
             bool(self.response),
             bool(self.company),
             bool(self.real_estate),
         ])
 
-        # ✅ MINIMUM ONE REQUIRED
-
-        if total == 0:
-            raise ValidationError(
-                "Please select Response, Company or Real Estate."
-            )
-
-        # ✅ ONLY ONE ALLOWED
-
         if total > 1:
             raise ValidationError(
                 "Only one field allowed: Response, Company or Real Estate."
             )
+
+        # =====================================
+        # RESPONSE
+        # =====================================
+
+        if self.form_type == "Response" and not self.response:
+            raise ValidationError("Response required")
+
+        # =====================================
+        # COMPANY
+        # =====================================
+
+        if self.form_type == "Company" and not self.company:
+            raise ValidationError("Company required")
+
+        # =====================================
+        # REAL ESTATE
+        # =====================================
+
+        if self.form_type == "Real_Estate" and not self.real_estate:
+            raise ValidationError("Real Estate required")
 
     # =========================================
     # SAVE
@@ -1091,7 +986,7 @@ class Meeting(models.Model):
 
     def save(self, *args, **kwargs):
 
-        # ✅ AUTO FORM TYPE
+        # ✅ AUTO UPDATE FORM TYPE
 
         if self.response:
             self.form_type = "Response"

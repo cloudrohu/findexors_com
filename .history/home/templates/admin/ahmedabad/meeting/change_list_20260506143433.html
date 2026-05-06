@@ -447,15 +447,17 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
 
         <!-- EDIT REAL ESTATE -->
 
-        {% if obj.real_estate and obj.real_estate.pk %}
-<a href="/admin/ahmedabad/ahmedabadrealestategmb/{{ obj.real_estate.pk }}/change/"
-   class="realestate">
+        {% if obj.real_estate %}
 
-    <i class="fas fa-home"></i>
-    Edit Real Estate
+        <a href="/admin/ahmedabad/ahmedabadrealestategmb/{{ obj.real_estate.pk }}/change/"
+           class="realestate">
 
-</a>
-{% endif %}
+            <i class="fas fa-home"></i>
+            Edit Real Estate
+
+        </a>
+
+        {% endif %}
 
     </div>
 
