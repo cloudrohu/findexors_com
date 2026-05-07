@@ -1,0 +1,423 @@
+{% extends "admin/change_list.html" %}
+{% load static %}
+{% load admin_urls %}
+
+{% block extrastyle %}
+{{ block.super }}
+
+<style>
+
+.cards{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(420px,1fr));
+    gap:18px;
+    margin-top:20px;
+}
+
+.card{
+    background:#fff;
+    border-radius:16px;
+    padding:18px;
+    box-shadow:0 10px 25px rgba(0,0,0,.08);
+    border:1px solid #eef2f7;
+}
+
+.title{
+    font-size:18px;
+    font-weight:800;
+    color:#111827;
+}
+
+.meta{
+    font-size:14px;
+    color:#4b5563;
+    margin-top:8px;
+    line-height:1.8;
+}
+
+.badge{
+    padding:4px 10px;
+    border-radius:999px;
+    font-size:11px;
+    font-weight:700;
+    background:#dbeafe;
+    color:#1d4ed8;
+}
+
+.actions{
+    margin-top:18px;
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+}
+
+.actions a{
+    padding:10px 16px;
+    border-radius:999px;
+    text-decoration:none;
+    font-size:12px;
+    font-weight:700;
+    color:#fff;
+}
+
+.call{
+    background:#16a34a;
+}
+
+.whatsapp{
+    background:#22c55e;
+}
+
+.edit{
+    background:#0f172a;
+}
+
+audio{
+    width:100%;
+    margin-top:10px;
+}
+
+hr{
+    margin:18px 0;
+    border:none;
+    border-top:1px solid #e5e7eb;
+}
+
+</style>
+
+{% endblock %}
+
+
+
+{% block result_list %}
+
+<div class="cards">
+
+{% for obj in cl.result_list %}
+
+<div class="card">
+
+    <!-- HEADER -->
+
+    <div style="display:flex;align-items:center;gap:12px;">
+
+        <div style="
+            width:42px;
+            height:42px;
+            border-radius:10px;
+            background:#f3f4f6;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            font-size:20px;
+        ">
+            📞
+        </div>
+
+        <div>
+
+            <div class="title">
+
+                <span style="
+                    background:#eef2ff;
+                    padding:3px 8px;
+                    border-radius:8px;
+                    font-size:10px;
+                    font-weight:700;
+                    margin-right:8px;
+                ">
+                    R{{ obj.id|stringformat:'03d' }}
+                </span>
+
+                {{ obj.business_name|default:"No Business" }}
+
+                <span class="badge">
+                    {{ obj.status }}
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- BASIC INFO -->
+
+    <div class="meta">
+        👤 {{ obj.contact_persone|default:"—" }}
+    </div>
+
+    <div class="meta">
+        📞 {{ obj.contact_no|default:"—" }}
+    </div>
+
+    {% if obj.business_category %}
+    <div class="meta">
+        🏢 {{ obj.business_category }}
+    </div>
+    {% endif %}
+
+    {% if obj.locality %}
+    <div class="meta">
+        📍 {{ obj.locality }}
+    </div>
+    {% endif %}
+
+    <div class="meta">
+        🚀 Lead Source: {{ obj.lead_source }}
+    </div>
+
+    {% if obj.comment %}
+    <div class="meta">
+        💬 {{ obj.comment }}
+    </div>
+    {% endif %}
+
+    <div class="meta">
+
+        {% if obj.is_converted %}
+            ✅ Converted
+        {% else %}
+            ❌ Not Converted
+        {% endif %}
+
+    </div>
+
+
+    <!-- FOLLOWUP -->
+
+    {% with obj.followup as f %}
+
+    {% if f %}
+
+    <hr>
+
+    <div class="meta">
+
+        📌 <strong>Followup</strong>
+
+        <br><br>
+
+        Status:
+        {{ f.status|default:"—" }}
+
+        <br>
+
+        Date:
+        {{ f.followup_date|date:"d M Y, h:i A"|default:"—" }}
+
+        <br>
+
+        Assigned:
+        {{ f.assigned_to|default:"—" }}
+
+        <br>
+
+        Comment:
+        {{ f.comment|default:"—" }}
+
+    </div>
+
+    {% endif %}
+
+    {% endwith %}
+
+
+    <!-- MEETINGS -->
+
+    {% with obj.ahmedabad_response_meetings.last as m %}
+
+    {% if m %}
+
+    <hr>
+
+    <div class="meta">
+
+        🤝 <strong>Meeting</strong>
+
+        <br><br>
+
+        Status:
+        {{ m.status }}
+
+        <br>
+
+        Date:
+        {{ m.meeting_date|date:"d M Y, h:i A" }}
+
+        <br>
+
+        Assigned:
+        {{ m.assigned_to|default:"—" }}
+
+        <br>
+
+        Comment:
+        {{ m.comment|default:"—" }}
+
+    </div>
+
+    {% endif %}
+
+    {% endwith %}
+
+
+    <!-- COMMENTS -->
+
+    {% for c in obj.comments.all %}
+
+    <hr>
+
+    <div class="meta">
+
+        💬 <strong>Comment {{ forloop.counter }}</strong>
+
+        <br><br>
+
+        {{ c.comment }}
+
+        <br><br>
+
+        👤 {{ c.created_by|default:"—" }}
+
+        |
+
+        {{ c.create_at|date:"d M Y, h:i A" }}
+
+    </div>
+
+    {% endfor %}
+
+
+    <!-- VISITS -->
+
+    {% for v in obj.visits.all %}
+
+    <hr>
+
+    <div class="meta">
+
+        🚗 <strong>Visit {{ forloop.counter }}</strong>
+
+        <br><br>
+
+        Type:
+        {{ v.visit_type }}
+
+        <br>
+
+        Status:
+        {{ v.visit_status }}
+
+        <br>
+
+        👤 {{ v.created_by|default:"—" }}
+
+        |
+
+        {{ v.create_at|date:"d M Y, h:i A" }}
+
+        {% if v.comment %}
+
+        <br>
+
+        💬 {{ v.comment }}
+
+        {% endif %}
+
+    </div>
+
+    {% endfor %}
+
+
+    <!-- VOICE RECORDINGS -->
+
+    {% for vr in obj.voice_recordings.all %}
+
+    <hr>
+
+    <div class="meta">
+
+        🎤 <strong>Voice Recording {{ forloop.counter }}</strong>
+
+        <br><br>
+
+        <audio controls>
+            <source src="{{ vr.file.url }}">
+        </audio>
+
+        <br>
+
+        👤 {{ vr.uploaded_by|default:"—" }}
+
+        |
+
+        {{ vr.create_at|date:"d M Y, h:i A" }}
+
+    </div>
+
+    {% endfor %}
+
+
+    <!-- AUDIT -->
+
+    <hr>
+
+    <div class="meta">
+
+        👤 Created:
+        {{ obj.created_by|default:"—" }}
+
+        |
+
+        {{ obj.create_at|date:"d M Y, h:i A" }}
+
+        <br>
+
+        ✏️ Updated:
+        {{ obj.updated_by|default:"—" }}
+
+        |
+
+        {{ obj.update_at|date:"d M Y, h:i A" }}
+
+    </div>
+
+
+    <!-- ACTIONS -->
+
+    <div class="actions">
+
+        {% if obj.contact_no %}
+
+        <a href="tel:{{ obj.contact_no }}" class="call">
+            📞 Call
+        </a>
+
+        <a href="https://wa.me/{{ obj.contact_no }}"
+           target="_blank"
+           class="whatsapp">
+
+            💬 WhatsApp
+
+        </a>
+
+        {% endif %}
+
+        <a class="edit"
+           href="{% url opts|admin_urlname:'change' obj.pk %}?_changelist_filters={{ request.GET.urlencode }}">
+
+            ✏️ Edit
+
+        </a>
+
+    </div>
+
+</div>
+
+{% endfor %}
+
+</div>
+
+{% endblock %}

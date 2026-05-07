@@ -130,30 +130,35 @@
     align-items:center;
     gap:6px;
     transition:.2s;
+    color:#fff;
 }
 
 .actions a:hover{
     transform:translateY(-1px);
 }
 
+.call{
+    background:#16a34a;
+}
+
+.whatsapp{
+    background:#25D366;
+}
+
 .edit{
     background:#111827;
-    color:#fff;
 }
 
 .response{
     background:#2563eb;
-    color:#fff;
 }
 
 .company{
     background:#7c3aed;
-    color:#fff;
 }
 
 .realestate{
     background:#ea580c;
-    color:#fff;
 }
 
 @media(max-width:640px){
@@ -296,16 +301,16 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
 
     </div>
 
-    <!-- ================= MEETING ================= -->
+    <!-- ================= FOLLOWUP ================= -->
 
     <div class="section">
 
         <div class="section-title">
 
-            🤝 Meeting Details
+            📌 Followup Details
 
             <span class="badge dark">
-                MT{{ obj.id|stringformat:"03d" }}
+                FU{{ obj.id|stringformat:"03d" }}
             </span>
 
         </div>
@@ -315,8 +320,8 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
         </div>
 
         <div class="row">
-            <b>Date:</b>
-            {{ obj.meeting_date|date:"d M Y, h:i A"|default:"—" }}
+            <b>Followup Date:</b>
+            {{ obj.followup_date|date:"d M Y, h:i A"|default:"—" }}
         </div>
 
         <div class="row">
@@ -369,14 +374,83 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
 
     <div class="actions">
 
-        <!-- EDIT MEETING -->
+        <!-- RESPONSE CALL -->
+
+        {% if obj.response and obj.response.contact_no %}
+
+        <a href="tel:+91{{ obj.response.contact_no }}"
+           class="call">
+
+            <i class="fas fa-phone"></i>
+            Call
+
+        </a>
+
+        <a href="https://wa.me/91{{ obj.response.contact_no }}"
+           target="_blank"
+           class="whatsapp">
+
+            <i class="fab fa-whatsapp"></i>
+            WhatsApp
+
+        </a>
+
+        {% endif %}
+
+        <!-- COMPANY CALL -->
+
+        {% if obj.company and obj.company.contact_no %}
+
+        <a href="tel:+91{{ obj.company.contact_no }}"
+           class="call">
+
+            <i class="fas fa-phone"></i>
+            Call
+
+        </a>
+
+        <a href="https://wa.me/91{{ obj.company.contact_no }}"
+           target="_blank"
+           class="whatsapp">
+
+            <i class="fab fa-whatsapp"></i>
+            WhatsApp
+
+        </a>
+
+        {% endif %}
+
+        <!-- REAL ESTATE CALL -->
+
+        {% if obj.real_estate and obj.real_estate.phone %}
+
+        <a href="tel:+91{{ obj.real_estate.phone }}"
+           class="call">
+
+            <i class="fas fa-phone"></i>
+            Call
+
+        </a>
+
+        <a href="https://wa.me/91{{ obj.real_estate.phone }}"
+           target="_blank"
+           class="whatsapp">
+
+            <i class="fab fa-whatsapp"></i>
+            WhatsApp
+
+        </a>
+
+        {% endif %}
+
+        <!-- EDIT FOLLOWUP -->
 
         <a href="{% url opts|admin_urlname:'change' obj.pk %}"
            class="edit">
 
-            <i class="fas fa-calendar"></i>
+            <i class="fas fa-calendar-check"></i>
 
-            Meeting • MT{{ obj.id|stringformat:"03d" }}
+            Followup • FU{{ obj.id|stringformat:"03d" }}
 
         </a>
 
@@ -426,144 +500,6 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
         {% endif %}
 
     </div>
-
-
-    <!-- ================= ACTIONS ================= -->
-
-<div class="actions">
-
-    <!-- ================= RESPONSE CALL ================= -->
-
-    {% if obj.response and obj.response.contact_no %}
-
-    <a href="tel:+91{{ obj.response.contact_no }}"
-       style="background:#16a34a;color:#fff;">
-
-        <i class="fas fa-phone"></i>
-
-        Call
-
-    </a>
-
-    <a href="https://wa.me/91{{ obj.response.contact_no }}"
-       target="_blank"
-       style="background:#25D366;color:#fff;">
-
-        <i class="fab fa-whatsapp"></i>
-
-        WhatsApp
-
-    </a>
-
-    {% endif %}
-
-    <!-- ================= COMPANY CALL ================= -->
-
-    {% if obj.company and obj.company.contact_no %}
-
-    <a href="tel:+91{{ obj.company.contact_no }}"
-       style="background:#16a34a;color:#fff;">
-
-        <i class="fas fa-phone"></i>
-
-        Call
-
-    </a>
-
-    <a href="https://wa.me/91{{ obj.company.contact_no }}"
-       target="_blank"
-       style="background:#25D366;color:#fff;">
-
-        <i class="fab fa-whatsapp"></i>
-
-        WhatsApp
-
-    </a>
-
-    {% endif %}
-
-    <!-- ================= REAL ESTATE CALL ================= -->
-
-    {% if obj.real_estate and obj.real_estate.phone %}
-
-    <a href="tel:+91{{ obj.real_estate.phone }}"
-       style="background:#16a34a;color:#fff;">
-
-        <i class="fas fa-phone"></i>
-
-        Call
-
-    </a>
-
-    <a href="https://wa.me/91{{ obj.real_estate.phone }}"
-       target="_blank"
-       style="background:#25D366;color:#fff;">
-
-        <i class="fab fa-whatsapp"></i>
-
-        WhatsApp
-
-    </a>
-
-    {% endif %}
-
-    <!-- ================= EDIT MEETING ================= -->
-
-    <a href="{% url opts|admin_urlname:'change' obj.pk %}"
-       class="edit">
-
-        <i class="fas fa-calendar"></i>
-
-        Meeting • MT{{ obj.id|stringformat:"03d" }}
-
-    </a>
-
-    <!-- ================= RESPONSE ================= -->
-
-    {% if obj.response %}
-
-    <a href="{% url 'admin:mumbai_mumbairesponse_change' obj.response.pk %}"
-       class="response">
-
-        <i class="fas fa-user"></i>
-
-        Response • MR{{ obj.response.id|stringformat:"03d" }}
-
-    </a>
-
-    {% endif %}
-
-    <!-- ================= COMPANY ================= -->
-
-    {% if obj.company %}
-
-    <a href="{% url 'admin:mumbai_mumbaicompany_change' obj.company.pk %}"
-       class="company">
-
-        <i class="fas fa-building"></i>
-
-        Company • CMP{{ obj.company.id|stringformat:"03d" }}
-
-    </a>
-
-    {% endif %}
-
-    <!-- ================= REAL ESTATE ================= -->
-
-    {% if obj.real_estate %}
-
-    <a href="{% url 'admin:mumbai_mumbairealestategmb_change' obj.real_estate.pk %}"
-       class="realestate">
-
-        <i class="fas fa-home"></i>
-
-        RealEstate • RE{{ obj.real_estate.id|stringformat:"03d" }}
-
-    </a>
-
-    {% endif %}
-
-</div>
 
 </div>
 

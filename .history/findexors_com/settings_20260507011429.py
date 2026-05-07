@@ -68,7 +68,6 @@ INSTALLED_APPS = [
     "realtypms",
     'jobs',
     'job_utility',
-    'mumbai',
     # ... (बाकी user apps) ...
     
     # 3. Django के Core Apps को अब नीचे रखें

@@ -1,0 +1,86 @@
+{% extends "admin/change_list.html" %}
+{% load admin_urls %}
+
+{% block result_list %}
+<div class="cards">
+
+{% for obj in cl.result_list %}
+
+    {% if obj.form_type == "Company" %}
+        {% with obj.company as e %}
+        {% with "Company" as type %}
+
+<div class="card">
+
+    <!-- 🔥 HEADER -->
+    <div class="title">
+        <b>{{ type }}</b> |
+        VR{{ obj.id|stringformat:"03d" }} -
+        {{ e.company_name|default:"No Name" }}
+    </div>
+
+    <!-- 🔥 BASIC -->
+    <div class="block">
+        👤 {{ e.contact_persone|default:"—" }} <br>
+        📞 {{ e.contact_no|default:"—" }} <br>
+        📍 {{ e.locality|default:"—" }} <br>
+        🎯 {{ e.status|default:"—" }}
+    </div>
+
+    <!-- 🔥 COMPANY EXTRA -->
+    <div class="block">
+        ⭐ {{ e.rating|default:"—" }} <br>
+        📊 {{ e.reviews_count|default:"—" }} <br>
+        🌐 {{ e.website|default:"—" }}
+    </div>
+
+    <!-- 🔥 VOICE -->
+    <div class="block">
+        {% if obj.file %}
+        <audio controls src="{{ obj.file.url }}"></audio>
+        {% else %} No Recording {% endif %}
+    </div>
+
+</div>
+
+        {% endwith %}
+        {% endwith %}
+
+    {% else %}
+        {% with obj.response as e %}
+        {% with "Response" as type %}
+
+<div class="card">
+
+    <!-- 🔥 HEADER -->
+    <div class="title">
+        <b>{{ type }}</b> |
+        VR{{ obj.id|stringformat:"03d" }} -
+        {{ e.business_name|default:"No Name" }}
+    </div>
+
+    <!-- 🔥 BASIC -->
+    <div class="block">
+        👤 {{ e.contact_persone|default:"—" }} <br>
+        📞 {{ e.contact_no|default:"—" }} <br>
+        📍 {{ e.locality|default:"—" }} <br>
+        🎯 {{ e.status|default:"—" }}
+    </div>
+
+    <!-- 🔥 VOICE -->
+    <div class="block">
+        {% if obj.file %}
+        <audio controls src="{{ obj.file.url }}"></audio>
+        {% else %} No Recording {% endif %}
+    </div>
+
+</div>
+
+        {% endwith %}
+        {% endwith %}
+    {% endif %}
+
+{% endfor %}
+
+</div>
+{% endblock %}
