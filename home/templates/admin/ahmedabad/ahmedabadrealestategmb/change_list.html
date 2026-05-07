@@ -14,15 +14,43 @@
     border-radius:20px;
     font-size:11px;
     margin-left:8px;
-    font-weight:600;
+    font-weight:700;
 }
 
-.status-new{ background:#e0f2fe; color:#0369a1; }
-.status-meeting{ background:#dcfce7; color:#166534; }
-.status-follow-up{ background:#fef9c3; color:#854d0e; }
-.status-not-received{ background:#fee2e2; color:#991b1b; }
-.status-not-interested{ background:#fee2e2; color:#991b1b; }
-.status-deal-done{ background:#dcfce7; color:#166534; }
+.status-new{
+    background:#e0f2fe;
+    color:#0369a1;
+}
+
+.status-meeting{
+    background:#dcfce7;
+    color:#166534;
+}
+
+.status-followup{
+    background:#fef9c3;
+    color:#854d0e;
+}
+
+.status-meeting-followup{
+    background:#ede9fe;
+    color:#6d28d9;
+}
+
+.status-not-received{
+    background:#fee2e2;
+    color:#991b1b;
+}
+
+.status-not-interested{
+    background:#fee2e2;
+    color:#991b1b;
+}
+
+.status-deal-done{
+    background:#dcfce7;
+    color:#166534;
+}
 
 /* ================= CARDS ================= */
 
@@ -35,41 +63,53 @@
 
 .card{
     background:#fff;
-    border-radius:14px;
-    padding:14px;
-    box-shadow:0 10px 25px rgba(0,0,0,.08);
+    border-radius:18px;
+    padding:18px;
     border:1px solid #eef2f7;
+    box-shadow:0 10px 25px rgba(0,0,0,.06);
 }
 
 .title{
     font-weight:800;
-    font-size:16px;
+    font-size:17px;
     color:#111827;
+    line-height:1.5;
 }
 
 .meta{
     font-size:13px;
-    color:#555;
-    margin-top:6px;
+    color:#475569;
+    margin-top:7px;
     line-height:1.7;
     word-break:break-word;
+}
+
+.section{
+    margin-top:14px;
+    padding-top:14px;
+    border-top:1px solid #f1f5f9;
 }
 
 /* ================= ACTIONS ================= */
 
 .actions{
-    margin-top:12px;
+    margin-top:16px;
     display:flex;
     gap:8px;
     flex-wrap:wrap;
 }
 
 .actions a{
-    padding:8px 14px;
+    padding:9px 14px;
     border-radius:999px;
     font-size:12px;
     text-decoration:none;
     font-weight:700;
+    transition:.25s;
+}
+
+.actions a:hover{
+    transform:translateY(-1px);
 }
 
 .call{
@@ -100,7 +140,7 @@
 /* ================= BADGE ================= */
 
 .badge{
-    padding:3px 8px;
+    padding:3px 9px;
     background:#eef2ff;
     border-radius:12px;
     font-size:11px;
@@ -138,24 +178,29 @@ audio{
 
     <!-- ================= HEADER ================= -->
 
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+    <div style="display:flex;align-items:center;gap:12px;">
 
         {% if obj.logo %}
 
             <img src="{{ obj.logo }}"
-                 style="width:45px;height:45px;object-fit:cover;border-radius:8px;">
+                 style="
+                 width:52px;
+                 height:52px;
+                 object-fit:cover;
+                 border-radius:12px;
+                 ">
 
         {% else %}
 
             <div style="
-                width:45px;
-                height:45px;
+                width:52px;
+                height:52px;
                 background:#f3f4f6;
-                border-radius:8px;
+                border-radius:12px;
                 display:flex;
                 align-items:center;
                 justify-content:center;
-                font-size:18px;
+                font-size:20px;
             ">
                 🏢
             </div>
@@ -182,167 +227,155 @@ audio{
 
     </div>
 
-    <!-- ================= CATEGORY ================= -->
+    <!-- ================= BASIC INFO ================= -->
 
-    <div class="meta">
-        🏢 {{ obj.category|default:"—" }}
-    </div>
+    <div class="section">
 
-    <!-- ================= TYPE ================= -->
+        <div class="meta">
+            🏢 {{ obj.category|default:"—" }}
+        </div>
 
-    {% if obj.type %}
-    <div class="meta">
-        🏗 {{ obj.type }}
-    </div>
-    {% endif %}
-
-    <!-- ================= LOCATION ================= -->
-
-    <div class="meta">
-
-        📍 {{ obj.city|default:"—" }}
-
-        {% if obj.locality %}
-            • {{ obj.locality }}
+        {% if obj.type %}
+        <div class="meta">
+            🏗 {{ obj.type }}
+        </div>
         {% endif %}
 
-        {% if obj.sub_locality %}
-            • {{ obj.sub_locality }}
-        {% endif %}
+        <div class="meta">
 
-    </div>
+            📍 {{ obj.city|default:"—" }}
 
-    <!-- ================= CONTACT ================= -->
+            {% if obj.locality %}
+                • {{ obj.locality }}
+            {% endif %}
 
-    <div class="meta">
-        📞 {{ obj.phone|default:"—" }}
-    </div>
+            {% if obj.sub_locality %}
+                • {{ obj.sub_locality }}
+            {% endif %}
 
-    <!-- ================= WEBSITE ================= -->
+        </div>
 
-    <div class="meta">
+        <div class="meta">
+            📞 {{ obj.phone|default:"—" }}
+        </div>
 
-        🌐
+        <div class="meta">
+            📌 {{ obj.address|default:"—" }}
+        </div>
 
-        {% if obj.website %}
-            <a href="{{ obj.website }}" target="_blank">
-                {{ obj.website }}
-            </a>
-        {% else %}
-            —
+        {% if obj.street %}
+        <div class="meta">
+            🛣 {{ obj.street }}
+        </div>
         {% endif %}
 
     </div>
-
-    <!-- ================= ADDRESS ================= -->
-
-    <div class="meta">
-        📌 {{ obj.address|default:"—" }}
-    </div>
-
-    {% if obj.street %}
-    <div class="meta">
-        🛣 {{ obj.street }}
-    </div>
-    {% endif %}
 
     <!-- ================= DESCRIPTION ================= -->
 
     {% if obj.description %}
-    <div class="meta">
-        📝 {{ obj.description|truncatechars:180 }}
+
+    <div class="section">
+
+        <div class="meta">
+            📝 {{ obj.description|truncatechars:180 }}
+        </div>
+
     </div>
+
     {% endif %}
 
-    <!-- ================= RATING ================= -->
+    <!-- ================= GOOGLE INFO ================= -->
 
-    {% if obj.rating %}
-    <div class="meta">
-        ⭐ {{ obj.rating }} ({{ obj.reviews|default:"0" }} Reviews)
+    <div class="section">
+
+        {% if obj.rating %}
+        <div class="meta">
+            ⭐ {{ obj.rating }} ({{ obj.reviews|default:"0" }} Reviews)
+        </div>
+        {% endif %}
+
+        {% if obj.business_status %}
+        <div class="meta">
+            🗺 {{ obj.business_status }}
+        </div>
+        {% endif %}
+
+        {% if obj.assigned_to %}
+        <div class="meta">
+            👤 Assigned To: {{ obj.assigned_to }}
+        </div>
+        {% endif %}
+
     </div>
-    {% endif %}
-
-    <!-- ================= BUSINESS STATUS ================= -->
-
-    {% if obj.business_status %}
-    <div class="meta">
-        🗺 {{ obj.business_status }}
-    </div>
-    {% endif %}
-
-    <!-- ================= ASSIGNED ================= -->
-
-    {% if obj.assigned_to %}
-    <div class="meta">
-        👤 Assigned To: {{ obj.assigned_to }}
-    </div>
-    {% endif %}
-
-    <hr>
 
     <!-- ================= FOLLOWUP ================= -->
 
     {% if obj.followup %}
 
-    <div class="meta">
+    <div class="section">
 
-        📌 <strong>Followup:</strong><br>
+        <div class="meta">
 
-        Status:
-        {{ obj.followup.status }}
+            📌 <strong>Followup:</strong><br>
 
-        <br>
+            Status:
+            {{ obj.followup.status }}
 
-        Date:
-        {{ obj.followup.followup_date|date:"d M Y, h:i A" }}
+            <br>
 
-        <br>
+            Date:
+            {{ obj.followup.followup_date|date:"d M Y, h:i A" }}
 
-        Assigned:
-        {{ obj.followup.assigned_to|default:"—" }}
+            <br>
 
-        <br>
+            Assigned:
+            {{ obj.followup.assigned_to|default:"—" }}
 
-        Comment:
-        {{ obj.followup.comment|default:"—" }}
+            <br>
+
+            Comment:
+            {{ obj.followup.comment|default:"—" }}
+
+        </div>
 
     </div>
-
-    <hr>
 
     {% endif %}
 
     <!-- ================= MEETING ================= -->
 
-    {% with obj.ahmedabad_realestate_meetings.last as m %}
+    {% with obj.meeting as m %}
 
     {% if m %}
 
-    <div class="meta">
+    <div class="section">
 
-        🤝 <strong>Meeting:</strong><br>
+        <div class="meta">
 
-        Status:
-        {{ m.status }}
+            🤝 <strong>Meeting:</strong><br>
 
-        <br>
+            Status:
+            {{ m.status }}
 
-        Date:
-        {{ m.meeting_date|date:"d M Y, h:i A" }}
+            <br>
 
-        <br>
+            Date:
+            {{ m.meeting_date|date:"d M Y, h:i A" }}
 
-        Assigned:
-        {{ m.assigned_to|default:"—" }}
+            <br>
 
-        <br>
+            Assigned:
+            {{ m.assigned_to|default:"—" }}
 
-        Comment:
-        {{ m.comment|default:"—" }}
+            <br>
+
+            Comment:
+            {{ m.comment|default:"—" }}
+
+        </div>
 
     </div>
-
-    <hr>
 
     {% endif %}
 
@@ -354,23 +387,25 @@ audio{
 
     {% if c %}
 
-    <div class="meta">
+    <div class="section">
 
-        💬 <strong>Last Comment:</strong>
+        <div class="meta">
 
-        {{ c.comment|truncatechars:100 }}
+            💬 <strong>Last Comment:</strong>
 
-        <br>
+            {{ c.comment|truncatechars:100 }}
 
-        👤 {{ c.created_by|default:"—" }}
+            <br>
 
-        |
+            👤 {{ c.created_by|default:"—" }}
 
-        {{ c.create_at|date:"d M Y, h:i A" }}
+            |
+
+            {{ c.create_at|date:"d M Y, h:i A" }}
+
+        </div>
 
     </div>
-
-    <hr>
 
     {% endif %}
 
@@ -382,39 +417,41 @@ audio{
 
     {% if v %}
 
-    <div class="meta">
+    <div class="section">
 
-        🚗 <strong>Last Visit:</strong><br>
+        <div class="meta">
 
-        Visit Type:
-        {{ v.visit_type }}
+            🚗 <strong>Last Visit:</strong><br>
 
-        <br>
+            Visit Type:
+            {{ v.visit_type }}
 
-        Status:
-        {{ v.visit_status }}
+            <br>
 
-        <br>
+            Status:
+            {{ v.visit_status }}
 
-        By:
-        {{ v.created_by|default:"—" }}
+            <br>
 
-        |
+            By:
+            {{ v.created_by|default:"—" }}
 
-        {{ v.create_at|date:"d M Y, h:i A" }}
+            |
 
-        {% if v.comment %}
+            {{ v.create_at|date:"d M Y, h:i A" }}
 
-        <br>
+            {% if v.comment %}
 
-        Note:
-        {{ v.comment|truncatechars:100 }}
+            <br>
 
-        {% endif %}
+            Note:
+            {{ v.comment|truncatechars:100 }}
+
+            {% endif %}
+
+        </div>
 
     </div>
-
-    <hr>
 
     {% endif %}
 
@@ -426,50 +463,56 @@ audio{
 
     {% if vr %}
 
-    <div class="meta">
+    <div class="section">
 
-        🎤 <strong>Voice Recording:</strong>
+        <div class="meta">
 
-        <audio controls>
-            <source src="{{ vr.file.url }}">
-        </audio>
+            🎤 <strong>Voice Recording:</strong>
 
-        <br>
+            <audio controls>
+                <source src="{{ vr.file.url }}">
+            </audio>
 
-        By:
-        {{ vr.uploaded_by|default:"—" }}
+            <br>
 
-        |
+            By:
+            {{ vr.uploaded_by|default:"—" }}
 
-        {{ vr.create_at|date:"d M Y, h:i A" }}
+            |
+
+            {{ vr.create_at|date:"d M Y, h:i A" }}
+
+        </div>
 
     </div>
-
-    <hr>
 
     {% endif %}
 
     {% endwith %}
 
-    <!-- ================= AUDIT ================= -->
+    <!-- ================= TRACKING ================= -->
 
-    <div class="meta">
+    <div class="section">
 
-        👤 Created:
-        {{ obj.created_by|default:"—" }}
+        <div class="meta">
 
-        |
+            👤 Created:
+            {{ obj.created_by|default:"—" }}
 
-        {{ obj.created_at|date:"d M Y, h:i A" }}
+            |
 
-        <br>
+            {{ obj.created_at|date:"d M Y, h:i A" }}
 
-        ✏️ Updated:
-        {{ obj.updated_by|default:"—" }}
+            <br>
 
-        |
+            ✏️ Updated:
+            {{ obj.updated_by|default:"—" }}
 
-        {{ obj.updated_at|date:"d M Y, h:i A" }}
+            |
+
+            {{ obj.updated_at|date:"d M Y, h:i A" }}
+
+        </div>
 
     </div>
 

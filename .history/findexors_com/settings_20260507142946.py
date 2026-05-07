@@ -69,7 +69,7 @@ INSTALLED_APPS = [
     'jobs',
     'job_utility',
     'mumbai',
-    'ahmedabad',
+    'ahmedabad'
     # ... (बाकी user apps) ...
     
     # 3. Django के Core Apps को अब नीचे रखें

@@ -487,7 +487,7 @@ class Comment(models.Model):
     comment = models.CharField(max_length=500, null=True, blank=True)
 
     # 🔥 ADD THESE
-    created_by = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL,related_name="mumbai_comments")
+    created_by = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL)
     updated_by = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL, related_name="+")
     create_at = models.DateTimeField(auto_now_add=True)
     update_at = models.DateTimeField(auto_now=True)# =======================

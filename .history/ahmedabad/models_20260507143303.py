@@ -212,7 +212,7 @@ class MumbaiResponse(models.Model):
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        related_name="mumbai_assigned_responses"
+        related_name="ahmedabad_assigned_responses"
     )
 
     contact_persone = models.CharField(max_length=500, blank=True, null=True)
@@ -229,7 +229,7 @@ class MumbaiResponse(models.Model):
     requirement_types = models.ManyToManyField(
         RequirementType,
         blank=True,
-        related_name="mumbai_requirements"
+        related_name="ahmedabad_requirements"
     )
 
     locality = models.ForeignKey(
@@ -257,7 +257,7 @@ class MumbaiResponse(models.Model):
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        related_name="mumbai_created_responses"
+        related_name="ahmedabad_created_responses"
     )
 
     updated_by = models.ForeignKey(
@@ -265,7 +265,7 @@ class MumbaiResponse(models.Model):
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        related_name="mumbai_updated_responses"
+        related_name="ahmedabad_updated_responses"
     )
 
     create_at = models.DateTimeField(auto_now_add=True)
@@ -312,7 +312,7 @@ class MumbaiRealEstateGMB(models.Model):
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        related_name="mumbai_gmb_categories"
+        related_name="ahmedabad_gmb_categories"
     )
 
     city = models.ForeignKey(
@@ -320,7 +320,7 @@ class MumbaiRealEstateGMB(models.Model):
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        related_name="mumbai_gmb_cities"
+        related_name="ahmedabad_gmb_cities"
     )
 
     locality = models.ForeignKey(
@@ -328,7 +328,7 @@ class MumbaiRealEstateGMB(models.Model):
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        related_name="mumbai_gmb_localities"
+        related_name="ahmedabad_gmb_localities"
     )
 
     sub_locality = models.ForeignKey(
@@ -336,7 +336,7 @@ class MumbaiRealEstateGMB(models.Model):
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        related_name="mumbai_gmb_sublocalities"
+        related_name="ahmedabad_gmb_sublocalities"
     )
 
     # ===========================
@@ -393,7 +393,7 @@ class MumbaiRealEstateGMB(models.Model):
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        related_name="mumbai_gmb_assigned"
+        related_name="ahmedabad_gmb_assigned"
     )
 
     is_active = models.BooleanField(default=True)
@@ -411,7 +411,7 @@ class MumbaiRealEstateGMB(models.Model):
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        related_name="mumbai_gmb_created"
+        related_name="ahmedabad_gmb_created"
     )
 
     updated_by = models.ForeignKey(
@@ -419,7 +419,7 @@ class MumbaiRealEstateGMB(models.Model):
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        related_name="mumbai_gmb_updated"
+        related_name="ahmedabad_gmb_updated"
     )
 
     created_at = models.DateTimeField(auto_now_add=True)
@@ -487,7 +487,7 @@ class Comment(models.Model):
     comment = models.CharField(max_length=500, null=True, blank=True)
 
     # 🔥 ADD THESE
-    created_by = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL,related_name="mumbai_comments")
+    created_by = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL)
     updated_by = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL, related_name="+")
     create_at = models.DateTimeField(auto_now_add=True)
     update_at = models.DateTimeField(auto_now=True)# =======================
@@ -540,7 +540,7 @@ class VoiceRecording(models.Model):
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        related_name="mumbai_voice_uploaded"
+        related_name="ahmedabad_voice_uploaded"
     )
 
     updated_by = models.ForeignKey(
@@ -786,7 +786,7 @@ class Followup(models.Model):
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        related_name="mumbai_followup_created"
+        related_name="ahmedabad_followup_created"
     )
 
     updated_by = models.ForeignKey(
@@ -936,7 +936,7 @@ class Meeting(models.Model):
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        related_name="mumbai_staff_meetings"
+        related_name="ahmedabad_staff_meetings"
     )
 
     comment = models.CharField(
@@ -954,7 +954,7 @@ class Meeting(models.Model):
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        related_name="mumbai_user_created_meetings"
+        related_name="ahmedabad_user_created_meetings"
     )
 
     updated_by = models.ForeignKey(
@@ -962,7 +962,7 @@ class Meeting(models.Model):
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        related_name="mumbai_user_updated_meetings"
+        related_name="ahmedabad_user_updated_meetings"
     )
 
     create_at = models.DateTimeField(auto_now_add=True)
