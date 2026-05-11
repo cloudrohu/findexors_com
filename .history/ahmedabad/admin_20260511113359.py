@@ -832,23 +832,8 @@ class AhmedabadResponseAdmin(AutoUserAdminMixin, admin.ModelAdmin):
             request,
             **kwargs
         )
-        
-    def get_search_results(self, request, queryset, search_term):
 
-        queryset, use_distinct = super().get_search_results(
-            request,
-            queryset,
-            search_term
-        )
 
-        if search_term.lower().startswith("mr"):
-
-            number = search_term.lower().replace("mr", "")
-
-            if number.isdigit():
-                queryset |= self.model.objects.filter(id=int(number))
-
-        return queryset, use_distinct
 @admin.register(Comment)
 class CommentAdmin(admin.ModelAdmin):
 

@@ -1,14 +1,14 @@
 from django.contrib import admin
 from .models import (
-    AhmedabadResponse,
+    MumbaiResponse,
     Comment,
     VoiceRecording,
     Visit,
     Followup,
     Meeting,
     Staff,
-    AhmedabadCompany,
-    AhmedabadRealEstateGMB,
+    MumbaiCompany,
+    MumbaiRealEstateGMB,
 )
 
 from utility.models import (
@@ -38,7 +38,7 @@ class PhoneFilter(admin.SimpleListFilter):
 
 
 from import_export.admin import ImportExportModelAdmin
-from .resources import AhmedabadRealEstateGMBResource
+from .resources import MumbaiRealEstateGMBResource
 
 @admin.register(Staff)
 class StaffAdmin(admin.ModelAdmin):
@@ -90,9 +90,9 @@ class AutoUserAdminMixin:
         # =========================================
 
         from .models import (
-            AhmedabadResponse,
-            AhmedabadCompany,
-            AhmedabadRealEstateGMB,
+            MumbaiResponse,
+            MumbaiCompany,
+            MumbaiRealEstateGMB,
             Meeting,
             Followup
         )
@@ -101,7 +101,7 @@ class AutoUserAdminMixin:
         # RESPONSE
         # =====================================================
 
-        if isinstance(parent, AhmedabadResponse):
+        if isinstance(parent, MumbaiResponse):
 
             has_meeting = Meeting.objects.filter(
                 response=parent
@@ -115,7 +115,7 @@ class AutoUserAdminMixin:
         # COMPANY
         # =====================================================
 
-        elif isinstance(parent, AhmedabadCompany):
+        elif isinstance(parent, MumbaiCompany):
 
             has_meeting = Meeting.objects.filter(
                 company=parent
@@ -129,7 +129,7 @@ class AutoUserAdminMixin:
         # REAL ESTATE
         # =====================================================
 
-        elif isinstance(parent, AhmedabadRealEstateGMB):
+        elif isinstance(parent, MumbaiRealEstateGMB):
 
             has_meeting = Meeting.objects.filter(
                 real_estate=parent
@@ -513,7 +513,7 @@ class MeetingCompanyInline(admin.StackedInline):
 
 
 class MeetingRealestateGMBInline(admin.StackedInline):
-    change_list_template = "admin/ahmedabad/meeting/change_list.html"
+    change_list_template = "admin/mumbai/meeting/change_list.html"
 
     model = Meeting
     extra = 0
@@ -538,11 +538,11 @@ class MeetingRealestateGMBInline(admin.StackedInline):
         "update_at",
     )
 
-@admin.register(AhmedabadRealEstateGMB)
-class AhmedabadRealEstateGMBAdmin(ImportExportModelAdmin):
-#class AhmedabadRealEstateGMBAdmin(AutoUserAdminMixin, admin.ModelAdmin):
-    change_list_template = "admin/ahmedabad/ahmedabadrealestategmb/change_list.html"
-    resource_class = AhmedabadRealEstateGMBResource
+@admin.register(MumbaiRealEstateGMB)
+#class MumbaiRealEstateGMBAdmin(ImportExportModelAdmin):
+class MumbaiRealEstateGMBAdmin(AutoUserAdminMixin, admin.ModelAdmin):
+    change_list_template = "admin/mumbai/mumbairealestategmb/change_list.html"
+    resource_class = MumbaiRealEstateGMBResource
 
 
     # 🔥 LIST VIEW (table columns)
@@ -705,7 +705,7 @@ class AhmedabadRealEstateGMBAdmin(ImportExportModelAdmin):
 
         if db_field.name == "locality":
             kwargs["queryset"] = Locality.objects.filter(
-                city__name="Ahmedabad"
+                city__name="Mumbai"
             )
 
         return super().formfield_for_foreignkey(
@@ -719,10 +719,10 @@ class AhmedabadRealEstateGMBAdmin(ImportExportModelAdmin):
 # =====================================================
 # ✅ COMPANY ADMIN (CARD UI)
 # =====================================================
-@admin.register(AhmedabadCompany)
-class AhmedabadCompanyAdmin(AutoUserAdminMixin, admin.ModelAdmin):
+@admin.register(MumbaiCompany)
+class MumbaiCompanyAdmin(AutoUserAdminMixin, admin.ModelAdmin):
 
-    change_list_template = "admin/ahmedabad/company/card_list.html"
+    change_list_template = "admin/mumbai/company/card_list.html"
     list_per_page = 20
     preserve_filters = True
 
@@ -756,7 +756,7 @@ class AhmedabadCompanyAdmin(AutoUserAdminMixin, admin.ModelAdmin):
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         if db_field.name == "locality":
-            kwargs["queryset"] = Locality.objects.filter(city__name="Ahmedabad")
+            kwargs["queryset"] = Locality.objects.filter(city__name="Mumbai")
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
 
@@ -764,11 +764,11 @@ class AhmedabadCompanyAdmin(AutoUserAdminMixin, admin.ModelAdmin):
 # =======================
 # MAIN ADMIN (NO TABS)
 # =======================
-@admin.register(AhmedabadResponse)
-class AhmedabadResponseAdmin(AutoUserAdminMixin, admin.ModelAdmin):
+@admin.register(MumbaiResponse)
+class MumbaiResponseAdmin(AutoUserAdminMixin, admin.ModelAdmin):
 
     preserve_filters = True
-    change_list_template = "admin/ahmedabad/ahmedabadresponse/change_list.html"
+    change_list_template = "admin/mumbai/mumbairesponse/change_list.html"
 
     list_display = (
         "id",
@@ -783,7 +783,7 @@ class AhmedabadResponseAdmin(AutoUserAdminMixin, admin.ModelAdmin):
 
     list_filter = ("status", "lead_source", "is_converted",)
 
-    search_fields = ( "id", "contact_no", "business_name", "contact_persone")
+    search_fields = ("contact_no", "business_name", "contact_persone")
 
     readonly_fields = ("created_by", "updated_by","create_at", "update_at", "converted_at")
 
@@ -824,7 +824,7 @@ class AhmedabadResponseAdmin(AutoUserAdminMixin, admin.ModelAdmin):
 
         if db_field.name == "locality":
             kwargs["queryset"] = Locality.objects.filter(
-                city__name="Ahmedabad"
+                city__name="Mumbai"
             )
 
         return super().formfield_for_foreignkey(
@@ -832,7 +832,6 @@ class AhmedabadResponseAdmin(AutoUserAdminMixin, admin.ModelAdmin):
             request,
             **kwargs
         )
-        
     def get_search_results(self, request, queryset, search_term):
 
         queryset, use_distinct = super().get_search_results(
@@ -849,6 +848,7 @@ class AhmedabadResponseAdmin(AutoUserAdminMixin, admin.ModelAdmin):
                 queryset |= self.model.objects.filter(id=int(number))
 
         return queryset, use_distinct
+
 @admin.register(Comment)
 class CommentAdmin(admin.ModelAdmin):
 
@@ -866,7 +866,7 @@ class CommentAdmin(admin.ModelAdmin):
 
 @admin.register(VoiceRecording)
 class VoiceRecordingAdmin(admin.ModelAdmin):
-    change_list_template = "admin/ahmedabad/voicerecording/change_form.html"
+    change_list_template = "admin/mumbai/voicerecording/change_form.html"
 
 
     list_display = (
@@ -907,7 +907,7 @@ class VisitAdmin(admin.ModelAdmin):
 
 @admin.register(Followup)
 class FollowupAdmin(admin.ModelAdmin):
-    change_list_template = "admin/ahmedabad/followup/change_list.html"
+    change_list_template = "admin/mumbai/followup/change_list.html"
 
 
     list_display = (
@@ -950,7 +950,7 @@ class FollowupAdmin(admin.ModelAdmin):
 
 @admin.register(Meeting)
 class MeetingAdmin(admin.ModelAdmin):
-    change_list_template = "admin/ahmedabad/meeting/change_list.html"
+    change_list_template = "admin/mumbai/meeting/change_list.html"
     
     
 
