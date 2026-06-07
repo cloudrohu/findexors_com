@@ -45,9 +45,9 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = [    
-
+    "admin_interface",
+    "colorfield",
     'tabbed_admin',
-    'jazzmin',          
     'rangefilter',
     'multiselectfield',
     'import_export',
@@ -63,7 +63,7 @@ INSTALLED_APPS = [
     'useremail.apps.UseremailConfig',
     'crm.apps.CrmConfig',
     'user.apps.UserConfig',
-    'projects.apps.ProjectsConfig',
+    'properties.apps.PropertiesConfig',
     "realestate",
     "realtypms",
     'jobs',

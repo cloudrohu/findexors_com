@@ -11,7 +11,7 @@ from utility.models import (
     City, Locality, Category, Sub_Locality
 )
 from response.models import Staff
-from projects.models import Project  # Project Import
+from properties.models import Project 
 
 # ============================================================
 # COMPANY MODEL

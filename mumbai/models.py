@@ -18,7 +18,7 @@ from utility.models import (
 )
 
 from response.models import Staff
-from projects.models import Project  # Project Import
+from properties.models import Project  # Project Import
 
 def clean_phone_last10(phone: str):
     if not phone:

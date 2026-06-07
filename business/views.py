@@ -18,7 +18,7 @@ from .models import Company, Comment, VoiceRecording, Visit, Meeting, Followup
 from response.models import Staff
 from utility.models import Locality, Sub_Locality, Category, City
 
-from projects.models import Project
+from properties.models import Project
 # 🎯 Import forms
 from .forms import CompanyForm, CommentForm, VoiceRecordingForm, VisitForm, MeetingForm
 

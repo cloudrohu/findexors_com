@@ -6,7 +6,7 @@ from django.utils.html import mark_safe
 
 from response.models import Staff
 from utility.models import City, Locality, Category, Sub_Locality
-from projects.models import Project
+from properties.models import Project
 
 
 # ✅ Phone Cleaner: last 10 digit + multiple numbers safe
