@@ -1,0 +1,1731 @@
+  {% load static %}
+  {% load humanize %}
+
+
+<main>
+
+  <!-- ======================= FEATURE PROJECTS ======================= -->
+  <section class="bg-[#f8fafc] py-16 relative overflow-hidden">
+    <div class="max-w-7xl mx-auto px-4">
+
+      <!-- Section Title -->
+      <div class="text-center mb-6">
+        <h2 class="text-3xl md:text-4xl font-bold text-orange-400 uppercase tracking-wide">
+          Featured Projects
+        </h2>
+        <p class="text-gray-400 text-sm md:text-base p-1">
+          Explore Our Best And Most Popular Real Estate Projects
+        </p>
+      </div>
+
+      <!-- Swiper Container -->
+      <div class="relative">
+        <div class="swiper featureSwiper">
+          <div class="swiper-wrapper">
+
+            {% for rs in project_featured %}
+            <div class="swiper-slide">
+              <div class="bg-white shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-200">
+
+                <!-- Image Section -->
+                <div class="relative h-60 w-full overflow-hidden">
+                  {% if rs.image %}
+                    <img src="{{ rs.image.url }}" alt="{{ rs.project_name }} " class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-110" loading="lazy">
+                  {% else %}
+                    <img src="{% static 'images/default-placeholder.jpg' %}" alt="Premium real estate project in Mumbai" class="w-full h-full object-cover" loading="lazy">
+                  {% endif %}
+
+                    <span class="absolute top-3 left-3 bg-orange-500/90 backdrop-blur text-white text-[11px] font-semibold px-3 py-1 uppercase tracking-wide shadow-md border border-white/20">
+                        {{ rs.propert_type }}
+                    </span>
+
+                      <span class="absolute bottom-3 right-3 bg-black/70 backdrop-blur text-white text-[11px] font-semibold px-3 py-1 shadow-md border border-white/20">
+                        {{ rs.construction_status }}
+                      </span>
+
+                  <!-- Hover Icons -->
+                  <div class="absolute inset-0 bg-black/40 flex items-center justify-center gap-4 opacity-0 hover:opacity-100 transition duration-300">
+                    <a href="{{ rs.get_absolute_url }}" class="bg-white p-3 rounded-full shadow hover:bg-orange-500 hover:text-white transition">
+                      <i class="fas fa-link"></i>
+                    </a>
+                    <a href="{{ rs.get_absolute_url }}" class="bg-white p-3 rounded-full shadow hover:bg-orange-500 hover:text-white transition">
+                      <i class="fas fa-video"></i>
+                    </a>
+                  </div>
+                  
+                </div>
+
+                <!-- Content -->
+                <div class="p-3 space-y-2">
+
+                    <div class="bg-white border border-gray-200 p-2 shadow-sm hover:shadow-md transition">
+
+                          <!-- TOP ROW -->
+                          <div class="flex items-start justify-between gap-1">
+
+                            <div class="flex-1">
+                            <h3 class="text-lg font-semibold text-gray-900 hover:text-orange-600 transition leading-tight line-clamp-2">
+                              {{ rs.project_name }}
+                            </h3>
+
+                            <p class="text-sm text-gray-600 flex items-center gap-1 mt-1">
+                                <i class="fas fa-map-marker-alt text-orange-500"></i>
+                                {{ rs.locality.name }}
+                              </p>
+                            </div>
+
+                            <div class="text-right shrink-0">
+                              {% if rs.min_price and rs.max_price %}
+                                <p class="text-sm font-bold text-orange-600">
+                                  ₹ – ₹
+                                </p>
+                              {% elif rs.min_price %}
+                                <p class="text-sm font-bold text-orange-600">
+                                  ₹+
+                                </p>
+                              {% else %}
+                                <p class="text-xs text-gray-400 italic">
+                                  Price on request
+                                </p>
+                              {% endif %}
+                            </div>
+
+                          </div>
+
+                          <!-- DIVIDER -->
+                          <div class="border-t border-gray-100 my-2"></div>
+
+                          <!-- BOTTOM ROW -->
+                          <div class="flex items-center justify-between text-sm">
+
+                            <!-- Developer -->
+                            <div>
+                              <span class="text-xs uppercase tracking-wide text-gray-400">Developer</span>
+                              <p class="font-semibold text-gray-700">
+                                {{ rs.developer }}
+                              </p>
+                            </div>
+
+                              <!-- Area -->
+                              <div class="text-right">
+                                <span class="text-xs uppercase tracking-wide text-gray-400">Carpet Start</span>
+                              <p class="font-semibold text-gray-700">
+                                {{ rs.get_carpet_area_range|cut:" sqft"|slice:":4" }} sqft
+                              </p>
+                              </div>
+
+                            <!-- Possession -->
+                            <div class="text-right">
+                              <span class="text-xs uppercase tracking-wide text-gray-400">Possession</span>
+                              <p class="font-semibold text-green-700">
+                                {{ rs.possession_month }} {{ rs.possession_year }}
+                              </p>
+                            </div>
+
+                          </div>
+
+                    </div>
+
+                    <!-- ================= CONFIGURATION CARD ================= -->
+                    <div class="config-card border bg-white mt-2 h-[140px] flex flex-col overflow-hidden">
+
+                      {% with rs.configurations.all as configs %}
+                      {% if configs %}
+                      {% regroup configs by bhk_type as bhk_groups %}
+
+                      <!-- ================= TABS ================= -->
+                      <div class="border-b border-gray-200 flex-shrink-0">
+                        <div class="bhk-tabs flex gap-1 text-sm font-semibold px-2 py-1 whitespace-nowrap relative">
+                          <span class="bhk-underline absolute bottom-0 h-[3px]"></span>
+
+                          {% for group in bhk_groups %}
+                          <button type="button"
+                            class="bhk-tab px-3 py-2 transition-all {% if forloop.first %}active{% endif %}"
+                            data-target="bhk-{{ rs.id }}-{{ forloop.counter }}">
+                            {{ group.grouper }}
+                          </button>
+                          {% endfor %}
+                        </div>
+                      </div>
+
+                      <!-- ================= PANELS ================= -->
+                      <div class="flex-1 overflow-hidden">
+
+                        {% for group in bhk_groups %}
+                        <div class="bhk-panel {% if not forloop.first %}hidden{% endif %} h-full"
+                          data-panel="bhk-{{ rs.id }}-{{ forloop.counter }}">
+
+                          <div class="table-scroll h-full overflow-y-auto bg-white">
+
+                            <table class="w-full text-xs sm:text-sm border-collapse">
+                              <thead class="bg-gray-50 sticky top-0">
+                                <tr class="text-center font-bold text-gray-700">
+                                  <th class="px-2 py-2 border-b">Area</th>
+                                  <th class="px-2 py-2 border-b">Price</th>
+                                  <th class="px-2 py-2 border-b">Parking</th>
+                                  <th class="px-2 py-2 border-b">Balcony</th>
+                                </tr>
+                              </thead>
+
+                              <tbody class="text-center">
+                                {% for cfg in group.list %}
+                                <tr class="h-[32px] {% if cfg.sold_out %}bg-red-50{% endif %}">
+                                  <td class="px-2 py-2 border-b">{{ cfg.area_sqft }} sqft</td>
+
+                                  <td class="px-2 py-2 border-b font-semibold">
+                                    {% if cfg.sold_out %}
+                                      <span class="bg-red-100 text-red-700 px-2 py-0.5 text-[11px] font-bold">SOLD OUT</span>
+                                    {% else %}
+                                      <span class="font-extrabold text-orange-600">{{ cfg.formatted_price }}</span>
+                                    {% endif %}
+                                  </td>
+
+                                  <td class="px-2 py-2 border-b">
+                                    {{ cfg.parking|yesno:"Yes,*" }}
+                                  </td>
+
+                                  <td class="px-2 py-2 border-b">
+                                    {{ cfg.balcony|yesno:"Yes,*" }}
+                                  </td>
+                                </tr>
+                                {% endfor %}
+                              </tbody>
+                            </table>
+
+                          </div>
+                        </div>
+                        {% endfor %}
+
+                      </div>
+
+                      {% else %}
+                      <!-- ================= NO CONFIG ================= -->
+                      <div class="flex-1 flex items-center justify-center text-sm text-gray-500 text-center px-2">
+                        Configuration details available on request
+                      </div>
+                      {% endif %}
+                      {% endwith %}
+
+                    </div>
+
+                </div>
+
+                <!-- Footer Button -->
+                <div class="bg-orange-500 text-center py-1 hover:bg-orange-600 transition">
+                  <div class="px-2 pb-1">
+                    <a href="{{ rs.get_absolute_url }}" target="_blank" class="block text-center py-2.5 font-bold tracking-wide text-sm text-white bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 transition shadow-md">
+                      SEE DETAILS
+                    </a>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+
+            {% empty %}
+            <p class="col-span-3 text-center text-gray-500">No featured projects available at the moment.</p>
+            {% endfor %}
+          </div>
+        </div>
+        <br>
+        <!-- Swiper Pagination & Arrows -->
+        <div class="swiper-pagination mt-12"></div>
+        <div class="swiper-button-prev !text-orange-500 !left-0 -translate-x-8 scale-90"></div>
+        <div class="swiper-button-next !text-orange-500 !right-0 translate-x-8 scale-90"></div>
+      </div>
+
+    </div>
+  </section>
+
+  <script>
+    var swiper = new Swiper(".featureSwiper", {
+      slidesPerView: 1,
+      spaceBetween: 20,
+      loop: true,
+      autoplay: {
+        delay: 3000, // Auto slide every 3 seconds
+        disableOnInteraction: false,
+        pauseOnMouseEnter: true, // pause on hover
+      },
+      pagination: {
+        el: ".swiper-pagination",
+        clickable: true,
+      },
+      navigation: {
+        nextEl: ".swiper-button-next",
+        prevEl: ".swiper-button-prev",
+      },
+    breakpoints: {
+      0: { slidesPerView: 1 },
+      640: { slidesPerView: 1 },
+      768: { slidesPerView: 2 },
+      1024: { slidesPerView: 3 }
+    },
+    });
+  </script>
+  <!-- ======================= FEATURE PROJECTS ======================= -->
+
+  <!-- ======================= FEATURE PROPERTIES ======================= -->
+   {% if rental_properties %}
+  <section class="bg-gray-100 py-8">
+    <div class="max-w-7xl mx-auto px-6">
+
+      <!-- Heading -->
+      <div class="text-center mb-8">
+        <h2 class="text-4xl font-bold">
+          Featured <span class="text-[#c6a16e]">Properties</span>
+        </h2>
+      </div>
+
+        <!-- Swiper -->
+      <div class="swiper rentPropSwiper h-full">
+        <div class="swiper-wrapper">
+
+          {% for property in rental_properties %}
+          <div class="swiper-slide flex h-auto">
+            <div class="bg-white rounded-lg shadow-md hover:shadow-xl transition duration-300 overflow-hidden flex flex-col w-full h-full">
+
+
+              <!-- Image -->
+              <div class="relative">
+                {% if property.image %}
+                  <img src="{{ property.image.url }}" class="w-full h-56 object-cover"  alt="{{ property.title }}">
+                {% else %}
+                  <img src="https://via.placeholder.com/800x500" class="w-full h-56 object-cover" alt="No Image">
+                {% endif %}
+
+                {% if property.configuration %}
+                <span class="absolute top-4 right-4 bg-[#c6a16e] text-white text-xs px-3 py-1 font-semibold">
+                  {{ property.configuration }}
+                </span>
+                {% endif %}
+              </div>
+
+              <!-- Content -->
+              <div class="p-6 flex flex-col flex-grow">
+                <h3 class="text-lg font-semibold">
+                  {{ property.title }}
+                </h3>
+
+                <p class="text-sm text-gray-500 mb-4">
+                  {{ property.locality.name }}, {{ property.city.name }}
+                </p>
+
+                <div class="space-y-2 text-sm text-gray-600">
+
+                  {% if property.furnishing_type %}
+                  <p>
+                    <i class="fa-solid fa-couch text-[#c6a16e] mr-2"></i>
+                    {{ property.furnishing_type.name }}
+                  </p>
+                  {% endif %}
+
+                  {% if property.tenant_type %}
+                  <p>
+                    <i class="fa-solid fa-users text-[#c6a16e] mr-2"></i>
+                    {{ property.tenant_type.name }}
+                  </p>
+                  {% endif %}
+
+                  <p>
+                    <i class="fa-solid fa-location-dot text-[#c6a16e] mr-2"></i>
+                    {{ property.city.name }}
+                  </p>
+                </div>
+
+                <!-- Price + Button -->
+                <div class="border-t border-gray-200 pt-3 mt-auto flex items-center justify-between">
+                  <div>
+                    <h4 class="text-xl font-bold text-[#c6a16e]">
+                      <i class="fa-solid fa-indian-rupee-sign mr-1"></i>
+                      {{ property.rent_details.monthly_rent|default:"0" }}
+                    </h4>
+                    <p class="text-xs text-gray-500">per month</p>
+                  </div>
+
+                  <a href="{% url 'rental_detail' property.slug %}"
+                    class="bg-[#c6a16e] text-white px-4 py-2 text-sm font-semibold rounded-lg transition-all duration-300 ease-in-out hover:bg-[#b8925a] hover:shadow-xl hover:scale-105">
+                    View Details
+                  </a>
+                </div>
+
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+
+        </div>
+
+        <div class="swiper-button-prev !text-[#c6a16e] scale-90"></div>
+        <div class="swiper-button-next !text-[#c6a16e] scale-90"></div>
+      </div>
+
+    </div>
+  </section>
+  {% else %}
+  <section class="bg-gray-100 py-16">
+    <div class="max-w-4xl mx-auto text-center px-6">
+
+      <!-- Icon -->
+      <div class="flex justify-center mb-6">
+        <div class="w-20 h-20 flex items-center justify-center rounded-full bg-white shadow-md">
+          <i class="fa-solid fa-house text-4xl text-[#c6a16e]"></i>
+        </div>
+      </div>
+
+      <!-- Heading -->
+      <h2 class="text-3xl font-bold text-gray-800 mb-3">
+        No Featured Properties Available
+      </h2>
+
+      <!-- Description -->
+      <p class="text-gray-500 max-w-xl mx-auto mb-6">
+        Currently there are no featured rental properties available in this location.
+        Please check back later or explore other listings.
+      </p>
+
+      <!-- Button -->
+      <a href="" class="inline-block bg-[#c6a16e] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#b8925a] transition">
+        Browse All Properties
+      </a>
+
+    </div>
+  </section>
+  {% endif %}
+  <!-- ======================= FEATURE PROPERTIES END ======================= -->
+
+  <!-- ======================= NEW LAUNCH PROJECTS ======================= -->
+  <section class="py-12" data-aos="fade-up">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6">
+      
+          <!-- Title -->
+          <h2 class="text-2xl sm:text-3xl font-extrabold text-center mb-8 text-orange-600 uppercase">
+            NEW LAUNCH PROJECTS
+          </h2>
+
+          <!-- Tabs -->
+          <div class="flex flex-wrap justify-center mb-8 gap-3">
+            <button data-tab="residential" class="tab-btn active px-6 py-2 font-semibold shadow transition">
+              Residential
+            </button>
+            <button data-tab="commercial" class="tab-btn bg-gray-200 text-gray-800 px-6 py-2 font-semibold hover:bg-orange-200 transition">
+              Commercial
+            </button>
+          </div>
+
+          <!-- residential TAB -->
+          <div id="residential" class="tab-content">
+            <div class="swiper newLaunchSwiper">
+              <div class="swiper-wrapper">
+
+                {% for project in new_launch_residential %}
+                <div class="swiper-slide bg-white flex flex-col overflow-hidden border border-gray-200 hover:shadow-xl transition min-h-[520px] max-h-[520px]">
+
+                    <!-- IMAGE SECTION -->
+                    <div class="relative h-[180px] sm:h-[210px] lg:h-[230px] overflow-hidden">
+
+                      {% if project.image %}
+                        <img src="{{ project.image.url }}" class="w-full h-full object-cover object-center transition-transform duration-500 hover:scale-105" alt="{{ project.project_name }}" loading="lazy">
+                      {% else %}
+                        <img src="https://dummyimage.com/400x250/cccccc/000000&text=No+Image" class="w-full h-full object-cover" alt="Premium real estate project in Mumbai">
+                      {% endif %}
+
+                      <span class="absolute top-3 left-3 bg-orange-500 text-white text-xs px-3 py-1 rounded">
+                        NEW LAUNCH
+                      </span>
+
+                      <span class="absolute bottom-3 right-3 bg-black text-white text-xs px-3 py-1 rounded">
+                        Residential
+                      </span>
+                    </div>
+
+                    <!-- CONTENT -->
+                    <div class="p-4 flex flex-col flex-grow">
+
+                      <h3 class="text-lg font-bold text-gray-800 leading-snug line-clamp-2">
+                        {{ project.project_name }}
+                      </h3>
+
+                      <p class="text-sm text-gray-600 mt-1">
+                        <i class="fas fa-map-marker-alt text-orange-500"></i>
+                        {{ project.locality.name }}, {{ project.city.name }}
+                      </p>
+
+                      <!-- ================= CONFIGURATION CARD ================= -->
+                      <div class="config-card border bg-white mt-3 overflow-hidden max-h-[170px] flex flex-col">
+
+                        {% with project.configurations.all as configs %}
+                        {% if configs %}
+                        {% regroup configs by bhk_type as bhk_groups %}
+
+                        <!-- BHK TABS -->
+                        <div class="relative overflow-x-auto border-b border-gray-200">
+                          <div class="bhk-tabs flex gap-1 text-sm font-semibold whitespace-nowrap px-2 py-1 relative">
+                            <span class="bhk-underline absolute bottom-0 h-[3px] bg-orange-500 transition-all"></span>
+
+                            {% for group in bhk_groups %}
+                              <button type="button"
+                                class="bhk-tab px-3 py-2 rounded-md transition-all duration-200 {% if forloop.first %}active{% endif %}"
+                                data-target="bhk-{{ project.id }}-{{ forloop.counter }}">
+                                {{ group.grouper }}
+                              </button>
+                            {% endfor %}
+                          </div>
+                        </div>
+
+                        <!-- PANELS -->
+                        {% for group in bhk_groups %}
+                        <div class="bhk-panel {% if not forloop.first %}hidden{% endif %}"
+                            data-panel="bhk-{{ project.id }}-{{ forloop.counter }}">
+
+                          <div class="table-scroll bg-white overflow-y-auto flex-1 max-h-[95px]">
+
+                            <table class="w-full text-xs sm:text-sm border-collapse">
+
+                              <thead class="bg-gray-50 sticky top-0 z-10">
+                                <tr class="text-center font-bold text-gray-700">
+                                  <th class="px-2 py-2 border-b">Area</th>
+                                  <th class="px-2 py-2 border-b">Price</th>
+                                  <th class="px-2 py-2 border-b">Parking</th>
+                                  <th class="px-2 py-2 border-b">Balcony</th>
+                                </tr>
+                              </thead>
+
+                              <tbody class="text-center">
+                                {% for cfg in group.list %}
+                                <tr class="h-[32px] {% if cfg.sold_out %}bg-red-50{% endif %}">
+
+                                  <td class="px-2 py-2 border-b text-gray-800">
+                                    {{ cfg.area_sqft }} sqft
+                                  </td>
+
+                                  <td class="px-2 py-2 border-b font-semibold">
+                                    {% if cfg.sold_out %}
+                                      <span class="px-2 py-0.5 bg-red-100 text-red-700 text-[11px] font-bold">
+                                        SOLD OUT
+                                      </span>
+                                    {% else %}
+                                      <span class="font-extrabold text-orange-600">
+                                        {{ cfg.formatted_price }}
+                                      </span>
+                                    {% endif %}
+                                  </td>
+
+                                  <td class="px-2 py-2 border-b">
+                                    {% if cfg.parking %}
+                                      <span class="text-green-600 font-bold">Yes</span>
+                                    {% else %}
+                                      <span class="text-gray-500">*</span>
+                                    {% endif %}
+                                  </td>
+
+                                  <td class="px-2 py-2 border-b">
+                                    {% if cfg.balcony %}
+                                      <span class="text-green-600 font-bold">Yes</span>
+                                    {% else %}
+                                      <span class="text-gray-500">*</span>
+                                    {% endif %}
+                                  </td>
+
+                                </tr>
+                                {% endfor %}
+                              </tbody>
+
+                            </table>
+
+                          </div>
+                        </div>
+                        {% endfor %}
+
+                        {% else %}
+                        <div class="text-center text-sm text-gray-500 py-3">
+                          Configuration details available on request
+                        </div>
+                        {% endif %}
+                        {% endwith %}
+
+                      </div>
+
+                    </div>
+
+                    <!-- BUTTON -->
+                    <div class="bg-orange-500 mt-auto text-center hover:bg-orange-600 transition">
+                      <a href="{{ project.get_absolute_url }}" target="_blank"
+                        class="block text-white font-bold w-full py-3 uppercase text-center hover:bg-orange-600 transition">
+                        See Details
+                      </a>
+                    </div>
+
+                </div>
+
+                {% empty %}
+                  <p class="text-center text-gray-500">No Residential New Launch Projects</p>
+                {% endfor %}
+
+              </div>
+
+              
+            </div>
+          </div>
+
+
+          <!-- COMMERCIAL TAB -->
+          <div id="commercial" class="tab-content hidden">
+          <div class="swiper newLaunchSwiper">
+              <div class="swiper-wrapper">
+
+                {% for project in new_launch_commercial %}
+                <div class="swiper-slide bg-white shadow-lg rounded overflow-hidden border-t-4 border-orange-500 hover:shadow-xl transition">
+
+                  <div class="relative">
+                    {% if project.image %}
+                      <img src="{{ project.image.url }}" class="w-full h-48 object-cover" alt="{{ project.project_name }}" loading="lazy">
+                    {% else %}
+                      <img src="https://dummyimage.com/400x250/cccccc/000000&text=No+Image" class="w-full h-48 object-cover" alt="Premium real estate project in Mumbai">
+                    {% endif %}
+
+                    <span class="absolute top-3 left-3 bg-orange-500 text-white text-xs px-3 py-1 ">
+                      NEW LAUNCH
+                    </span>
+
+                    <span class="absolute bottom-3 right-3 bg-black text-white text-xs px-3 py-1 ">
+                      Commercial
+                    </span>
+                  </div>
+
+                  <div class="p-4">
+                    <p class="text-lg font-bold text-gray-700">
+                      {{ project.project_name }}
+                    </p>
+
+                    <p class="text-orange-600 font-semibold mt-1">
+                      {{ project.get_configuration_details|linebreaksbr }}
+                    </p>
+
+                    <p class="text-sm text-gray-600 mt-1">
+                      <i class="fas fa-map-marker-alt text-orange-500"></i>
+                      {{ project.locality.name }}, {{ project.city.name }}
+                    </p>
+                  </div>
+
+                  <div class="bg-orange-500 text-center">
+                    <a href="{{ project.get_absolute_url }}"
+                      class="block text-white font-bold w-full py-3 uppercase">
+                      See Details
+                    </a>
+                  </div>
+                </div>
+                {% empty %}
+                  <p class="text-center text-gray-500">No Commercial New Launch Projects</p>
+                {% endfor %}
+
+              </div>
+            </div>
+          </div>
+
+
+    </div>
+  </section>
+  <!-- ======================= NEW LAUNCH PROJECTS END ======================= -->
+
+  <!-- ======================= POSSESSION STATUS (UNIQUE) ======================= -->
+  <section class="py-16 bg-gradient-to-b from-gray-50 to-white relative overflow-hidden">
+
+    <!-- Decorative blobs -->
+    <div class="absolute -top-20 -left-20 w-72 h-72 bg-orange-200/30 blur-3xl"></div>
+    <div class="absolute -bottom-28 -right-24 w-80 h-80 bg-blue-200/30 blur-3xl"></div>
+
+    <div class="max-w-7xl mx-auto px-6 grid lg:grid-cols-12 gap-10 items-start relative z-10">
+
+      <!-- LEFT INFO -->
+      <div class="lg:col-span-4">
+
+        <!-- Vertical accent title -->
+        <div class="flex items-start gap-4">
+          <div class="w-2 h-20 bg-gradient-to-b from-orange-500 to-yellow-400 mt-2"></div>
+
+          <div>
+            <p class="text-sm font-bold tracking-widest text-gray-500 uppercase">Possession Dashboard</p>
+            <h2 class="text-4xl font-extrabold text-gray-900 leading-tight mt-1">Explore Projects by <span class="text-orange-600">Possession Status</span></h2>
+            <p class="text-gray-600 mt-3 max-w-md">Choose your preference — ready, early possession, or new launch projects. Filter your listings with one click.</p>
+          </div>
+        </div>
+
+        <!-- CTA -->
+        <div class="mt-6">
+          <a href="{% url 'search_projects' %}" target="_blank" class="inline-flex items-center justify-center px-7 py-3 text-white font-bold bg-gradient-to-r from-[#002D62] to-[#0b4aa0] shadow hover:opacity-95 transition">View All Projects</a>
+        </div>
+
+      </div>
+
+      <!-- RIGHT CARDS -->
+      <div class="lg:col-span-8 grid md:grid-cols-3 gap-6">
+
+        <!-- CARD 1 -->
+        <a target="_blank" href="{% url 'search_projects' %}?bhk=&construction_status=Ready+To+Move&rera=" class="group relative  overflow-hidden shadow-lg border border-gray-100">
+          <img src="https://sigmahomes.co.in/media/images/aerial_view-new.webp" class="w-full h-72 object-cover group-hover:scale-110 transition duration-700" alt="Ready to Move" >
+          <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+
+          <div class="absolute top-4 left-4">
+            <span class="px-4 py-1.5 text-xs font-extrabold bg-white/15 backdrop-blur text-white border border-white/25">READY TO MOVE</span>
+          </div>
+
+          <div class="absolute bottom-4 left-4 right-4">
+            <div class="flex items-end justify-between">
+              <div>
+                <h3 class="text-xl font-extrabold text-white">Ready Homes</h3>
+                <p class="text-white/80 text-sm mt-1">Immediate possession options</p>
+              </div>
+              <div class="text-right">
+                <p class="text-2xl font-extrabold text-white leading-none">{{ possession_counts.ready_to_move|default:"0" }}</p>
+                <p class="text-white/80 text-xs font-bold uppercase tracking-wide">Projects</p>
+              </div>
+            </div>
+
+            <div class="mt-4 h-10 rounded-2xl bg-white/10 backdrop-blur border border-white/15 flex items-center justify-between px-4 opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition">
+              <span class="text-white font-bold text-sm">Explore</span><span class="text-white text-sm">→</span>
+            </div>
+          </div>
+        </a>
+
+        <!-- CARD 2 -->
+        <a target="_blank" href="{% url 'search_projects' %}?bhk=&construction_status=Under+Construction&rera=" class="group relative  overflow-hidden shadow-lg border border-gray-100">
+          <img src="https://sigmahomes.co.in/media/images/Elevation_Render_1_fQvU_1.webp" class="w-full h-72 object-cover group-hover:scale-110 transition duration-700" alt="Early Possession">
+          <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+
+          <div class="absolute top-4 left-4">
+            <span class="px-4 py-1.5 text-xs font-extrabold bg-white/15 backdrop-blur text-white border border-white/25">Under Construction</span>
+          </div>
+
+          <div class="absolute bottom-4 left-4 right-4">
+            <div class="flex items-end justify-between">
+              <div>
+                <h3 class="text-xl font-extrabold text-white">Under Construction</h3>
+                <p class="text-white/80 text-sm mt-1">Possession in near future</p>
+              </div>
+              <div class="text-right">
+                <p class="text-2xl font-extrabold text-white leading-none">{{ possession_counts.under_construction|default:"0" }}</p>
+                <p class="text-white/80 text-xs font-bold uppercase tracking-wide">Projects</p>
+              </div>
+            </div>
+
+            <div class="mt-4 h-10 rounded-2xl bg-white/10 backdrop-blur border border-white/15 flex items-center justify-between px-4 opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition">
+              <span class="text-white font-bold text-sm">Explore</span><span class="text-white text-sm">→</span>
+            </div>
+          </div>
+        </a>
+
+        <!-- CARD 3 -->
+        <a target="_blank" href="{% url 'search_projects' %}?bhk=&construction_status=New+Launch&rera=" class="group relative  overflow-hidden shadow-lg border border-gray-100">
+          <img src="https://sigmahomes.co.in/media/images/Road-To-Elevation-3.webp" class="w-full h-72 object-cover group-hover:scale-110 transition duration-700" alt="New Launch">
+          <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+
+          <div class="absolute top-4 left-4">
+            <span class="px-4 py-1.5 text-xs font-extrabold bg-white/15 backdrop-blur text-white border border-white/25">NEW LAUNCH</span>
+          </div>
+
+          <div class="absolute bottom-4 left-4 right-4">
+            <div class="flex items-end justify-between">
+              <div>
+                <h3 class="text-xl font-extrabold text-white">New Launch</h3>
+                <p class="text-white/80 text-sm mt-1">Fresh listings & launches</p>
+              </div>
+              <div class="text-right">
+                <p class="text-2xl font-extrabold text-white leading-none">{{ possession_counts.new_launch|default:"0" }}</p>
+                <p class="text-white/80 text-xs font-bold uppercase tracking-wide">Projects</p>
+              </div>
+            </div>
+
+            <div class="mt-4 h-10 rounded-2xl bg-white/10 backdrop-blur border border-white/15 flex items-center justify-between px-4 opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition">
+              <span class="text-white font-bold text-sm">Explore</span><span class="text-white text-sm">→</span>
+            </div>
+          </div>
+        </a>
+
+      </div>
+
+    </div>
+  </section>
+  <!-- ======================= POSSESSION STATUS (UNIQUE END) ======================= -->
+
+  <hr>
+
+  <!-- ======================= WHAT ARE YOU LOOKING FOR? ======================= -->
+  <section class="py-16 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 text-center">
+
+      <!-- Heading -->
+      <h2 class="text-2xl sm:text-3xl font-extrabold text-gray-800 mb-12 uppercase" data-aos="fade-up">
+        What Are You Looking For?
+      </h2>
+
+      <!-- Grid Responsive -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+
+        <!-- Office Space -->
+        <div class="text-center bg-white shadow-sm hover:shadow-md p-8 transition" data-aos="fade-up" data-aos-delay="100">
+          <div class="flex items-center justify-center h-20 w-20 mx-auto bg-orange-50 shadow">
+            <i class="fas fa-building text-orange-500 text-3xl"></i>
+          </div>
+          <h3 class="mt-4 font-bold text-gray-800 uppercase">Office Space</h3>
+          <p class="text-sm text-gray-600 mt-2">
+            Give your business a presence in prime location with luxurious working atmosphere.
+          </p>
+        </div>
+
+        <!-- Residential -->
+        <div class="text-center bg-white shadow-sm hover:shadow-md p-8 transition" data-aos="fade-up" data-aos-delay="200">
+          <div class="flex items-center justify-center h-20 w-20 mx-auto bg-orange-50 shadow">
+            <i class="fas fa-home text-orange-500 text-3xl"></i>
+          </div>
+          <h3 class="mt-4 font-bold text-gray-800 uppercase">Residential Apartment</h3>
+          <p class="text-sm text-gray-600 mt-2">
+            Find verified listings of luxury apartments for sale or rent from trusted owners.
+          </p>
+        </div>
+
+        <!-- Land -->
+        <div class="text-center bg-white shadow-sm hover:shadow-md p-8 transition" data-aos="fade-up" data-aos-delay="300">
+          <div class="flex items-center justify-center h-20 w-20 mx-auto bg-orange-50 shadow">
+            <i class="fas fa-map-marked-alt text-orange-500 text-3xl"></i>
+          </div>
+          <h3 class="mt-4 font-bold text-gray-800 uppercase">Land</h3>
+          <p class="text-sm text-gray-600 mt-2">
+            Buy, rent or sell residential and commercial land in your location.
+          </p>
+        </div>
+
+        <!-- Commercial -->
+        <div class="text-center bg-white shadow-sm hover:shadow-md p-8 transition" data-aos="fade-up" data-aos-delay="400">
+          <div class="flex items-center justify-center h-20 w-20 mx-auto bg-orange-50 shadow">
+            <i class="fas fa-store text-orange-500 text-3xl"></i>
+          </div>
+          <h3 class="mt-4 font-bold text-gray-800 uppercase">Commercial</h3>
+          <p class="text-sm text-gray-600 mt-2">
+            Explore shops, showrooms and office spaces for sale or rent.
+          </p>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+  <!-- ======================= WHAT ARE YOU LOOKING FOR? ======================= -->
+
+  <!-- ======================= 🌟 WHY CHOOSE US ======================= -->
+  <section class="hidden md:block py-12 bg-white" id="why-choose">
+    <div class="max-w-7xl mx-auto px-4 md:px-6 grid md:grid-cols-2 gap-8 items-center">
+
+      <!-- IMAGE SIDE -->
+      <div class="relative group md:order-none order-1"
+          data-aos="zoom-in-right">
+
+        <div class="absolute -inset-2 bg-orange-500/10 blur-xl opacity-0 md:group-hover:opacity-100 transition"></div>
+
+        <img 
+          src="{{ about_page.home_bg.url|default:'https://dummyimage.com/600x380/cccccc/000&text=Why+Choose+Us' }}"
+          class="relative w-full h-[220px] sm:h-[280px] md:h-[450px] object-cover shadow-xl transition md:group-hover:scale-[1.01]"
+          alt="Why Choose"
+          loading="lazy"
+        >
+
+        <div class="absolute inset-0 border border-white/20 pointer-events-none"></div>
+      </div>
+
+      <!-- TEXT SIDE -->
+      <div data-aos="fade-left">
+
+        <h2 class="text-2xl md:text-3xl font-bold text-orange-600 mb-4 text-center md:text-left">
+          Why Choose Us
+        </h2>
+
+        <!-- NO INTERNAL SCROLL ON MOBILE -->
+        <div class="md:max-h-[350px] md:overflow-y-auto pr-1 md:pr-3 space-y-4 text-gray-800 text-[15px] leading-relaxed">
+
+          {% for item in why_choose_items %}
+          <div class="flex gap-3">
+
+            <span class="text-green-600 text-xl leading-none">
+              {% if item.icon %} {{ item.icon }} {% else %} ✔ {% endif %}
+            </span>
+
+            <span class="font-medium">
+              {{ item.title }}
+              {% if item.subtitle %}
+              <span class="text-gray-600 font-normal"> — {{ item.subtitle }}</span>
+              {% endif %}
+            </span>
+
+          </div>
+          {% endfor %}
+
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <section class="block md:hidden py-10 bg-gray-50">
+
+    <div class="max-w-md mx-auto px-4 text-center">
+
+      <h2 class="text-2xl font-bold text-orange-600 mb-6">
+        Why Choose Us
+      </h2>
+
+      <div class="space-y-4">
+
+        {% for item in why_choose_items|slice:":5" %}
+        <div class="flex items-center gap-3 bg-white shadow-sm rounded-xl p-4">
+
+          <span class="text-green-600 text-xl">
+            {% if item.icon %} {{ item.icon }} {% else %} ✔ {% endif %}
+          </span>
+
+          <span class="text-gray-800 font-medium text-left">
+            {{ item.title }}
+          </span>
+
+        </div>
+        {% endfor %}
+
+      </div>
+
+    </div>
+  </section>
+  <!-- ======================= 🌟 WHY CHOOSE US END ======================= -->
+
+  <!-- ===================== How We Work ======================= -->
+  <section class="w-full py-12 text-white bg-cover bg-center relative" style="background-image: url('https://sigmahomes.co.in/media/about/Prithvi_Pride.jpg');">
+
+    <div class="absolute inset-0 bg-black/50"></div>
+
+    <div class="relative max-w-7xl mx-auto px-6 text-center">
+
+      <h2 class="text-3xl md:text-4xl font-semibold mb-14 uppercase">
+        How We Work
+      </h2>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-10 relative">
+
+        <div class="hidden md:block absolute top-[38px] left-0 right-0 h-[2px] bg-white/30"></div>
+
+        <!-- ITEM 1 -->
+        <div class="group flex flex-col items-center text-center">
+          <div class="w-20 h-20 rounded-full border-2 border-white/40 flex items-center justify-center
+                      transition group-hover:bg-orange-500 group-hover:scale-110">
+            <i class="fa-solid fa-building text-2xl"></i>
+          </div>
+
+          <h3 class="mt-4 font-semibold">Search & Shortlisting</h3>
+          <p class="mt-2 text-sm opacity-100 md:opacity-0 md:group-hover:opacity-100 transition">
+            Lacs of verified listings from 500+ developers
+          </p>
+
+          <button class="common-btn"
+            data-bs-toggle="modal"
+            data-bs-target="#commonModal"
+            data-modal-title="Get In Touch">
+            Get In Touch
+          </button>
+        </div>
+
+        <!-- ITEM 2 -->
+        <div class="group flex flex-col items-center text-center">
+          <div class="w-20 h-20 rounded-full border-2 border-white/40 flex items-center justify-center
+                      transition group-hover:bg-orange-500 group-hover:scale-110">
+            <i class="fa-solid fa-car text-2xl"></i>
+          </div>
+
+          <h3 class="mt-4 font-semibold">Site Visit</h3>
+          <p class="mt-2 text-sm opacity-100 md:opacity-0 md:group-hover:opacity-100 transition">
+            Guided site visits with experts
+          </p>
+
+          <button class="common-btn"
+            data-bs-toggle="modal"
+            data-bs-target="#commonModal"
+            data-modal-title="Book Site Visit">
+            Book Site Visit
+          </button>
+        </div>
+
+        <!-- ITEM 3 -->
+        <div class="group flex flex-col items-center text-center">
+          <div class="w-20 h-20 rounded-full border-2 border-white/40 flex items-center justify-center
+                      transition group-hover:bg-orange-500 group-hover:scale-110">
+            <i class="fa-solid fa-sack-dollar text-2xl"></i>
+          </div>
+
+          <h3 class="mt-4 font-semibold">Home Loan Assistance</h3>
+          <p class="mt-2 text-sm opacity-100 md:opacity-0 md:group-hover:opacity-100 transition">
+            Loan guidance from top banks
+          </p>
+
+          <button class="common-btn"
+            data-bs-toggle="modal"
+            data-bs-target="#commonModal"
+            data-modal-title="Home Loan Assistance">
+            Apply Home Loan
+          </button>
+        </div>
+
+        <!-- ITEM 4 -->
+        <div class="group flex flex-col items-center text-center">
+          <div class="w-20 h-20 rounded-full border-2 border-white/40 flex items-center justify-center
+                      transition group-hover:bg-orange-500 group-hover:scale-110">
+            <i class="fa-solid fa-file-lines text-2xl"></i>
+          </div>
+
+          <h3 class="mt-4 font-semibold">Legal Advice</h3>
+          <p class="mt-2 text-sm opacity-100 md:opacity-0 md:group-hover:opacity-100 transition">
+            Legal and documentation support
+          </p>
+
+          <button class="common-btn"
+            data-bs-toggle="modal"
+            data-bs-target="#commonModal"
+            data-modal-title="Legal Advice">
+            Get In Touch
+          </button>
+        </div>
+
+        <!-- ITEM 5 -->
+        <div class="group flex flex-col items-center text-center">
+          <div class="w-20 h-20 rounded-full border-2 border-white/40 flex items-center justify-center
+                      transition group-hover:bg-orange-500 group-hover:scale-110">
+            <i class="fa-solid fa-key text-2xl"></i>
+          </div>
+
+          <h3 class="mt-4 font-semibold">Unit Booking</h3>
+          <p class="mt-2 text-sm opacity-100 md:opacity-0 md:group-hover:opacity-100 transition">
+            Assistance till final possession
+          </p>
+
+          <button class="common-btn"
+            data-bs-toggle="modal"
+            data-bs-target="#commonModal"
+            data-modal-title="Unit Booking">
+            Get In Touch
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </section>
+  <!-- ===================== How We Work End======================= -->
+
+  <!-- ======================= Blog Section Start ======================= -->
+  <section id="blog" class="py-20 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4">
+
+      <div class="text-center mb-12">
+        <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900">Latest from Our Blog</h2>
+        <p class="text-gray-600 mt-2">Property tips, market news & expert guides</p>
+      </div>
+
+      <!-- ✅ Desktop Grid (3 cards) -->
+      <div class="hidden md:grid grid-cols-3 gap-8">
+        {% for blog in blogs %}
+        <article class="bg-white border border-gray-200 shadow-sm hover:shadow-xl transition overflow-hidden">
+          <a href="{% url 'blog:blog_detail' blog.slug %}">
+            {% if blog.featured_image %}
+            <img src="{{ blog.featured_image.url }}" alt="{{ blog.title }}" class="w-full h-56 object-cover">
+            {% else %}
+            <img src="https://via.placeholder.com/600x400" alt="{{ blog.title }}" class="w-full h-56 object-cover">
+            {% endif %}
+          </a>
+          <div class="p-6 text-left">
+            {% if blog.category %}
+            <p class="text-xs font-semibold text-gray-500 tracking-wider uppercase">{{ blog.category.name }}</p>
+            {% else %}
+            <p class="text-xs font-semibold text-gray-500 tracking-wider uppercase">General</p>
+            {% endif %}
+            <h3 class="text-xl font-extrabold text-gray-900 mt-2 leading-snug line-clamp-2">
+              <a href="{% url 'blog:blog_detail' blog.slug %}" class="hover:underline">{{ blog.title }}</a>
+            </h3>
+            <p class="text-sm text-gray-600 mt-3 leading-relaxed line-clamp-2">{{ blog.short_description }}</p>
+            <div class="flex items-center justify-between mt-5">
+              <span class="text-xs font-semibold text-gray-500">By <span class="text-gray-800">{{ blog.author_name }}</span></span>
+              <a href="{% url 'blog:blog_detail' blog.slug %}" class="inline-flex items-center gap-2 text-blue-700 text-sm font-extrabold hover:underline">Read More <span>→</span></a>
+            </div>
+          </div>
+        </article>
+        {% endfor %}
+      </div>
+
+      <!-- ✅ Mobile/Tablet Slider (dots pagination) -->
+      <div class="md:hidden">
+        <div class="swiper blogSwiper">
+          <div class="swiper-wrapper">
+
+            {% for blog in blogs %}
+            <div class="swiper-slide">
+              <article class="bg-white border border-gray-200 shadow-sm overflow-hidden">
+                <a href="{% url 'blog:blog_detail' blog.slug %}">
+                  {% if blog.featured_image %}
+                  <img src="{{ blog.featured_image.url }}" alt="{{ blog.title }}" class="w-full h-56 object-cover">
+                  {% else %}
+                  <img src="https://via.placeholder.com/600x400" alt="{{ blog.title }}" class="w-full h-56 object-cover">
+                  {% endif %}
+                </a>
+                <div class="p-6 text-left">
+                  {% if blog.category %}
+                  <p class="text-xs font-semibold text-gray-500 tracking-wider uppercase">{{ blog.category.name }}</p>
+                  {% else %}
+                  <p class="text-xs font-semibold text-gray-500 tracking-wider uppercase">General</p>
+                  {% endif %}
+                  <h3 class="text-xl font-extrabold text-gray-900 mt-2 leading-snug line-clamp-2">
+                    <a href="{% url 'blog:blog_detail' blog.slug %}" class="hover:underline">{{ blog.title }}</a>
+                  </h3>
+                  <p class="text-sm text-gray-600 mt-3 leading-relaxed line-clamp-2">{{ blog.short_description }}</p>
+                  <div class="flex items-center justify-between mt-5">
+                    <span class="text-xs font-semibold text-gray-500">By <span class="text-gray-800">{{ blog.author_name }}</span></span>
+                    <a href="" class="inline-flex items-center gap-2 text-blue-700 text-sm font-extrabold hover:underline">Read More <span>→</span></a>
+                  </div>
+                </div>
+              </article>
+            </div>
+            {% endfor %}
+
+          </div>
+
+          <div class="swiper-pagination mt-6 !relative"></div>
+        </div>
+      </div>
+
+      <div class="text-center mt-12">
+        <a href="" class="inline-flex items-center gap-2 px-7 py-3 bg-blue-700 text-white font-extrabold shadow-md hover:shadow-xl transition">View All Blogs <span>→</span></a>
+      </div>
+
+    </div>
+  </section>
+  <!-- ======================= Blog Section End ======================= -->
+
+  <br>
+  <!-- ======================= STATS COUNTER ======================= -->
+  <section class="py-20 bg-[#0f172a] text-white">
+    <div class="max-w-6xl mx-auto grid md:grid-cols-4 gap-10">
+
+      {% for item in impactmetric %}
+
+      <div class="group">
+        
+        <!-- PROGRESS LINE -->
+        <div class="h-1 bg-orange-500 rounded-full mb-3"
+            style="width: {{ item.value|cut:'+'|cut:'%' }}%; max-width: 100%;"></div>
+
+        <!-- ICON + VALUE -->
+        <div class="flex items-center gap-3">
+          <i class="{{ item.icon }} text-orange-400 text-2xl"></i>
+          <h3 class="text-4xl font-bold">{{ item.value }}</h3>
+        </div>
+
+        <!-- TITLE -->
+        <p class="text-gray-300 mt-1">{{ item.title }}</p>
+
+      </div>
+
+      {% endfor %}
+
+    </div>
+  </section>
+  <!-- ======================= STATS COUNTER END ======================= -->
+
+  <!-- ======================= HOME LOAN PARTNERS SLIDER ======================= -->
+  <section class="py-20 bg-white" id="home-loan-partners">
+    <div class="max-w-7xl mx-auto px-6 text-center">
+
+      <h2 class="text-3xl md:text-4xl font-extrabold text-orange-600 mb-3">
+        Home Loan Partners
+      </h2>
+
+      <p class="text-gray-600 max-w-2xl mx-auto mb-12">
+        We are associated with India’s most trusted banks to help you
+        get the best home loan deals.
+      </p>
+
+      <!-- ✅ Slider Wrapper -->
+      <div class="relative">
+
+
+        <!-- ✅ Swiper -->
+        <div class="swiper loanPartnerSwiper !py-3 !px-2">
+          <div class="swiper-wrapper">
+
+            {% for bank in bank %}
+            <div class="swiper-slide !w-[240px] md:!w-[280px] lg:!w-[300px]">
+
+              <!-- ✅ Premium Partner Card -->
+              <div class="group relative w-full h-[160px] md:h-[180px] rounded-2xl overflow-hidden border border-gray-200 shadow-sm hover:shadow-2xl transition-all duration-500 bg-white">
+
+                <!-- ✅ Full Image Cover -->
+                <img src="{{bank.image.url}}" alt="{{bank.title}}"
+                  class="w-full h-full object-cover transition duration-700 group-hover:scale-110 group-hover:rotate-[0.5deg]"/>
+
+                <!-- ✅ Dark Gradient Overlay -->
+                <div
+                  class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent opacity-100 transition duration-500">
+                </div>
+
+                <!-- ✅ Bank Title -->
+                <div class="absolute bottom-0 left-0 right-0 p-3">
+                  <p
+                    class="text-white text-sm font-bold tracking-wide uppercase drop-shadow-lg truncate">
+                    {{bank.title}}
+                  </p>
+                </div>
+
+                <!-- ✅ Hover Glow Border -->
+                <div
+                  class="absolute inset-0 rounded-2xl ring-0 group-hover:ring-2 group-hover:ring-orange-500/70 transition duration-500">
+                </div>
+
+              </div>
+            </div>
+            {% endfor %}
+
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+  <!-- ======================= HOME LOAN PARTNERS SLIDER END ======================= -->
+
+  <!-- ======================= FEATURED DEVELOPERS ======================= -->
+  <div class="developer-section">
+    <h2 class="section-title">Top Developers Projects</h2>
+
+    <div class="card-container">
+
+      {% for dev in featured_developers %}
+      <a href="{% url 'search_projects' %}?developer={{ dev.slug }}">
+        <div class="dev-card">
+
+          <div class="logo">
+            {% if  dev.logo %}
+            <img src="{{ dev.logo.url }}" alt="{{ dev.name }}" class="h-full w-full object-contain bg-cover">
+            {% else %}
+            <img src="{{ dev.logo.url }}" alt="{{ dev.name }}" class="h-full w-full object-contain bg-cover">
+            {% endif %}
+          </div>
+
+          <div class="footer-badge">
+            <span>TOTAL PROJECTS</span>
+            <span class="count">{{ dev.project_count }}</span>
+          </div>
+
+        </div>
+      </a>
+      {% endfor %}
+
+    </div>
+  </div>
+  <!-- ======================= FEATURED DEVELOPERS END ======================= -->
+
+  <!-- ======================= LOCALITY START ======================= -->
+  <section class="py-16 bg-white">
+    <div class="max-w-7xl mx-auto px-6">
+
+      <!-- Heading -->
+      <h2 class="text-4xl font-bold text-gray-900 mb-2">Popular Location</h2>
+      <p class="text-gray-600 mb-10">
+        Explore prime locations and key real estate destinations in Mumbai
+      </p>
+
+      <!-- Grid -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        {% for rs in featured_locality %}
+        <!-- Card -->
+        <a href="{% url 'search_projects' %}?locality={{ rs.id }}" class="flex items-center gap-3 bg-gray-50 border border-gray-200 rounded-xl p-4 hover:shadow-md transition">
+          <div class="bg-gray-100 p-3 rounded-xl">
+            <i class="fa-solid fa-location-dot text-red-500 text-xl"></i>
+          </div>
+          <h3 class="font-semibold text-lg text-gray-800">{{rs.name}}</h3>
+        </a>
+        {% endfor %}     
+      </div>
+    </div>
+    <div class="mt-10 text-center">
+      <a href="{% url 'search_projects' %}" 
+        class="inline-flex items-center gap-2 px-6 py-3 border border-orange-500 text-orange-600 font-semibold hover:bg-orange-500 hover:text-white transition">
+
+        See All Localities
+        <i class="fa-solid fa-arrow-right text-sm"></i>
+
+      </a>
+    </div>
+  </section>
+  <!-- ======================= LOCALITY END ======================= -->
+
+  <!-- ======================= TESTIMONIALS ======================= -->
+  <section class="py-16 bg-gray-100" id="testimonial">
+    <div class="max-w-4xl mx-auto px-6 text-center">
+      <h2 class="text-3xl font-bold text-orange-600 mb-10">Testimonials</h2>
+      <div class="grid md:grid-cols-2 gap-8">
+        {% for t in testimonials %}
+        <div class="bg-white shadow rounded p-2" data-aos="fade-up">
+          {% if t.image %}
+          <img src="{{ t.image.url }}" class="w-16 h-16 rounded-full mx-auto mb-3" />
+          {% endif %}
+          <p class="text-gray-700 italic">"{{ t.message }}"</p>
+          <h3 class="mt-3 font-bold">{{ t.name }}</h3>
+          {% if t.designation %}<p class="text-sm text-gray-500">{{ t.designation }}</p>{% endif %}
+          <p class="text-yellow-400 mt-2">{% for i in "12345"|slice:":t.rating" %}⭐{% endfor %}</p>
+        </div>
+        {% empty %}
+        <p>No testimonials available.</p>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+  <!-- ======================= TESTIMONIALS ======================= -->
+
+  <!-- ======================= CONTACT SECTION ======================= -->
+  <section id="contact" class="py-14 bg-orange-50">
+      <h2 class="text-3xl font-bold text-orange-600 mb-4 text-center">Get In Touch</h2>
+        <p class="text-gray-600 mb-6 text-center">We are here to assist you with any queries.</p>
+    <div class="max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-12 items-start">
+
+      <!-- LEFT SIDE DETAILS -->
+      <div class="mt-6 rounded-lg overflow-hidden shadow-md border border-gray-100">
+          {% if contact_content and contact_content.map_iframe %}
+            {{ contact_content.map_iframe|safe }}
+          {% elif settings_obj and settings_obj.google_map %}
+            {{ settings_obj.google_map|safe }}
+          {% else %}
+            <div class="p-6 text-center text-sm text-gray-500">Map not available.</div>
+          {% endif %}
+        </div>
+
+      <!-- RIGHT SIDE FORM -->
+      <div class="bg-white p-8 rounded-xl shadow-md border border-orange-100">
+
+        <h3 class="text-xl font-semibold text-orange-600 mb-5">Send Us a Message</h3>
+
+        <form class="space-y-4">
+
+          <input type="text" placeholder="Your Name"
+                class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-orange-400 outline-none">
+
+          <input type="email" placeholder="Your Email"
+                class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-orange-400 outline-none">
+
+          <textarea rows="4" placeholder="Your Message"
+                    class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-orange-400 outline-none"></textarea>
+
+          <button class="w-full bg-orange-600 text-white py-3 rounded-lg font-semibold hover:bg-orange-700 transition">
+            Send Message
+          </button>
+
+        </form>
+
+      </div>
+
+    </div>
+  </section>
+  <!-- ======================= CONTACT SECTION END======================= -->
+
+  <!-- ======================= ❓ FAQ ======================= -->
+  <section class="py-20 bg-gray-100" id="faq">
+    <div class="max-w-7xl mx-auto px-6">
+
+      <h2 class="text-4xl font-bold text-orange-600 mb-12 text-center">
+        Frequently Asked Questions
+      </h2>
+
+      <!-- FAQ Grid -->
+      <div id="faqContainer" class="grid grid-cols-1 md:grid-cols-2 gap-8"></div>
+
+      <!-- Buttons -->
+      <div class="text-center mt-10 space-x-4">
+        <button id="loadMoreBtn"
+          class="px-6 py-3 bg-orange-600 text-white rounded-lg font-semibold hover:bg-orange-700 transition">
+          Load More
+        </button>
+
+        <button id="showLessBtn"
+          class="px-3 py-2 bg-gray-400 text-white rounded-lg font-semibold hover:bg-gray-500 transition hidden">
+          Show Less   
+        </button>
+      </div>
+
+    </div>
+  </section>
+
+  <div id="faqData" class="hidden">
+    {% for faq in faqs %}
+    <div class="faq-item">
+      <div class="bg-white p-6 rounded-xl shadow hover:shadow-md transition">
+
+        <details class="group cursor-pointer">
+          <summary class="flex justify-between items-center font-semibold text-lg text-gray-900">
+            {{ faq.question }}
+            <i class="fas fa-chevron-down text-gray-600 transition-transform duration-300 group-open:rotate-180"></i>
+          </summary>
+
+          <p class="mt-4 text-gray-700 leading-7">
+            {{ faq.answer|safe }}
+          </p>
+        </details>
+
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  <!-- ======================= ❓ FAQ ======================= -->
+
+
+  <script defer>
+    document.addEventListener("DOMContentLoaded", () => {
+
+      /* ===== MODAL ===== */
+      const modal = document.getElementById("commonModal");
+      if (modal) {
+        modal.addEventListener("show.bs.modal", e => {
+          document.getElementById("modalTitle").innerText =
+            e.relatedTarget?.getAttribute("data-modal-title") || "";
+        });
+      }
+
+      /* ===== SWIPER (ALL TYPES) ===== */
+      if (window.Swiper) {
+
+      // Home Loan Partners smooth auto slider
+        document.querySelectorAll(".loanPartnerSwiper").forEach(el=>{
+          new Swiper(el,{
+            loop:true,
+            speed:6000,
+            spaceBetween:22,
+
+            freeMode:true,
+            freeModeMomentum:false,
+
+            autoplay:{
+              delay:0,
+              disableOnInteraction:false,
+              pauseOnMouseEnter:true
+            },
+
+            breakpoints:{
+              320:{slidesPerView:1.2},
+              480:{slidesPerView:1.6},
+              640:{slidesPerView:2.3},
+              768:{slidesPerView:3},
+              1024:{slidesPerView:3.8},
+              1280:{slidesPerView:4.5}
+            }
+          });
+        });
+
+        // Blog mobile slider
+        document.querySelectorAll(".blogSwiper").forEach(el=>{
+          new Swiper(el,{
+            slidesPerView:1,
+            spaceBetween:18,
+            loop:true,
+
+            autoplay:{
+              delay:4000,
+              disableOnInteraction:false,
+              pauseOnMouseEnter:true
+            },
+
+            pagination:{
+              el: el.querySelector(".swiper-pagination"),
+              clickable:true
+            }
+          });
+        });
+
+          // New Launch Projects slider
+        document.querySelectorAll(".newLaunchSwiper").forEach(el=>{
+          new Swiper(el,{
+            slidesPerView:1,
+            spaceBetween:20,
+            loop:true,
+
+            autoplay:{
+              delay:3500,
+              disableOnInteraction:false,
+              pauseOnMouseEnter:true
+            },
+
+            breakpoints:{
+              0:{slidesPerView:1},
+              640:{slidesPerView:1},
+              768:{slidesPerView:2},
+              1024:{slidesPerView:3}
+            }
+          });
+        });
+
+
+      }
+
+      /* ===== BHK TABS ===== */
+      function activateTab(tab, card){
+        const wrap = card.querySelector(".bhk-tabs");
+        const underline = wrap.querySelector(".bhk-underline");
+
+        card.querySelectorAll(".bhk-tab").forEach(t=>t.classList.remove("active"));
+        card.querySelectorAll(".bhk-panel").forEach(p=>p.classList.add("hidden"));
+
+        tab.classList.add("active");
+
+        const r1=tab.getBoundingClientRect(), r2=wrap.getBoundingClientRect();
+        underline.style.width=r1.width+"px";
+        underline.style.left=(r1.left-r2.left)+"px";
+
+        card.querySelector(`[data-panel="${tab.dataset.target}"]`)?.classList.remove("hidden");
+      }
+
+      document.addEventListener("click", e=>{
+        const tab=e.target.closest(".bhk-tab");
+        if(!tab || tab.classList.contains("bhk-disabled")) return;
+        const card=tab.closest(".config-card");
+        if(card) activateTab(tab,card);
+      });
+
+      document.querySelectorAll(".config-card").forEach(card=>{
+        const first=card.querySelector(".bhk-tab:not(.bhk-disabled)");
+        if(first) activateTab(first,card);
+      });
+
+      /* ===== SIMPLE TABS ===== */
+      document.querySelectorAll(".tab-btn").forEach(btn=>{
+        btn.addEventListener("click",()=>{
+          document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
+          btn.classList.add("active");
+
+          document.querySelectorAll(".tab-content").forEach(t=>t.classList.add("hidden"));
+          document.getElementById(btn.dataset.tab)?.classList.remove("hidden");
+        });
+      });
+
+      /* ===== AJAX CITY ===== */
+      const city=document.getElementById("city");
+      if(city){
+        city.addEventListener("change",()=>{
+          fetch(`/ajax/load-localities/?city_id=${city.value}`)
+            .then(r=>r.json())
+            .then(data=>{
+              const loc=document.getElementById("locality");
+              loc.innerHTML='<option value="">Select Locality</option>';
+              data.forEach(l=>loc.innerHTML+=`<option value="${l.id}">${l.name}</option>`);
+            });
+        });
+      }
+
+    });
+    const container = document.querySelector(".card-container");
+
+    let isDown = false;
+    let startX;
+    let scrollLeft;
+
+    // DRAG TO SLIDE (desktop premium feel)
+    container.addEventListener("mousedown", e => {
+      isDown = true;
+      container.classList.add("active");
+      startX = e.pageX - container.offsetLeft;
+      scrollLeft = container.scrollLeft;
+    });
+
+    container.addEventListener("mouseleave", () => isDown = false);
+    container.addEventListener("mouseup", () => isDown = false);
+
+    container.addEventListener("mousemove", e => {
+      if (!isDown) return;
+      e.preventDefault();
+      const x = e.pageX - container.offsetLeft;
+      const walk = (x - startX) * 1.5;
+      container.scrollLeft = scrollLeft - walk;
+    });
+
+    // AUTO SLIDE
+    setInterval(() => {
+      container.scrollLeft += 220;
+
+      if (container.scrollLeft + container.clientWidth >= container.scrollWidth) {
+        container.scrollLeft = 0;
+      }
+    }, 2500); 
+    var swiper = new Swiper(".rentPropSwiper", {
+      slidesPerView: 3,
+      spaceBetween: 30,
+      loop: true,
+      grabCursor: true,
+
+      pagination: {
+        el: ".swiper-pagination",
+        clickable: true,
+      },
+
+      navigation: {
+        nextEl: ".swiper-button-next",
+        prevEl: ".swiper-button-prev",
+      },
+
+      breakpoints: {
+        0: {
+          slidesPerView: 1,
+        },
+        640: {
+          slidesPerView: 2,
+        },
+        1024: {
+          slidesPerView: 3,
+        },
+      },
+      autoplay: {
+      delay: 3000,
+      disableOnInteraction: false,
+    },
+    });
+
+  </script>
+
+  <style>
+    .swiper-slide {
+      overflow: visible !important;
+    }
+    .common-btn{
+      margin-top:12px;padding:8px 16px;border:1px solid white;border-radius:6px;
+      font-size:14px;transition:.3s
+    }
+    @media(min-width:768px){
+      .common-btn{opacity:0}
+      .group:hover .common-btn{opacity:1}
+    }
+    .common-btn:hover{background:#fff;color:#000}
+
+    /* Scrollbars */
+    .table-scroll,.bhk-tabs,.bhk-panel div{
+      scrollbar-width:thin;
+      scrollbar-color:#fb923c transparent
+    }
+    .table-scroll::-webkit-scrollbar,
+    .bhk-tabs::-webkit-scrollbar,
+    .bhk-panel div::-webkit-scrollbar{width:6px;height:5px}
+    .table-scroll::-webkit-scrollbar-thumb,
+    .bhk-tabs::-webkit-scrollbar-thumb,
+    .bhk-panel div::-webkit-scrollbar-thumb{
+      background:#fb923c;border-radius:10px
+    }
+
+    /* BHK Tabs */
+    .bhk-tab{
+      backdrop-filter:blur(10px);
+      background:rgba(255,255,255,.6);
+      padding:6px 10px;
+      color:#374151;
+      white-space:nowrap
+    }
+    .bhk-tab.active{color:#fb923c}
+    .bhk-disabled{opacity:.4;pointer-events:none}
+
+    /* Underline */
+    .bhk-underline{
+      background:#fb923c;
+      height:2px;
+      transition:.3s ease;
+      width:0;left:0
+    }
+      .developer-section {
+    font-family: Arial, sans-serif;
+    padding: 20px;
+    background-color: #f8f9fa;
+    }
+
+    .section-title {
+    font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 20px;
+    }
+
+    .card-container {
+      display: flex;
+      gap: 20px;
+      overflow-x: auto; /* Mobile ke liye scrollable */
+      padding-bottom: 10px;
+    }
+
+    .dev-card {
+      min-width: 200px;
+      background: white;
+      border-radius: 15px;
+      padding: 20px 15px 0 15px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .logo {
+      height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 40px;
+    }
+
+    .logo img {
+      max-width: 120px;
+    }
+
+    .footer-badge {
+      background-color: #e8f5e9; /* Light green background */
+      width: 100%;
+      padding: 10px;
+      border-radius: 50% 50% 0 0 / 20% 20% 0 0; /* Yeh curve banata hai */
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      font-size: 10px;
+      font-weight: bold;
+      color: #1e7d32;
+    }
+
+    .count {
+      background: #1a3e59; /* Dark blue circle */
+      color: white;
+      padding: 3px 5px;
+      border-radius: 50%;
+      font-size: 12px;
+    }
+  </style>
+
+
+  <div class="modal fade" id="commonModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content rounded-xl">
+
+        <div class="modal-header">
+          <h5 class="modal-title text-lg font-semibold" id="modalTitle">
+            Get In Touch
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+
+        <div class="modal-body">
+          <form class="space-y-3">
+            <input type="text" placeholder="Your Name" class="w-full border px-3 py-2 rounded">
+            <input type="tel" placeholder="Phone Number" class="w-full border px-3 py-2 rounded">
+            <textarea rows="3" placeholder="Message" class="w-full border px-3 py-2 rounded"></textarea>
+
+            <button class="w-full bg-orange-500 text-white py-2 rounded">
+              Submit
+            </button>
+          </form>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</main>

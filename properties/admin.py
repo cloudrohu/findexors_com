@@ -3,6 +3,7 @@ from django.utils.html import mark_safe
 from mptt.admin import MPTTModelAdmin
 from django.contrib import admin
 from django.utils.html import mark_safe
+from import_export.admin import ImportExportModelAdmin
 from .models import Developer
 
 from .models import (
@@ -15,7 +16,7 @@ from .models import (
 NO_IMAGE_URL = "https://via.placeholder.com/80x80.png?text=No+Image"
 
 @admin.register(Developer)
-class DeveloperAdmin(admin.ModelAdmin):
+class DeveloperAdmin(ImportExportModelAdmin):
     list_display = (
         'title',
         'city',

@@ -69,6 +69,7 @@ INSTALLED_APPS = [
     'jobs',
     'job_utility',
     'mumbai',
+    'django.contrib.humanize',
     'ahmedabad',
     # ... (बाकी user apps) ...
     
@@ -101,6 +102,8 @@ MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
 ]
+
+
 
 ROOT_URLCONF = 'findexors_com.urls'
 

@@ -43,7 +43,7 @@ class Developer(models.Model):
 
 
     def save(self, *args, **kwargs):
-        self.slug = slugify(self.title + ' ' + self.city.title)
+        self.slug = slugify(self.title + ' ' + self.city.name)
         super(Developer, self).save(*args, **kwargs)
 
     def get_absolute_url(self):
@@ -51,7 +51,6 @@ class Developer(models.Model):
 
     def image_tag(self):
         return mark_safe('<img src="%s" width="50" height="50" />' % (self.image.url))
-
 
 def format_price(num):
     """Convert number into Indian readable format (Lakh/Cr)."""
@@ -79,7 +78,6 @@ def format_price_range(price_min, price_max):
     if price_min == price_max:
         return fmt(price_min)
     return f"{fmt(price_min)}–{fmt(price_max)}"
-
 class Project(MPTTModel):
     
     BHK_CHOICES = (
@@ -263,14 +261,12 @@ class Project(MPTTModel):
             return f"₹ {fmt(price_min)}"
 
         return f"₹ {fmt(price_min)} – {fmt(price_max)}"
-
 class BookingOffer(models.Model):
     Project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="BookingOffer")
     title = models.CharField(max_length=255)
 
     def __str__(self):
         return self.title
-
 class WelcomeTo(models.Model):
     Project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="welcomes")
     description = models.TextField(null=True, blank=True,max_length=5500)
@@ -278,7 +274,6 @@ class WelcomeTo(models.Model):
 
     def __str__(self):
         return self.description
-
 class WebSlider(models.Model):
     Project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="sliders")
     image = models.ImageField(upload_to='web_slider/')
@@ -286,7 +281,6 @@ class WebSlider(models.Model):
 
     def __str__(self):
         return self.caption or f"Slider #{self.pk}"
-
 class Overview(models.Model):
     Project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="overviews")
     heading = models.CharField(max_length=255)
@@ -294,20 +288,17 @@ class Overview(models.Model):
 
     def __str__(self):
         return self.heading
-
 class AboutUs(models.Model):
     Project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="aboutus")
     content = models.TextField()
 
     def __str__(self):
         return "About Us"
-
 class USP(models.Model):
     Project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="usps")
     point = models.CharField(null=True, blank=True,max_length=150)
     def __str__(self):
         return self.point
-
 class Configuration(models.Model):
     Project = models.ForeignKey("Project", on_delete=models.CASCADE, related_name="configurations")
     bhk_type = models.CharField(max_length=50)
@@ -367,7 +358,6 @@ class Header(models.Model):
 
     def __str__(self):
         return self.keywords
-
 class RERA_Info(models.Model):
     Project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="rera")
     qr_image = models.ImageField(null=True, blank=True,upload_to='overviewimage/')
@@ -381,7 +371,6 @@ class RERA_Info(models.Model):
 
     def __str__(self):
         return self.registration_no
-
 class WhyInvest(models.Model):
     Project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="why_invest")
     title = models.CharField(max_length=350,null=True, blank=True)
@@ -390,23 +379,19 @@ class WhyInvest(models.Model):
 
     def __str__(self):
         return f"Why Invest - {self.pk}"
- 
+
 class BankOffer(models.Model):
     Project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="amenities")
     bank = models.ForeignKey(Bank, on_delete=models.CASCADE, related_name="amenities")
     
     def __str__(self):
         return f"{self.Project.project_name} - {self.bank.title}"
-  
-
 class BankOffer(models.Model):
     Project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="bank_offers")
     bank = models.ForeignKey(Bank, on_delete=models.CASCADE, related_name="bank_offers")
     
     def __str__(self):
         return f"{self.Project.project_name} - {self.bank.title}"
-
-
 class ProjectFAQ(models.Model):
     project = models.ForeignKey(
         Project,
@@ -422,8 +407,6 @@ class ProjectFAQ(models.Model):
 
     def __str__(self):
         return f"{self.project.project_name} - {self.question}"
-
-
 class Enquiry(models.Model):
     project = models.ForeignKey(
         'Project',

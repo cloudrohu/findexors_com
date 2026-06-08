@@ -1,0 +1,377 @@
+{% load static %}
+
+<div class="hidden md:block">
+  <section  class="relative flex flex-col items-center justify-center text-center text-white h-[560px] bg-cover bg-center bg-no-repeat overflow-hidden" style="background-image: url('{% if settings_obj.search_bg %}{{ settings_obj.search_bg.url }}{% else %}{% static 'images/central-mumbai.jpeg' %}{% endif %}');">
+
+    <h1 class="text-3xl md:text-4xl font-bold mb-3">Find Your Dream Property</h1>
+ 
+    <p class="text-gray-600 mb-4">
+      We’ve got you covered! From finding the perfect property to
+      <span class="text-pink-700">Transactions</span>
+    </p>
+    
+    <div class="relative mb-2 w-[90%] md:w-[500px] mx-auto">
+      
+      <div class="relative flex bg-white/30 backdrop-blur-md p-1 rounded-xl border border-white/40 shadow-lg">
+        
+       <div id="desktop-tab-indicator" class="absolute top-1 left-1 h-[calc(100%-8px)] w-[32%] bg-green-500 rounded-lg shadow-md transition-all duration-300 ease-out">
+        </div>
+
+        <button class="tab-btn relative z-10 flex-1 py-2 text-sm font-bold text-white transition-colors duration-300" data-tab="buy">
+          Buy
+        </button>
+        <button class="tab-btn relative z-10 flex-1 py-2 text-sm font-bold text-gray-800 hover:text-gray-800 transition-colors duration-300" data-tab="new">
+          New Property
+        </button>
+        <button class="tab-btn relative z-10 flex-1 py-2 text-sm font-bold text-gray-800 hover:text-gray-800 transition-colors duration-300" data-tab="rental">
+          Rental
+        </button>
+        
+      </div>
+      
+    </div>
+
+    <div class="bg-white/30 w-[90%] md:w-[55%] rounded-2xl p-3 mb-5 shadow-xl text-gray-700 backdrop-blur-sm relative">
+
+      <div class="relative flex flex-wrap items-center gap-2 rounded-md">
+        <select id="propertyType" class="border rounded-md px-3 py-2 w-40">
+          <option>Residential</option>
+          <option>Commercial</option>
+        </select>
+
+        <div class="relative flex-grow">
+          <input id="searchInput" type="text" placeholder="Select City, Locality, Developer Or Projects Name" class="w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white/90" autocomplete="off" />
+          <ul id="suggestionBox" class="absolute left-0 right-0 top-full bg-white border border-gray-200 rounded-b-lg shadow-xl max-h-56 overflow-y-auto hidden z-50"></ul>
+        </div>
+
+        <button id="searchButton" class="bg-green-500 text-white px-6 py-2 rounded-md font-semibold hover:bg-green-600 transition">
+          Search
+        </button>
+      </div>
+      
+    </div>
+
+    <div class="flex items-center gap-6 bg-gray-100 px-6 py-3 rounded-full shadow-md w-fit mx-auto">
+         
+      <!-- Verified Properties -->
+      <div class="flex items-center gap-2 text-green-600 font-medium">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4M7 7h10v10H7z"/>
+        </svg>
+        Verified Properties
+      </div>
+
+      <div class="h-6 w-px bg-gray-400"></div>
+
+
+      <!-- Bottom Rate Policy -->
+      <div class="flex items-center gap-2 text-[#0b7a44] font-medium">
+        <div class="w-6 h-6">
+          <!-- MahaRERA Logo -->
+          <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="256" cy="256" r="240" fill="#fff" stroke="#d9362a" stroke-width="35"/>
+            <circle cx="256" cy="256" r="180" fill="#fff" stroke="#000" stroke-width="10"/>
+            <rect x="175" y="180" width="40" height="130" fill="#000"/>
+            <rect x="225" y="150" width="40" height="160" fill="#000"/>
+            <rect x="275" y="200" width="40" height="110" fill="#000"/>
+            <text x="256" y="260" text-anchor="middle" font-size="70" fill="#000" font-family="Arial Black">MAHA</text>
+            <text x="256" y="330" text-anchor="middle" font-size="70" fill="#000" font-family="Arial Black">RERA</text>
+          </svg>
+        </div>
+
+     RERA Registered Properties
+      </div>
+
+   
+
+    </div>
+
+  </section>
+</div>
+
+<div class="md:hidden">
+  <section  class="relative flex flex-col items-center justify-center text-center text-white h-[420px] overflow-hidden">
+
+    <img src="{% if settings_obj.search_bg %}{{ settings_obj.search_bg.url }}{% else %}{% static 'images/central-mumbai.webp' %}{% endif %}" loading="eager " fetchpriority="high" class="absolute inset-0 w-full h-full object-cover" alt="Real estate background">
+
+    <div class="absolute inset-0 bg-black/25"></div>
+
+      <div class="relative z-10 w-full px-4">
+
+        <h2 class="text-2xl font-bold mb-2">Real Estate Made Real Easy</h2>
+        <p class="text-gray-300 mb-5 text-sm">
+          We’ve got you covered! From finding property to 
+          <span class="text-pink-400 font-semibold">Interiors</span>
+        </p>
+
+        <!-- Tabs -->
+        <div id="mobileTabs" class="flex justify-center gap-2 overflow-x-auto scrollbar-hide w-full max-w-md mx-auto">
+          <button class="tab-btn bg-white text-black px-3 py-2 rounded-md font-semibold" data-tab="buy">Buy</button>
+          <button class="tab-btn bg-[#122c61] text-white px-3 py-2 rounded-md" data-tab="projects">New Projects</button>
+          <button class="tab-btn bg-[#122c61] text-white px-3 py-2 rounded-md" data-tab="rental">Rental</button>
+        </div>
+
+        <!-- Search -->
+        <div class="flex items-center bg-white/80 mt-5 rounded-full px-4 py-2 text-gray-700 shadow-md max-w-lg mx-auto">
+
+          <select id="propertyTypeSelect" class="text-sm text-gray-600 bg-transparent outline-none cursor-pointer">
+            <option value="residential">Residential</option>
+            <option value="commercial">Commercial</option>
+          </select>
+
+          <div class="h-5 w-px bg-gray-300 mx-2"></div>
+
+          <div class="relative flex-grow">
+            <input id="mobileSearchInput" class="w-full bg-transparent outline-none text-sm" placeholder="Select City, Locality Or Projects Name" autocomplete="off">
+
+          </div>
+
+          <button id="mobileSearchButton" class="ml-2">
+            <i class="fas fa-search text-gray-700"></i>
+          </button>
+
+        </div>
+      </div>
+
+  </section>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+
+    /* =========================
+      DEBOUNCE FUNCTION
+    ========================== */
+    function debounce(callback, delay = 350) {
+      let timer;
+      return function (...args) {
+        clearTimeout(timer);
+        timer = setTimeout(() => callback.apply(this, args), delay);
+      };
+    }
+
+    /* =========================
+      ELEMENTS
+    ========================== */
+    const desktopInput = document.getElementById("searchInput");
+    const desktopBox = document.getElementById("suggestionBox");
+    const desktopBtn = document.getElementById("searchButton");
+
+    const mobileInput = document.getElementById("mobileSearchInput");
+    const mobileBox = document.getElementById("mobileSuggestionBox");
+    const mobileBtn = document.getElementById("mobileSearchButton");
+
+    /* =========================
+      FETCH SUGGESTIONS
+    ========================== */
+    async function fetchSuggestions(query, suggestionBox, inputField) {
+
+      if (!suggestionBox) return;
+
+      if (query.length < 1) {
+        suggestionBox.classList.add("hidden");
+        return;
+      }
+
+      try {
+        const response = await fetch(`/properties/api/search-suggestions/?q=${encodeURIComponent(query)}`);
+
+        if (!response.ok) throw new Error("Network error");
+
+        const data = await response.json();
+        suggestionBox.innerHTML = "";
+
+        if (!data.length) {
+          suggestionBox.innerHTML =
+            `<li class="px-4 py-2 text-sm text-gray-500">No results found</li>`;
+          suggestionBox.classList.remove("hidden");
+          return;
+        }
+
+        data.forEach(item => {
+          const li = document.createElement("li");
+          li.className =
+            "px-4 py-2 text-sm cursor-pointer hover:bg-gray-100 flex justify-between items-center";
+
+          li.innerHTML = `
+            <span>${item.name}</span>
+            <span class="text-xs text-gray-400">${item.type}</span>
+          `;
+
+          li.addEventListener("click", () => {
+
+            // Smart redirect based on type
+            if (item.type === "Project") {
+              window.location.href =
+                `/properties/search/?q=${encodeURIComponent(item.name)}`;
+            }
+
+            else if (item.type === "Developer") {
+              window.location.href =
+                `/properties/search/?q=${encodeURIComponent(item.name)}`;
+            }
+
+            else if (item.type === "Locality") {
+              window.location.href =
+                `/properties/search/?q=${encodeURIComponent(item.name)}`;
+            }
+
+            else if (item.type === "City") {
+              window.location.href =
+                `/properties/search/?q=${encodeURIComponent(item.name)}`;
+            }
+
+            suggestionBox.classList.add("hidden");
+          });
+
+          suggestionBox.appendChild(li);
+        });
+
+        suggestionBox.classList.remove("hidden");
+
+      } catch (error) {
+        suggestionBox.innerHTML =
+          `<li class="px-4 py-2 text-sm text-red-500">Error loading</li>`;
+        suggestionBox.classList.remove("hidden");
+      }
+    }
+
+    /* =========================
+      DESKTOP SEARCH
+    ========================== */
+    const desktopSearch = debounce((value) => {
+      fetchSuggestions(value, desktopBox, desktopInput);
+    });
+
+    desktopInput?.addEventListener("input", (e) => {
+      desktopSearch(e.target.value.trim());
+    });
+
+    desktopBtn?.addEventListener("click", () => {
+      const value = desktopInput.value.trim();
+      if (value.length < 1) {
+        alert("Please enter a valid search term");
+        return;
+      }
+      window.location.href =
+        `/properties/search/?q=${encodeURIComponent(value)}`;
+    });
+
+    /* =========================
+      MOBILE SEARCH
+    ========================== */
+    const mobileSearch = debounce((value) => {
+      fetchSuggestions(value, mobileBox, mobileInput);
+    });
+
+    mobileInput?.addEventListener("input", (e) => {
+      mobileSearch(e.target.value.trim());
+    });
+
+    mobileBtn?.addEventListener("click", () => {
+      const value = mobileInput.value.trim();
+      if (value.length < 2) {
+        alert("Please enter a valid search term");
+        return;
+      }
+      window.location.href =
+        `/properties/search/?q=${encodeURIComponent(value)}`;
+    });
+
+    /* =========================
+      CLOSE DROPDOWN ON OUTSIDE CLICK
+    ========================== */
+    document.addEventListener("click", function (e) {
+
+      if (!e.target.closest("#searchInput")) {
+        desktopBox?.classList.add("hidden");
+      }
+
+      if (!e.target.closest("#mobileSearchInput")) {
+        mobileBox?.classList.add("hidden");
+      }
+
+    });
+
+  });
+  document.addEventListener("DOMContentLoaded", function () {
+
+    const tabOptions = {
+      buy: ["Residential", "Commercial"],
+      new: ["Residential", "Commercial"],
+      rental: ["Residential", "Commercial", "PG / Co-living"]
+    };
+
+    const desktopTabs = document.querySelectorAll(".hidden.md\\:block .tab-btn");
+    const mobileTabs = document.querySelectorAll("#mobileTabs .tab-btn");
+    const desktopType = document.getElementById("propertyType");
+    const mobileType = document.getElementById("propertyTypeSelect");
+    const indicator = document.getElementById("desktop-tab-indicator");
+
+    /* ======================
+      DESKTOP TAB CLICK
+    ====================== */
+    desktopTabs.forEach((tab, index) => {
+      tab.addEventListener("click", function () {
+
+        // Reset all tabs
+        desktopTabs.forEach(t => {
+          t.classList.remove("text-white");
+          t.classList.add("text-gray-800");
+        });
+
+        this.classList.remove("text-gray-800");
+        this.classList.add("text-white");
+
+        const selectedTab = this.dataset.tab;
+        const options = tabOptions[selectedTab];
+
+        if (!options || !desktopType) return;
+
+        // Update dropdown
+        desktopType.innerHTML = "";
+        options.forEach(option => {
+          const opt = document.createElement("option");
+          opt.textContent = option;
+          opt.value = option.toLowerCase().replace(/\s+/g, "-");
+          desktopType.appendChild(opt);
+        });
+
+        // Move indicator
+        if (indicator) {
+          indicator.style.left = `${index * 33.33}%`;
+        }
+      });
+    });
+
+    /* ======================
+      MOBILE TAB CLICK
+    ====================== */
+    mobileTabs.forEach(tab => {
+      tab.addEventListener("click", function () {
+
+        mobileTabs.forEach(t => {
+          t.classList.remove("bg-white", "text-black", "font-semibold");
+          t.classList.add("bg-[#122c61]", "text-white");
+        });
+
+        this.classList.remove("bg-[#122c61]", "text-white");
+        this.classList.add("bg-white", "text-black", "font-semibold");
+
+        const selectedTab = this.dataset.tab;
+        const options = tabOptions[selectedTab];
+
+        if (!options || !mobileType) return;
+
+        mobileType.innerHTML = "";
+        options.forEach(option => {
+          const opt = document.createElement("option");
+          opt.textContent = option;
+          opt.value = option.toLowerCase().replace(/\s+/g, "-");
+          mobileType.appendChild(opt);
+        });
+      });
+    });
+
+  });
+</script>
