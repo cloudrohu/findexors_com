@@ -46,18 +46,39 @@ class InterviewInline(admin.StackedInline):
 # =====================================================
 class JobApplicantInline(admin.TabularInline):
     model = JobApplicant
-    extra = 0
+    extra = 2
     show_change_link = True
     readonly_fields = ("applied_at",)
 
     fields = (
         "full_name",
         "phone",
+        "other_number",
+        "email",
+
+
         "city",
-        "experience_months",
-        "status",
+        "locality",
         "apply_source",
+        "data_source",
+
+        "resume",
+        "image",
+        "experience_months",
+        "current_company",
+        "current_salary",
+        "expected_salary",
+        "notice_period",
+        "expected_joining_date",
+        "cover_letter",
+        "internal_notes",
+        "allow_whatsapp",
+        "status",
         "applied_at",
+
+
+
+
     )
 
 
