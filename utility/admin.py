@@ -272,6 +272,10 @@ class ProjectAmenitiesAdmin(admin.ModelAdmin):
     preview.short_description = "Image Preview"
 
 
+@admin.register(RequirementType)
+class RequirementTypeAdmin(admin.ModelAdmin):
+    list_display = ("name",)
+
 # ======================================================
 # 🔹 BANK ADMIN
 # ======================================================
@@ -306,7 +310,3 @@ class BankAdmin(admin.ModelAdmin):
 
     safe_image_preview.short_description = "Logo"
 
-@admin.register(RequirementType)
-class RequirementTypeAdmin(admin.ModelAdmin):
-
-    list_display = ("name")
