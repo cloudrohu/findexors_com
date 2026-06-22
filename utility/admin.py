@@ -305,3 +305,8 @@ class BankAdmin(admin.ModelAdmin):
         )
 
     safe_image_preview.short_description = "Logo"
+
+@admin.register(RequirementType)
+class RequirementTypeAdmin(admin.ModelAdmin):
+
+    list_display = ("name")

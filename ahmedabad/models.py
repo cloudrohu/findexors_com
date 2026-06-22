@@ -45,18 +45,18 @@ class Staff(models.Model):
 
 class AhmedabadCompany(models.Model):
     STATUS_CHOICES = [
-    ("New", "New"),
-    ("Meeting", "Meeting"),
-    ("FollowUp", "Follow Up"),
-    ("Not_received", "Not Received"),
-    ("Not Interested", "Not Interested"),
-    ("They Will Connect", "They Will Connect"),
-    ("Call later", "Call later"),
-    ("Call Tomorrow", "Call Tomorrow"),
-    ("Switched Off", "Switched Off"),
-    ("Invalid Number", "Invalid Number"),
-    ("Meeting_FollowUp", "Meeting-Follow Up"),
-]
+        ("New", "New"),
+        ("Meeting", "Meeting"),
+        ("FollowUp", "Follow Up"),
+        ("Not_received", "Not Received"),
+        ("Not Interested", "Not Interested"),
+        ("They Will Connect", "They Will Connect"),
+        ("Call later", "Call later"),
+        ("Call Tomorrow", "Call Tomorrow"),
+        ("Switched Off", "Switched Off"),
+        ("Invalid Number", "Invalid Number"),
+        ("Meeting_FollowUp", "Meeting-Follow Up"),
+    ]
 
 
 
