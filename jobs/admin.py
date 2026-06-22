@@ -232,6 +232,11 @@ class JobApplicantAdmin(admin.ModelAdmin):
         "allow_whatsapp",
         "status",
         "applied_at",
+        "other_number",
+        "image",
+        "data_source",
+
+        
     )
 
     list_filter = (
@@ -244,6 +249,9 @@ class JobApplicantAdmin(admin.ModelAdmin):
         "allow_whatsapp",
         "applied_at",
         "status_updated_at",
+        "other_number",
+        "data_source",
+
     )
 
     search_fields = (
@@ -252,6 +260,8 @@ class JobApplicantAdmin(admin.ModelAdmin):
         "email",
         "current_company",
         "job__title__name",
+        "other_number",
+
     )
 
     autocomplete_fields = (

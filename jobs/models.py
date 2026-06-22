@@ -131,11 +131,21 @@ class JobApplicant(models.Model):
     ]
 
     APPLY_SOURCE_CHOICES = [
+        ("Apna", "Apna"),
+        ("Job_hai", "Job Hai"),
+        ("Indeed", "Indeed"),
+        ("Work_India", "Work India"),
         ("website", "Website"),
         ("whatsapp", "WhatsApp"),
         ("call", "Call"),
         ("admin", "Admin"),
         ("import", "Imported"),
+    ]
+
+    DATA_SOURCE_CHOICES = [
+        ("Apply", "Apply"),
+        ("Recommendations", "Recommendations"),
+        ("Data_Base", "Data Base"),
     ]
 
     NOTICE_PERIOD_CHOICES = [
@@ -147,93 +157,50 @@ class JobApplicant(models.Model):
     ]
 
     # 🔹 Relations
-    job = models.ForeignKey(
-        Job,
-        on_delete=models.CASCADE,
-        related_name="applications"
-    )
+    job = models.ForeignKey(Job,on_delete=models.CASCADE,related_name="applications")
 
-    user = models.ForeignKey(
-        User,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True
-    )
+    user = models.ForeignKey(User,on_delete=models.SET_NULL,null=True,blank=True)
 
-    city = models.ForeignKey(
-        City,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True
-    )
+    city = models.ForeignKey(City,on_delete=models.SET_NULL,null=True,blank=True)
 
-    locality = models.ForeignKey(
-        Locality,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True
-    )
+    locality = models.ForeignKey(Locality,on_delete=models.SET_NULL,null=True,blank=True)
 
-    # 🔹 Basic info
     full_name = models.CharField(max_length=150)
+
     phone = models.CharField(max_length=15)
+
+    other_number = models.CharField(max_length=15, blank=True, null=True)
+
+
     email = models.EmailField(blank=True, null=True)
 
-    resume = models.FileField(
-        upload_to="resumes/",
-        blank=True,
-        null=True
-    )
+    resume = models.FileField(upload_to="resumes/",blank=True,null=True)
 
-    # 🔹 Career info
+    image = models.ImageField(upload_to="applicant_images/", blank=True, null=True)
+
     experience_months = models.PositiveIntegerField(default=0)
 
-    current_company = models.CharField(
-        max_length=150,
-        blank=True,
-        null=True
-    )
+    current_company = models.CharField(max_length=150,blank=True,null=True)
 
-    current_salary = models.PositiveIntegerField(
-        blank=True,
-        null=True
-    )
+    current_salary = models.PositiveIntegerField(blank=True,null=True)
 
-    expected_salary = models.PositiveIntegerField(
-        blank=True,
-        null=True
-    )
+    expected_salary = models.PositiveIntegerField(blank=True,null=True)
 
-    notice_period = models.CharField(
-        max_length=20,
-        choices=NOTICE_PERIOD_CHOICES,
-        blank=True,
-        null=True
-    )
+    notice_period = models.CharField(max_length=20,choices=NOTICE_PERIOD_CHOICES,blank=True,null=True)
 
-    expected_joining_date = models.DateField(
-        blank=True,
-        null=True
-    )
+    expected_joining_date = models.DateField(blank=True,null=True)
 
-    # 🔹 Notes
     cover_letter = models.TextField(blank=True, null=True)
     internal_notes = models.TextField(blank=True, null=True)
 
-    # 🔹 Tracking
-    apply_source = models.CharField(
-        max_length=20,
-        choices=APPLY_SOURCE_CHOICES,
-        default="website"
-    )
+    apply_source = models.CharField(max_length=20,choices=APPLY_SOURCE_CHOICES,default="website")
+
+    data_source = models.CharField(max_length=20,choices=DATA_SOURCE_CHOICES,default="Apply")
+
 
     allow_whatsapp = models.BooleanField(default=True)
 
-    status = models.CharField(
-        max_length=20,
-        choices=APPLICATION_STATUS,
-        default="applied"
-    )
+    status = models.CharField(max_length=20,choices=APPLICATION_STATUS,default="applied")
 
     applied_at = models.DateTimeField(default=timezone.now)
     status_updated_at = models.DateTimeField(auto_now=True)
@@ -244,6 +211,8 @@ class JobApplicant(models.Model):
 
     def __str__(self):
         return f"{self.full_name} → {self.job}"
+
+
 class InterviewSchedule(models.Model):
 
     INTERVIEW_TYPE_CHOICES = [

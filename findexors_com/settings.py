@@ -45,7 +45,7 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = [    
-    "admin_interface",
+    'jazzmin',
     "colorfield",
     'tabbed_admin',
     'rangefilter',

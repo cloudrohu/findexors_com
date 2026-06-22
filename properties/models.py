@@ -52,7 +52,6 @@ class Developer(models.Model):
     def image_tag(self):
         return mark_safe('<img src="%s" width="50" height="50" />' % (self.image.url))
 
-
 def format_price(num):
     """Convert number into Indian readable format (Lakh/Cr)."""
     try:
@@ -79,6 +78,7 @@ def format_price_range(price_min, price_max):
     if price_min == price_max:
         return fmt(price_min)
     return f"{fmt(price_min)}–{fmt(price_max)}"
+
 class Project(MPTTModel):
     
     BHK_CHOICES = (
@@ -118,11 +118,11 @@ class Project(MPTTModel):
     city = models.ForeignKey(City, on_delete=models.CASCADE) 
     locality = models.ForeignKey(Locality, on_delete=models.CASCADE) 
     
-    land_parce = models.CharField(max_length=50,null=True, blank=True)
+    land_parcel = models.CharField(max_length=50,null=True, blank=True)
     bhk_type = MultiSelectField(choices=BHK_CHOICES, max_length=50,null=True, blank=True)
     floor = models.CharField(max_length=50,null=True, blank=True)
     
-    possession_year = models.ForeignKey(PossessionIn, on_delete=models.CASCADE) 
+    possession_year = models.ForeignKey(PossessionIn, on_delete=models.CASCADE,null=True, blank=True) 
     possession_month = models.CharField(max_length=20, choices=MONTH_CHOICES, blank=True, null=True, help_text="Select Possession Month")
     
     luxurious = models.CharField(max_length=50,null=True, blank=True)
@@ -137,7 +137,7 @@ class Project(MPTTModel):
     featured_property = models.BooleanField(default=False)
     balcony = models.BooleanField(default=False)
     active = models.BooleanField(default=False)
-    image = models.ImageField(null=True, blank=True,upload_to='images/')
+    image = models.ImageField(upload_to='images/',null=True, blank=True)
     google_map_iframe = models.TextField(null=True, blank=True,)
 
     

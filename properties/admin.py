@@ -200,28 +200,30 @@ class ProjectAdmin(MPTTModelAdmin):
             'fields': (
                 'project_name', 'slug', 'parent', 'developer',
                 'city', 'locality', 'propert_type',
-                'construction_status', 'bhk_type',
-                'floor', 'land_parce', 'luxurious', 'priceing'
+                'image',
+                'construction_status',
+                'image_preview',
+                'youtube_embed_id', 'youtube_preview',
+                'create_at', 'update_at',
+                'google_map_iframe',
+
+                
+
+
+                
             )
         }),
-        ('Possession & Status', {
+        ('More Info', {
             'fields': (
+                
+                'bhk_type',
+                'floor', 'land_parcel', 'luxurious', 'priceing',
                 'possession_month', 'possession_year',
                 'Occupancy_Certificate',
                 'Commencement_Certificate',
                 'featured_property', 'active'
+                
             )
-        }),
-        ('Media & Map', {
-            'fields': (
-                'image', 'image_preview',
-                'youtube_embed_id',
-                'google_map_iframe',
-                'youtube_preview'
-            )
-        }),
-        ('Timestamps', {
-            'fields': ('create_at', 'update_at')
         }),
     )
 
