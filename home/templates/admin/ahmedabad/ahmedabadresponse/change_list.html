@@ -202,6 +202,26 @@ audio{
             🚀 Lead Source: {{ obj.lead_source }}
         </div>
 
+        {% if obj.requirement_types.exists %}
+            <div class="meta">
+                📌 Requirement:
+                {% for req in obj.requirement_types.all %}
+                    <span style="
+                        display:inline-block;
+                        padding:3px 8px;
+                        margin:2px;
+                        border-radius:20px;
+                        background:#e0f2fe;
+                        color:#0369a1;
+                        font-size:11px;
+                        font-weight:600;
+                    ">
+                        {{ req }}
+                    </span>
+                {% endfor %}
+            </div>
+            {% endif %}
+
         {% if obj.comment %}
         <div class="meta">
             💬 {{ obj.comment }}
