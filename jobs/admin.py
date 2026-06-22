@@ -62,23 +62,6 @@ class JobApplicantInline(admin.TabularInline):
         "apply_source",
         "data_source",
 
-        "resume",
-        "image",
-        "experience_months",
-        "current_company",
-        "current_salary",
-        "expected_salary",
-        "notice_period",
-        "expected_joining_date",
-        "cover_letter",
-        "internal_notes",
-        "allow_whatsapp",
-        "status",
-        "applied_at",
-
-
-
-
     )
 
 
