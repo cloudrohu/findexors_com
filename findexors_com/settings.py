@@ -26,6 +26,8 @@ DATABASES = {
     }
 }
 
+DATA_UPLOAD_MAX_NUMBER_FIELDS = 50000
+
 MEDIA_URL = '/uploads/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'uploads')
 
