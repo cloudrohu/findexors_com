@@ -5,11 +5,12 @@ from django.contrib import admin
 from django.utils.html import mark_safe
 from import_export.admin import ImportExportModelAdmin
 from .models import Developer
+from django.utils.html import format_html
 
 from .models import (
     Project, BookingOffer, WelcomeTo, WebSlider, Overview, AboutUs,
     USP, Configuration, Connectivity, Amenities, Gallery, Header,
-    RERA_Info, WhyInvest, BankOffer,Enquiry,ProjectFAQ
+    RERA_Info, WhyInvest, BankOffer,Enquiry,ProjectFAQ,Architects,Engineer
 )
 
 # ✅ Placeholder image for missing logos
@@ -22,47 +23,44 @@ class DeveloperAdmin(ImportExportModelAdmin):
         'title',
         'city',
         'locality',
+        'address',
+        'contact_person', 'contact_no', 'email', 'web_site',
+        'note',
         'featured_builder',
         'created_date',
         'updated_date',
         'logo_preview',
     )
-    list_filter = ('city', 'featured_builder', 'create_at', 'update_at')
-    search_fields = ('title', 'city__name', 'locality__name', 'keywords', 'contact_person')
+    list_filter = ('city', 'locality','featured_builder', 'create_at', 'update_at')
+    search_fields = ('title', 'city__name', 'locality__name', 'keywords', 'contact_person','contact_no','note','address',)
     prepopulated_fields = {"slug": ("title",)}
     readonly_fields = ('create_at', 'update_at', 'logo_preview')
 
     fieldsets = (
         ('Basic Information', {
-            'fields': ('title', 'slug', 'city', 'locality', 'featured_builder')
+            'fields':('title',  'city', 'locality', 'address','contact_person', 'contact_no', 'email', 'web_site','featured_builder',)
         }),
-        ('Contact Details', {
-            'fields': ('contact_person', 'contact_no', 'email', 'web_site', 'google_map', 'address')
-        }),
+        
         ('SEO & Content', {
-            'fields': ('keywords', 'about_developer')
+            'fields': ('keywords', 'about_developer','logo', 'logo_preview', 'google_map','slug','create_at', 'update_at')
         }),
-        ('Media', {
-            'fields': ('logo', 'logo_preview')
-        }),
-        ('Timestamps', {
-            'fields': ('create_at', 'update_at')
-        }),
+       
     )
 
     def logo_preview(self, obj):
-        """
-        Show developer logo or a default 'no image' placeholder.
-        """
-        if obj.logo and hasattr(obj.logo, 'url'):
-            image_url = obj.logo.url
-        else:
-            image_url = NO_IMAGE_URL
-        return mark_safe(
-            f'<img src="{image_url}" width="80" height="80" '
-            f'style="object-fit:contain; border:1px solid #ddd; border-radius:6px;" />'
+        if obj.logo and obj.logo.name:
+            return format_html(
+                '<img src="{}" width="80" height="80" style="object-fit:contain;border:1px solid #ddd;border-radius:6px;" />',
+                obj.logo.url
+            )
+
+        return format_html(
+            '<img src="{}" width="80" height="80" style="object-fit:contain;border:1px solid #ddd;border-radius:6px;" />',
+            NO_IMAGE_URL
         )
+
     logo_preview.short_description = "Logo Preview"
+        
 
     def created_date(self, obj):
         return obj.create_at.strftime('%d %b %Y')
@@ -72,11 +70,117 @@ class DeveloperAdmin(ImportExportModelAdmin):
         return obj.update_at.strftime('%d %b %Y')
     updated_date.short_description = "Updated"
 
+@admin.register(Architects)
+class ArchitectsAdmin(ImportExportModelAdmin):
+    list_display = (
+        'id',
+        'title',
+        'city',
+        'locality',
+        'address',
+        'contact_person', 'contact_no', 'email', 'web_site',
+        'note',
+        'featured_architect',
+        'created_date',
+        'updated_date',
+        'logo_preview',
+    )
+    list_filter = ('city', 'locality','featured_architect', 'create_at', 'update_at')
+    search_fields = ('title', 'city__name', 'locality__name', 'keywords', 'contact_person','contact_no','note','address',)
+    prepopulated_fields = {"slug": ("title",)}
+    readonly_fields = ('create_at', 'update_at', 'logo_preview')
+
+    fieldsets = (
+        ('Basic Information', {
+            'fields':('title',  'city', 'locality', 'address','contact_person', 'contact_no', 'email', 'web_site','featured_architect',)
+        }),
+        
+        ('SEO & Content', {
+            'fields': ('keywords', 'about_architect','logo', 'logo_preview', 'google_map','slug','create_at', 'update_at')
+        }),
+       
+    )
+
+    def logo_preview(self, obj):
+        if obj.logo and obj.logo.name:
+            return format_html(
+                '<img src="{}" width="80" height="80" style="object-fit:contain;border:1px solid #ddd;border-radius:6px;" />',
+                obj.logo.url
+            )
+
+        return format_html(
+            '<img src="{}" width="80" height="80" style="object-fit:contain;border:1px solid #ddd;border-radius:6px;" />',
+            NO_IMAGE_URL
+        )
+
+    logo_preview.short_description = "Logo Preview"
+        
+
+    def created_date(self, obj):
+        return obj.create_at.strftime('%d %b %Y')
+    created_date.short_description = "Created"
+
+    def updated_date(self, obj):
+        return obj.update_at.strftime('%d %b %Y')
+    updated_date.short_description = "Updated"
+
+@admin.register(Engineer)
+class EngineerAdmin(ImportExportModelAdmin):
+    list_display = (
+        'id',
+        'title',
+        'city',
+        'locality',
+        'address',
+        'contact_person', 'contact_no', 'email', 'web_site',
+        'note',
+        'featured_engineer',
+        'created_date',
+        'updated_date',
+        'logo_preview',
+    )
+    list_filter = ('city', 'locality','featured_engineer', 'create_at', 'update_at')
+    search_fields = ('title', 'city__name', 'locality__name', 'keywords', 'contact_person','contact_no','note','address',)
+    prepopulated_fields = {"slug": ("title",)}
+    readonly_fields = ('create_at', 'update_at', 'logo_preview')
+
+    fieldsets = (
+        ('Basic Information', {
+            'fields':('title',  'city', 'locality', 'address','contact_person', 'contact_no', 'email', 'web_site','featured_engineer',)
+        }),
+        
+        ('SEO & Content', {
+            'fields': ('keywords', 'about_engineer','logo', 'logo_preview', 'google_map','slug','create_at', 'update_at')
+        }),
+       
+    )
+
+    def logo_preview(self, obj):
+        if obj.logo and obj.logo.name:
+            return format_html(
+                '<img src="{}" width="80" height="80" style="object-fit:contain;border:1px solid #ddd;border-radius:6px;" />',
+                obj.logo.url
+            )
+
+        return format_html(
+            '<img src="{}" width="80" height="80" style="object-fit:contain;border:1px solid #ddd;border-radius:6px;" />',
+            NO_IMAGE_URL
+        )
+
+    logo_preview.short_description = "Logo Preview"
+        
+
+    def created_date(self, obj):
+        return obj.create_at.strftime('%d %b %Y')
+    created_date.short_description = "Created"
+
+    def updated_date(self, obj):
+        return obj.update_at.strftime('%d %b %Y')
+    updated_date.short_description = "Updated"
 
 class BookingOfferInline(admin.TabularInline):
     model = BookingOffer
     extra = 1
-
 
 class WelcomeToInline(admin.StackedInline):
     model = WelcomeTo
@@ -86,7 +190,6 @@ class ProjectFAQInline(admin.TabularInline):
     model = ProjectFAQ
     extra = 1
     fields = ("order", "question", "answer")
-
 
 class WebSliderInline(admin.TabularInline):
     model = WebSlider
@@ -101,11 +204,9 @@ class WebSliderInline(admin.TabularInline):
         return mark_safe(f'<img src="{url}" width="80" height="50" style="object-fit:cover;border-radius:6px;">')
     image_preview.short_description = "Preview"
 
-
 class OverviewInline(admin.StackedInline):
     model = Overview
     extra = 1
-
 
 class AboutUsInline(admin.StackedInline):
     model = AboutUs
@@ -169,13 +270,13 @@ class BankOfferInline(admin.TabularInline):
 @admin.register(Project)
 class ProjectAdmin(MPTTModelAdmin):
     list_display = (
-        'project_name', 'city', 'locality', 'developer',
+        'project_name', 'city', 'locality', 'developer','architects','engineer',
         'construction_status', 'possession_month', 'possession_year',
         'featured_property', 'active', 'image_preview', 'youtube_preview'
     )
 
     list_filter = (
-        'city', 'developer', 'propert_type',
+        'city', 'developer', 'architects','engineer','propert_type',
         'construction_status', 'featured_property', 'active'
     )
 
@@ -183,7 +284,9 @@ class ProjectAdmin(MPTTModelAdmin):
         'project_name',
         'city__name',
         'locality__name',
-        'developer__title'
+        'developer__title',
+        'architects_title',
+        'engineer_title',
     )
 
     prepopulated_fields = {"slug": ("project_name",)}
@@ -205,12 +308,7 @@ class ProjectAdmin(MPTTModelAdmin):
                 'image_preview',
                 'youtube_embed_id', 'youtube_preview',
                 'create_at', 'update_at',
-                'google_map_iframe',
-
-                
-
-
-                
+                'google_map_iframe',      
             )
         }),
         ('More Info', {
@@ -221,7 +319,10 @@ class ProjectAdmin(MPTTModelAdmin):
                 'possession_month', 'possession_year',
                 'Occupancy_Certificate',
                 'Commencement_Certificate',
-                'featured_property', 'active'
+                'featured_property',
+                'active',
+                'architects',
+                'engineer',
                 
             )
         }),
@@ -243,7 +344,7 @@ class ProjectAdmin(MPTTModelAdmin):
         RERAInfoInline,
         WhyInvestInline,
         BankOfferInline,
-        ProjectFAQInline,   # ✅ FAQ INLINE
+        ProjectFAQInline,
     ]
 
     class MPTTMeta:

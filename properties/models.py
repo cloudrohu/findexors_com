@@ -29,7 +29,8 @@ class Developer(models.Model):
     address = models.CharField(max_length=500, null=True, blank=True)
     keywords = models.CharField(max_length=255, null=True, blank=True)
     about_developer = models.TextField(max_length=5000, null=True, blank=True)
-    logo = models.ImageField(upload_to='images/')
+    note = models.TextField(max_length=5000, null=True, blank=True)
+    logo = models.ImageField(upload_to='images/', null=True, blank=True)
     featured_builder = models.BooleanField(default=False)
     slug = models.SlugField(unique=True, null=True, blank=True)
     create_at = models.DateTimeField(auto_now_add=True)
@@ -51,6 +52,78 @@ class Developer(models.Model):
 
     def image_tag(self):
         return mark_safe('<img src="%s" width="50" height="50" />' % (self.image.url))
+
+class Architects(models.Model):
+    city = models.ForeignKey(City, on_delete=models.CASCADE, null=True,blank=True)  # many to one relation with Brand
+    locality = models.ForeignKey(Locality, on_delete=models.CASCADE, null=True,blank=True)  # many to one relation with Brand
+    title = models.CharField(max_length=150, unique=True)
+    contact_person = models.CharField(max_length=255, null=True, blank=True)
+    contact_no = models.CharField(max_length=255, null=True, blank=True)
+    email = models.EmailField(null=True, blank=True)
+    google_map = models.CharField(blank=True,max_length=1000)
+    web_site = models.CharField(blank=True,max_length=150)
+    address = models.CharField(max_length=500, null=True, blank=True)
+    keywords = models.CharField(max_length=255, null=True, blank=True)
+    about_architect = models.TextField(max_length=5000, null=True, blank=True)
+    note = models.TextField(max_length=5000, null=True, blank=True)
+    logo = models.ImageField(upload_to='images/', null=True, blank=True)
+    featured_architect = models.BooleanField(default=False)
+    slug = models.SlugField(unique=True, null=True, blank=True)
+    create_at = models.DateTimeField(auto_now_add=True)
+    update_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.title
+    
+    class Meta:
+        verbose_name_plural='Architects'
+
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.title + ' ' + self.city.name)
+        super(Architects, self).save(*args, **kwargs)
+
+    def get_absolute_url(self):
+        return reverse('architect_detail', kwargs={'slug': self.slug})
+
+    def image_tag(self):
+        return mark_safe('<img src="%s" width="50" height="50" />' % (self.image.url))
+class Engineer(models.Model):
+    city = models.ForeignKey(City, on_delete=models.CASCADE, null=True,blank=True)  # many to one relation with Brand
+    locality = models.ForeignKey(Locality, on_delete=models.CASCADE, null=True,blank=True)  # many to one relation with Brand
+    title = models.CharField(max_length=150, unique=True)
+    contact_person = models.CharField(max_length=255, null=True, blank=True)
+    contact_no = models.CharField(max_length=255, null=True, blank=True)
+    email = models.EmailField(null=True, blank=True)
+    google_map = models.CharField(blank=True,max_length=1000)
+    web_site = models.CharField(blank=True,max_length=150)
+    address = models.CharField(max_length=500, null=True, blank=True)
+    keywords = models.CharField(max_length=255, null=True, blank=True)
+    about_engineer = models.TextField(max_length=5000, null=True, blank=True)
+    note = models.TextField(max_length=5000, null=True, blank=True)
+    logo = models.ImageField(upload_to='images/', null=True, blank=True)
+    featured_engineer = models.BooleanField(default=False)
+    slug = models.SlugField(unique=True, null=True, blank=True)
+    create_at = models.DateTimeField(auto_now_add=True)
+    update_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.title
+    
+    class Meta:
+        verbose_name_plural='Engineer'
+
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.title + ' ' + self.city.name)
+        super(Engineer, self).save(*args, **kwargs)
+
+    def get_absolute_url(self):
+        return reverse('engineer_detail', kwargs={'slug': self.slug})
+
+    def image_tag(self):
+        return mark_safe('<img src="%s" width="50" height="50" />' % (self.image.url))
+
 
 def format_price(num):
     """Convert number into Indian readable format (Lakh/Cr)."""
@@ -78,7 +151,6 @@ def format_price_range(price_min, price_max):
     if price_min == price_max:
         return fmt(price_min)
     return f"{fmt(price_min)}–{fmt(price_max)}"
-
 class Project(MPTTModel):
     
     BHK_CHOICES = (
@@ -115,7 +187,9 @@ class Project(MPTTModel):
     
     # Foreign Keys
     developer = models.ForeignKey(Developer, on_delete=models.CASCADE) 
-    city = models.ForeignKey(City, on_delete=models.CASCADE) 
+    architects = models.ForeignKey(Architects, on_delete=models.CASCADE,null=True,blank=True) 
+    engineer = models.ForeignKey(Engineer, on_delete=models.CASCADE,null=True,blank=True) 
+    city = models.ForeignKey(City, on_delete=models.CASCADE)
     locality = models.ForeignKey(Locality, on_delete=models.CASCADE) 
     
     land_parcel = models.CharField(max_length=50,null=True, blank=True)
