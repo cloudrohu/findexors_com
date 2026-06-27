@@ -24,6 +24,7 @@ class DeveloperAdmin(ImportExportModelAdmin):
         'city',
         'locality',
         'address',
+        'postal_code',
         'contact_person', 'contact_no', 'email', 'web_site',
         'note',
         'featured_builder',
@@ -32,13 +33,13 @@ class DeveloperAdmin(ImportExportModelAdmin):
         'logo_preview',
     )
     list_filter = ('city', 'locality','featured_builder', 'create_at', 'update_at')
-    search_fields = ('title', 'city__name', 'locality__name', 'keywords', 'contact_person','contact_no','note','address',)
+    search_fields = ('title', 'city__name', 'locality__name','postal_code_postal_code', 'keywords', 'contact_person','contact_no','note','address','postal_code',)
     prepopulated_fields = {"slug": ("title",)}
     readonly_fields = ('create_at', 'update_at', 'logo_preview')
 
     fieldsets = (
         ('Basic Information', {
-            'fields':('title',  'city', 'locality', 'address','contact_person', 'contact_no', 'email', 'web_site','featured_builder',)
+            'fields':('title',  'city', 'locality', 'address','postal_code','contact_person', 'contact_no', 'email', 'web_site','featured_builder',)
         }),
         
         ('SEO & Content', {
@@ -78,6 +79,7 @@ class ArchitectsAdmin(ImportExportModelAdmin):
         'city',
         'locality',
         'address',
+        'postal_code',
         'contact_person', 'contact_no', 'email', 'web_site',
         'note',
         'featured_architect',
@@ -86,13 +88,13 @@ class ArchitectsAdmin(ImportExportModelAdmin):
         'logo_preview',
     )
     list_filter = ('city', 'locality','featured_architect', 'create_at', 'update_at')
-    search_fields = ('title', 'city__name', 'locality__name', 'keywords', 'contact_person','contact_no','note','address',)
+    search_fields = ('title', 'city__name', 'locality__name','postal_code_postal_code', 'keywords', 'contact_person','contact_no','note','address',)
     prepopulated_fields = {"slug": ("title",)}
     readonly_fields = ('create_at', 'update_at', 'logo_preview')
 
     fieldsets = (
         ('Basic Information', {
-            'fields':('title',  'city', 'locality', 'address','contact_person', 'contact_no', 'email', 'web_site','featured_architect',)
+            'fields':('title',  'city', 'locality', 'address','postal_code','contact_person', 'contact_no', 'email', 'web_site','featured_architect',)
         }),
         
         ('SEO & Content', {
@@ -132,6 +134,7 @@ class EngineerAdmin(ImportExportModelAdmin):
         'city',
         'locality',
         'address',
+        'postal_code',
         'contact_person', 'contact_no', 'email', 'web_site',
         'note',
         'featured_engineer',
@@ -139,14 +142,14 @@ class EngineerAdmin(ImportExportModelAdmin):
         'updated_date',
         'logo_preview',
     )
-    list_filter = ('city', 'locality','featured_engineer', 'create_at', 'update_at')
-    search_fields = ('title', 'city__name', 'locality__name', 'keywords', 'contact_person','contact_no','note','address',)
+    list_filter = ('city', 'locality','postal_code','featured_engineer', 'create_at', 'update_at')
+    search_fields = ('title', 'city__name', 'locality__name','postal_code_postal_code', 'keywords', 'contact_person','contact_no','note','address',)
     prepopulated_fields = {"slug": ("title",)}
     readonly_fields = ('create_at', 'update_at', 'logo_preview')
 
     fieldsets = (
         ('Basic Information', {
-            'fields':('title',  'city', 'locality', 'address','contact_person', 'contact_no', 'email', 'web_site','featured_engineer',)
+            'fields':('title',  'city', 'locality', 'address','postal_code','contact_person', 'contact_no', 'email', 'web_site','featured_engineer',)
         }),
         
         ('SEO & Content', {
@@ -270,13 +273,13 @@ class BankOfferInline(admin.TabularInline):
 @admin.register(Project)
 class ProjectAdmin(MPTTModelAdmin):
     list_display = (
-        'project_name', 'city', 'locality', 'developer','architects','engineer',
+        'project_name', 'city', 'locality','postal_code', 'developer','architects','engineer',
         'construction_status', 'possession_month', 'possession_year',
         'featured_property', 'active', 'image_preview', 'youtube_preview'
     )
 
     list_filter = (
-        'city', 'developer', 'architects','engineer','propert_type',
+        'city', 'developer','postal_code', 'architects','engineer','propert_type',
         'construction_status', 'featured_property', 'active'
     )
 
@@ -287,6 +290,7 @@ class ProjectAdmin(MPTTModelAdmin):
         'developer__title',
         'architects_title',
         'engineer_title',
+        'postal_code_postal_code',
     )
 
     prepopulated_fields = {"slug": ("project_name",)}
@@ -302,7 +306,7 @@ class ProjectAdmin(MPTTModelAdmin):
         ('Basic Info', {
             'fields': (
                 'project_name', 'slug', 'parent', 'developer',
-                'city', 'locality', 'propert_type',
+                'city', 'locality','postal_code', 'propert_type',
                 'image',
                 'construction_status',
                 'image_preview',

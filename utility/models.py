@@ -12,6 +12,18 @@ from mptt.models import MPTTModel, TreeForeignKey
 from mptt.models import MPTTModel
 from django.utils.text import slugify
 
+class Postal_Code(models.Model):    
+    postal_name = models.CharField(max_length=500,blank=True, null=True,)
+    postal_code = models.CharField(max_length=6,blank=True, null=True,)
+
+    def __str__(self):
+        return self.postal_name 
+    
+    class Meta:
+        verbose_name_plural='Postal_Code'
+
+
+
 class Find_Form(models.Model):    
     title = models.CharField(max_length=500,blank=True, null=True,)
     create_at=models.DateTimeField(auto_now_add=True)

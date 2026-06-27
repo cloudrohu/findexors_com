@@ -10,7 +10,7 @@ from django.utils.safestring import mark_safe
 from mptt.fields import TreeForeignKey
 from mptt.models import MPTTModel
 from django.utils.text import slugify
-from utility.models import City,Locality,PossessionIn,PropertyType,ProjectAmenities,Bank
+from utility.models import City,Locality,PossessionIn,PropertyType,ProjectAmenities,Bank,Postal_Code
 from multiselectfield import MultiSelectField
 from embed_video.fields import EmbedVideoField
 from utility.compress_mixin import ImageCompressionMixin
@@ -27,6 +27,7 @@ class Developer(models.Model):
     google_map = models.CharField(blank=True,max_length=1000)
     web_site = models.CharField(blank=True,max_length=150)
     address = models.CharField(max_length=500, null=True, blank=True)
+    postal_code = models.ForeignKey(Postal_Code, on_delete=models.CASCADE,null=True,blank=True) 
     keywords = models.CharField(max_length=255, null=True, blank=True)
     about_developer = models.TextField(max_length=5000, null=True, blank=True)
     note = models.TextField(max_length=5000, null=True, blank=True)
@@ -63,6 +64,7 @@ class Architects(models.Model):
     google_map = models.CharField(blank=True,max_length=1000)
     web_site = models.CharField(blank=True,max_length=150)
     address = models.CharField(max_length=500, null=True, blank=True)
+    postal_code = models.ForeignKey(Postal_Code, on_delete=models.CASCADE,null=True,blank=True) 
     keywords = models.CharField(max_length=255, null=True, blank=True)
     about_architect = models.TextField(max_length=5000, null=True, blank=True)
     note = models.TextField(max_length=5000, null=True, blank=True)
@@ -98,6 +100,7 @@ class Engineer(models.Model):
     google_map = models.CharField(blank=True,max_length=1000)
     web_site = models.CharField(blank=True,max_length=150)
     address = models.CharField(max_length=500, null=True, blank=True)
+    postal_code = models.ForeignKey(Postal_Code, on_delete=models.CASCADE,null=True,blank=True) 
     keywords = models.CharField(max_length=255, null=True, blank=True)
     about_engineer = models.TextField(max_length=5000, null=True, blank=True)
     note = models.TextField(max_length=5000, null=True, blank=True)
@@ -191,6 +194,8 @@ class Project(MPTTModel):
     engineer = models.ForeignKey(Engineer, on_delete=models.CASCADE,null=True,blank=True) 
     city = models.ForeignKey(City, on_delete=models.CASCADE)
     locality = models.ForeignKey(Locality, on_delete=models.CASCADE) 
+    postal_code = models.ForeignKey(Postal_Code, on_delete=models.CASCADE,null=True,blank=True) 
+
     
     land_parcel = models.CharField(max_length=50,null=True, blank=True)
     bhk_type = MultiSelectField(choices=BHK_CHOICES, max_length=50,null=True, blank=True)

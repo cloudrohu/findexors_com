@@ -12,13 +12,22 @@ from .models import (
     Find_Form, Call_Status,
     SocialSite, Googlemap_Status,
     Response_Status, RequirementType,
-    Category
+    Category,Postal_Code
 )
 
 # ======================================================
 # 🔹 CONSTANT
 # ======================================================
 NO_IMAGE_URL = "https://via.placeholder.com/80x80.png?text=No+Image"
+
+@admin.register(Postal_Code)
+class Postal_CodeAdmin(admin.ModelAdmin):
+
+    list_display = ("postal_name","postal_code")
+    ordering = ("postal_name","postal_code")
+    search_fields = ("postal_name","postal_code")
+    list_per_page = 30
+
 
 
 # ======================================================
