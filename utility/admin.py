@@ -4,6 +4,7 @@ from import_export import resources, fields
 from import_export.widgets import ForeignKeyWidget
 from mptt.admin import MPTTModelAdmin, DraggableMPTTAdmin
 from django.utils.html import format_html, mark_safe
+from import_export.admin import ImportExportModelAdmin
 
 from .models import (
     City, Locality, Sub_Locality,
@@ -15,24 +16,16 @@ from .models import (
     Category,Postal_Code
 )
 
-# ======================================================
-# 🔹 CONSTANT
-# ======================================================
 NO_IMAGE_URL = "https://via.placeholder.com/80x80.png?text=No+Image"
 
 @admin.register(Postal_Code)
-class Postal_CodeAdmin(admin.ModelAdmin):
+class Postal_CodeAdmin(ImportExportModelAdmin):
 
     list_display = ("postal_name","postal_code")
     ordering = ("postal_name","postal_code")
     search_fields = ("postal_name","postal_code")
     list_per_page = 30
 
-
-
-# ======================================================
-# 🔹 LOCALITY IMPORT EXPORT
-# ======================================================
 class LocalityResource(resources.ModelResource):
     parent = fields.Field(
         column_name="parent",
@@ -45,10 +38,6 @@ class LocalityResource(resources.ModelResource):
         fields = ("id", "title", "city", "parent", "slug")
         import_id_fields = ("id",)
 
-
-# ======================================================
-# 🔹 CITY ADMIN
-# ======================================================
 @admin.register(City)
 class CityAdmin(MPTTModelAdmin):
 
@@ -78,10 +67,6 @@ class CityAdmin(MPTTModelAdmin):
 
     list_per_page = 30
 
-
-# ======================================================
-# 🔹 LOCALITY ADMIN (IMPORTANT FOR AUTOCOMPLETE)
-# ======================================================
 @admin.register(Locality)
 class LocalityAdmin(ImportExportModelAdmin, DraggableMPTTAdmin):
 
@@ -114,10 +99,6 @@ class LocalityAdmin(ImportExportModelAdmin, DraggableMPTTAdmin):
 
     list_per_page = 30
 
-
-# ======================================================
-# 🔹 SUB LOCALITY ADMIN
-# ======================================================
 @admin.register(Sub_Locality)
 class SubLocalityAdmin(admin.ModelAdmin):
 
@@ -149,10 +130,6 @@ class SubLocalityAdmin(admin.ModelAdmin):
 
     list_per_page = 30
 
-
-# ======================================================
-# 🔹 CATEGORY ADMIN (MPTT SAFE)
-# ======================================================
 @admin.register(Category)
 class CategoryAdmin(DraggableMPTTAdmin):
 
@@ -200,10 +177,6 @@ class CategoryAdmin(DraggableMPTTAdmin):
 
     safe_icon_tag.short_description = "Icon"
 
-
-# ======================================================
-# 🔹 PROPERTY TYPE ADMIN
-# ======================================================
 @admin.register(PropertyType)
 class PropertyTypeAdmin(MPTTModelAdmin):
 
