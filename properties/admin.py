@@ -16,6 +16,15 @@ from .models import (
 # ✅ Placeholder image for missing logos
 NO_IMAGE_URL = "https://via.placeholder.com/80x80.png?text=No+Image"
 
+from django.contrib import admin
+from django.utils.html import format_html
+from import_export.admin import ImportExportModelAdmin
+
+from .models import Developer
+
+NO_IMAGE_URL = "https://via.placeholder.com/80x80.png?text=No+Image"
+
+
 @admin.register(Developer)
 class DeveloperAdmin(ImportExportModelAdmin):
     list_display = (
@@ -23,54 +32,110 @@ class DeveloperAdmin(ImportExportModelAdmin):
         'title',
         'city',
         'locality',
-        'address',
         'postal_code',
-        'contact_person', 'contact_no', 'email', 'web_site',
-        'note',
+        'address',
+        'contact_person',
+        'contact_no',
+        'email',
+        'web_site',
         'featured_builder',
         'created_date',
         'updated_date',
         'logo_preview',
     )
-    list_filter = ('city', 'locality','featured_builder', 'create_at', 'update_at')
-    search_fields = ('title', 'city__name', 'locality__name','postal_code_postal_code', 'keywords', 'contact_person','contact_no','note','address','postal_code',)
-    prepopulated_fields = {"slug": ("title",)}
-    readonly_fields = ('create_at', 'update_at', 'logo_preview')
+
+    list_filter = (
+        'city',
+        'locality',
+        'postal_code',
+        'featured_builder',
+        'create_at',
+    )
+
+    search_fields = (
+        'title',
+
+        # Postal Code
+        'postal_code__postal_code',
+        'postal_code__postal_name',
+
+        # Other Fields
+        'address',
+        'keywords',
+        'contact_person',
+        'contact_no',
+        'email',
+        'note',
+    )
+
+    prepopulated_fields = {
+        "slug": ("title",)
+    }
+
+    readonly_fields = (
+        'create_at',
+        'update_at',
+        'logo_preview',
+    )
 
     fieldsets = (
-        ('Basic Information', {
-            'fields':('title',  'city', 'locality', 'address','postal_code','contact_person', 'contact_no', 'email', 'web_site','featured_builder',)
-        }),
-        
-        ('SEO & Content', {
-            'fields': ('keywords', 'about_developer','logo', 'logo_preview', 'google_map','slug','create_at', 'update_at')
-        }),
-       
+        (
+            "Basic Information",
+            {
+                "fields": (
+                    "title",
+                    "city",
+                    "locality",
+                    "postal_code",
+                    "address",
+                    "contact_person",
+                    "contact_no",
+                    "email",
+                    "web_site",
+                    "featured_builder",
+                )
+            },
+        ),
+        (
+            "SEO & Content",
+            {
+                "fields": (
+                    "keywords",
+                    "about_developer",
+                    "logo",
+                    "logo_preview",
+                    "google_map",
+                    "slug",
+                    "create_at",
+                    "update_at",
+                    "note",
+                )
+            },
+        ),
     )
 
     def logo_preview(self, obj):
-        if obj.logo and obj.logo.name:
+        if obj.logo:
             return format_html(
-                '<img src="{}" width="80" height="80" style="object-fit:contain;border:1px solid #ddd;border-radius:6px;" />',
-                obj.logo.url
+                '<img src="{}" width="80" height="80" style="object-fit:contain;border:1px solid #ddd;border-radius:6px;">',
+                obj.logo.url,
             )
-
         return format_html(
-            '<img src="{}" width="80" height="80" style="object-fit:contain;border:1px solid #ddd;border-radius:6px;" />',
-            NO_IMAGE_URL
+            '<img src="{}" width="80" height="80" style="object-fit:contain;border:1px solid #ddd;border-radius:6px;">',
+            NO_IMAGE_URL,
         )
 
-    logo_preview.short_description = "Logo Preview"
-        
+    logo_preview.short_description = "Logo"
 
     def created_date(self, obj):
-        return obj.create_at.strftime('%d %b %Y')
+        return obj.create_at.strftime("%d %b %Y")
+
     created_date.short_description = "Created"
 
     def updated_date(self, obj):
-        return obj.update_at.strftime('%d %b %Y')
-    updated_date.short_description = "Updated"
+        return obj.update_at.strftime("%d %b %Y")
 
+    updated_date.short_description = "Updated"
 @admin.register(Architects)
 class ArchitectsAdmin(ImportExportModelAdmin):
     list_display = (
@@ -88,7 +153,7 @@ class ArchitectsAdmin(ImportExportModelAdmin):
         'logo_preview',
     )
     list_filter = ('city', 'locality','featured_architect', 'create_at', 'update_at')
-    search_fields = ('title', 'city__name', 'locality__name','postal_code_postal_code', 'keywords', 'contact_person','contact_no','note','address',)
+    search_fields = ('title','postal_code_postal_code', 'keywords', 'contact_person','contact_no','note','address',)
     prepopulated_fields = {"slug": ("title",)}
     readonly_fields = ('create_at', 'update_at', 'logo_preview')
 
@@ -143,7 +208,7 @@ class EngineerAdmin(ImportExportModelAdmin):
         'logo_preview',
     )
     list_filter = ('city', 'locality','postal_code','featured_engineer', 'create_at', 'update_at')
-    search_fields = ('title', 'city__name', 'locality__name','postal_code_postal_code', 'keywords', 'contact_person','contact_no','note','address',)
+    search_fields = ('title','postal_code_postal_code', 'keywords', 'contact_person','contact_no','note','address',)
     prepopulated_fields = {"slug": ("title",)}
     readonly_fields = ('create_at', 'update_at', 'logo_preview')
 
