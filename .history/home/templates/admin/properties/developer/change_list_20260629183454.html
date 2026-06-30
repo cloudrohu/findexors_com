@@ -1,0 +1,778 @@
+{% extends "admin/change_list.html" %}
+{% load static %}
+{% load admin_urls %}
+
+{% block extrastyle %}
+{{ block.super }}
+
+<style>
+
+.cards{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(430px,1fr));
+    gap:20px;
+    margin-top:20px;
+}
+
+.card{
+    background:#fff;
+    border-radius:18px;
+    overflow:hidden;
+    border:1px solid #e5e7eb;
+    box-shadow:0 10px 25px rgba(0,0,0,.06);
+    transition:.25s;
+}
+
+.card:hover{
+    transform:translateY(-3px);
+}
+
+.header{
+    padding:22px;
+    display:flex;
+    gap:16px;
+    border-bottom:1px solid #f1f5f9;
+}
+
+.logo{
+    width:72px;
+    height:72px;
+    border-radius:14px;
+    overflow:hidden;
+    flex-shrink:0;
+    background:#f3f4f6;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+.logo img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+}
+
+.logo span{
+    font-size:32px;
+}
+
+.info{
+    flex:1;
+}
+
+.badges{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-bottom:10px;
+}
+
+.badge{
+    padding:5px 12px;
+    border-radius:999px;
+    font-size:11px;
+    font-weight:800;
+}
+
+.blue{
+    background:#DBEAFE;
+    color:#1D4ED8;
+}
+
+.green{
+    background:#DCFCE7;
+    color:#166534;
+}
+
+.orange{
+    background:#FED7AA;
+    color:#C2410C;
+}
+
+.red{
+    background:#FEE2E2;
+    color:#991B1B;
+}
+
+.gray{
+    background:#F3F4F6;
+    color:#374151;
+}
+
+.title{
+    font-size:20px;
+    font-weight:900;
+    color:#111827;
+}
+
+.meta{
+    margin-top:7px;
+    font-size:13px;
+    color:#475569;
+    line-height:1.7;
+}
+
+.section{
+    padding:18px 22px;
+    border-bottom:1px solid #f1f5f9;
+}
+
+.section-title{
+    font-size:14px;
+    font-weight:900;
+    margin-bottom:12px;
+    color:#111827;
+}
+
+.row{
+    margin-top:8px;
+    font-size:13px;
+    color:#374151;
+    line-height:1.7;
+}
+
+.stats{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:10px;
+}
+
+.stat{
+    text-align:center;
+    padding:12px;
+    border-radius:12px;
+    background:#f8fafc;
+}
+
+.stat-number{
+    font-size:22px;
+    font-weight:900;
+}
+
+.stat-title{
+    font-size:11px;
+    color:#64748b;
+}
+.actions{
+    padding:20px;
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+}
+
+.actions a{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    padding:10px 15px;
+    border-radius:999px;
+    color:#fff;
+    text-decoration:none;
+    font-size:12px;
+    font-weight:800;
+    transition:.2s;
+}
+
+.actions a:hover{
+    transform:translateY(-2px);
+}
+
+.call{
+    background:#16a34a;
+}
+
+.whatsapp{
+    background:#25D366;
+}
+
+.website{
+    background:#2563eb;
+}
+
+.map{
+    background:#7c3aed;
+}
+
+.project{
+    background:#ea580c;
+}
+
+.followup{
+    background:#0891b2;
+}
+
+.meeting{
+    background:#dc2626;
+}
+
+.comment{
+    background:#4338ca;
+}
+
+.visit{
+    background:#059669;
+}
+
+.voice{
+    background:#7c2d12;
+}
+
+.edit{
+    background:#111827;
+}
+
+@media(max-width:640px){
+
+.cards{
+grid-template-columns:1fr;
+}
+
+.actions a{
+flex:1;
+justify-content:center;
+}
+
+.stats{
+grid-template-columns:repeat(2,1fr);
+}
+
+}
+
+</style>
+
+{% endblock %}
+
+
+
+{% block result_list %}
+
+<div class="cards">
+
+{% for obj in cl.result_list %}
+
+<div class="card">
+
+<div class="header">
+
+<div class="logo">
+
+{% if obj.logo %}
+
+<img src="{{ obj.logo.url }}">
+
+{% else %}
+
+<span>🏢</span>
+
+{% endif %}
+
+</div>
+
+<div class="info">
+
+<div class="badges">
+
+<span class="badge blue">
+DEV{{ obj.id|stringformat:"03d" }}
+</span>
+
+{% if obj.featured_builder %}
+<span class="badge green">
+⭐ Featured
+</span>
+{% endif %}
+
+{% if obj.calling_status == "New" %}
+<span class="badge blue">{{ obj.calling_status }}</span>
+
+{% elif obj.calling_status == "Meeting" %}
+<span class="badge orange">{{ obj.calling_status }}</span>
+
+{% elif obj.calling_status == "FollowUp" %}
+<span class="badge gray">{{ obj.calling_status }}</span>
+
+{% elif obj.calling_status == "Meeting_FollowUp" %}
+<span class="badge red">Meeting + Followup</span>
+
+{% else %}
+<span class="badge gray">{{ obj.calling_status }}</span>
+{% endif %}
+
+</div>
+
+<div class="title">
+
+{{ obj.title }}
+
+</div>
+
+<div class="meta">
+
+👤 {{ obj.contact_person|default:"-" }}
+
+</div>
+
+<div class="meta">
+
+📞 {{ obj.contact_no|default:"-" }}
+
+</div>
+
+<div class="meta">
+
+✉ {{ obj.email|default:"-" }}
+
+</div>
+
+<div class="meta">
+
+📍 {{ obj.city }} • {{ obj.locality }}
+
+</div>
+
+</div>
+
+</div>
+
+<!-- Continue with -->
+<!-- About -->
+<!-- CRM Summary -->
+<!-- Latest Followup -->
+<!-- Latest Meeting -->
+<!-- Latest Visit -->
+<!-- Latest Comment -->
+<!-- Latest Voice -->
+<!-- Tracking -->
+<!-- Actions -->
+
+{% endfor %}
+
+</div>
+
+{% endblock %}
+<!-- ================= ABOUT ================= -->
+
+<div class="section">
+
+<div class="section-title">
+🏢 Developer Details
+</div>
+
+<div class="row">
+<b>Address :</b>
+{{ obj.address|default:"-" }}
+</div>
+
+<div class="row">
+<b>Postal Code :</b>
+{{ obj.postal_code|default:"-" }}
+</div>
+
+<div class="row">
+<b>Website :</b>
+{{ obj.web_site|default:"-" }}
+</div>
+
+<div class="row">
+<b>Assigned To :</b>
+{{ obj.assigned_to|default:"-" }}
+</div>
+
+{% if obj.about_developer %}
+
+<div class="row">
+<b>About :</b><br>
+{{ obj.about_developer|truncatechars:220 }}
+</div>
+
+{% endif %}
+
+</div>
+
+
+
+<!-- ================= CRM SUMMARY ================= -->
+
+<div class="section">
+
+<div class="section-title">
+📊 CRM Summary
+</div>
+
+<div class="stats">
+
+<div class="stat">
+<div class="stat-number">
+{{ obj.project_set.count }}
+</div>
+<div class="stat-title">
+Projects
+</div>
+</div>
+
+<div class="stat">
+<div class="stat-number">
+{{ obj.meeting_set.count }}
+</div>
+<div class="stat-title">
+Meetings
+</div>
+</div>
+
+<div class="stat">
+<div class="stat-number">
+{{ obj.followup_set.count }}
+</div>
+<div class="stat-title">
+Followups
+</div>
+</div>
+
+<div class="stat">
+<div class="stat-number">
+{{ obj.comment_set.count }}
+</div>
+<div class="stat-title">
+Comments
+</div>
+</div>
+
+<div class="stat">
+<div class="stat-number">
+{{ obj.visit_set.count }}
+</div>
+<div class="stat-title">
+Visits
+</div>
+</div>
+
+<div class="stat">
+<div class="stat-number">
+{{ obj.voicerecording_set.count }}
+</div>
+<div class="stat-title">
+Voice
+</div>
+</div>
+
+</div>
+
+</div>
+
+
+
+<!-- ================= LAST FOLLOWUP ================= -->
+
+{% with obj.followup_set.first as followup %}
+
+{% if followup %}
+
+<div class="section">
+
+<div class="section-title">
+📌 Latest Followup
+</div>
+
+<div class="row">
+<b>Status :</b>
+{{ followup.status }}
+</div>
+
+<div class="row">
+<b>Date :</b>
+{{ followup.followup_date|date:"d M Y h:i A" }}
+</div>
+
+<div class="row">
+<b>Assigned :</b>
+{{ followup.assigned_to|default:"-" }}
+</div>
+
+{% if followup.comment %}
+
+<div class="row">
+{{ followup.comment }}
+</div>
+
+{% endif %}
+
+</div>
+
+{% endif %}
+
+{% endwith %}
+
+
+
+<!-- ================= LAST MEETING ================= -->
+
+{% with obj.meeting_set.first as meeting %}
+
+{% if meeting %}
+
+<div class="section">
+
+<div class="section-title">
+🤝 Latest Meeting
+</div>
+
+<div class="row">
+<b>Status :</b>
+{{ meeting.status }}
+</div>
+
+<div class="row">
+<b>Date :</b>
+{{ meeting.meeting_date|date:"d M Y h:i A" }}
+</div>
+
+<div class="row">
+<b>Assigned :</b>
+{{ meeting.assigned_to|default:"-" }}
+</div>
+
+{% if meeting.comment %}
+
+<div class="row">
+{{ meeting.comment }}
+</div>
+
+{% endif %}
+
+</div>
+
+{% endif %}
+
+{% endwith %}
+
+<!-- ================= LAST VISIT ================= -->
+
+{% with obj.visit_set.first as visit %}
+
+{% if visit %}
+
+<div class="section">
+
+<div class="section-title">
+🚗 Latest Visit
+</div>
+
+<div class="row">
+<b>Visit Type :</b>
+{{ visit.visit_type }}
+</div>
+
+<div class="row">
+<b>Status :</b>
+{{ visit.visit_status }}
+</div>
+
+{% if visit.comment %}
+
+<div class="row">
+{{ visit.comment }}
+</div>
+
+{% endif %}
+
+<div class="row">
+{{ visit.create_at|date:"d M Y h:i A" }}
+</div>
+
+</div>
+
+{% endif %}
+
+{% endwith %}
+
+
+
+<!-- ================= LAST COMMENT ================= -->
+
+{% with obj.comment_set.first as comment %}
+
+{% if comment %}
+
+<div class="section">
+
+<div class="section-title">
+💬 Latest Comment
+</div>
+
+<div class="row">
+{{ comment.comment }}
+</div>
+
+<div class="row">
+👤 {{ comment.created_by|default:"-" }}
+</div>
+
+<div class="row">
+{{ comment.create_at|date:"d M Y h:i A" }}
+</div>
+
+</div>
+
+{% endif %}
+
+{% endwith %}
+
+
+
+<!-- ================= LAST VOICE ================= -->
+
+{% with obj.voicerecording_set.first as voice %}
+
+{% if voice %}
+
+<div class="section">
+
+<div class="section-title">
+🎤 Voice Recording
+</div>
+
+<audio controls style="width:100%;margin-top:10px;">
+
+<source src="{{ voice.file.url }}">
+
+</audio>
+
+<div class="row">
+Uploaded By :
+{{ voice.uploaded_by|default:"-" }}
+</div>
+
+<div class="row">
+{{ voice.create_at|date:"d M Y h:i A" }}
+</div>
+
+</div>
+
+{% endif %}
+
+{% endwith %}
+
+
+
+<!-- ================= TRACKING ================= -->
+
+<div class="section">
+
+<div class="section-title">
+⚙ System Information
+</div>
+
+<div class="row">
+<b>Created By :</b>
+{{ obj.created_by|default:"-" }}
+</div>
+
+<div class="row">
+<b>Created :</b>
+{{ obj.create_at|date:"d M Y h:i A" }}
+</div>
+
+<div class="row">
+<b>Updated By :</b>
+{{ obj.updated_by|default:"-" }}
+</div>
+
+<div class="row">
+<b>Updated :</b>
+{{ obj.update_at|date:"d M Y h:i A" }}
+</div>
+
+</div>
+
+
+
+<!-- ================= ACTIONS ================= -->
+
+<div class="actions">
+
+{% if obj.contact_no %}
+
+<a href="tel:+91{{ obj.contact_no }}" class="call">
+📞 Call
+</a>
+
+<a href="https://wa.me/91{{ obj.contact_no }}"
+target="_blank"
+class="whatsapp">
+💬 WhatsApp
+</a>
+
+{% endif %}
+
+{% if obj.web_site %}
+
+<a href="{{ obj.web_site }}"
+target="_blank"
+class="website">
+🌐 Website
+</a>
+
+{% endif %}
+
+{% if obj.google_map %}
+
+<a href="{{ obj.google_map }}"
+target="_blank"
+class="map">
+📍 Google Map
+</a>
+
+{% endif %}
+
+<a href="{% url 'admin:properties_project_changelist' %}?developer__id__exact={{ obj.id }}"
+class="project">
+🏢 Projects
+</a>
+
+<a href="{% url 'admin:properties_followup_changelist' %}?developer__id__exact={{ obj.id }}"
+class="followup">
+📌 Followups
+</a>
+
+<a href="{% url 'admin:properties_meeting_changelist' %}?developer__id__exact={{ obj.id }}"
+class="meeting">
+🤝 Meetings
+</a>
+
+<a href="{% url 'admin:properties_comment_changelist' %}?developer__id__exact={{ obj.id }}"
+class="comment">
+💬 Comments
+</a>
+
+<a href="{% url 'admin:properties_visit_changelist' %}?developer__id__exact={{ obj.id }}"
+class="visit">
+🚗 Visits
+</a>
+
+<a href="{% url 'admin:properties_voicerecording_changelist' %}?developer__id__exact={{ obj.id }}"
+class="voice">
+🎤 Voice
+</a>
+
+<a href="{% url opts|admin_urlname:'change' obj.pk %}"
+class="edit">
+✏ Edit
+</a>
+
+</div>
+
+</div>
+
+{% endfor %}
+
+</div>
+
+
+{{ obj.project_set.count }}
+{% with obj.followup_set.first as followup %}
+{% with obj.meeting_set.first as meeting %}
+{% with obj.comment_set.first as comment %}
+{% with obj.visit_set.first as visit %}
+{% with obj.visit_set.first as visit %}
+
+{% endblock %}

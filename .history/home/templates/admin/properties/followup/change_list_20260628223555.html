@@ -1,0 +1,79 @@
+{% extends "admin/properties/crm_base.html" %}
+{% load admin_urls %}
+
+
+{% block card_content %}
+
+<div class="crm-header">
+
+{% if obj.developer %}
+
+<span class="crm-badge blue">
+DEV{{ obj.developer.id|stringformat:"03d" }}
+</span>
+
+<div class="crm-title">
+{{ obj.developer.title }}
+</div>
+
+<div class="crm-meta">
+👤 {{ obj.developer.contact_person|default:"-" }}
+</div>
+
+<div class="crm-meta">
+📞 {{ obj.developer.contact_no|default:"-" }}
+</div>
+
+<div class="crm-meta">
+📍 {{ obj.developer.city|default:"-" }}
+</div>
+
+{% elif obj.project %}
+
+<span class="crm-badge green">
+PRJ{{ obj.project.id|stringformat:"03d" }}
+</span>
+
+<div class="crm-title">
+{{ obj.project.project_name }}
+</div>
+
+<div class="crm-meta">
+🏢 {{ obj.project.developer }}
+</div>
+
+<div class="crm-meta">
+📍 {{ obj.project.city }}
+</div>
+
+{% elif obj.architect %}
+
+<span class="crm-badge orange">
+ARC{{ obj.architect.id|stringformat:"03d" }}
+</span>
+
+<div class="crm-title">
+{{ obj.architect.title }}
+</div>
+
+<div class="crm-meta">
+📞 {{ obj.architect.contact_no }}
+</div>
+
+{% elif obj.engineer %}
+
+<span class="crm-badge red">
+ENG{{ obj.engineer.id|stringformat:"03d" }}
+</span>
+
+<div class="crm-title">
+{{ obj.engineer.title }}
+</div>
+
+<div class="crm-meta">
+📞 {{ obj.engineer.contact_no }}
+</div>
+
+{% endif %}
+
+</div>

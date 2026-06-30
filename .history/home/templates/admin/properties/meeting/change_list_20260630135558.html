@@ -1,0 +1,322 @@
+{% extends "admin/properties/crm_card_base.html" %}
+{% load admin_urls %}
+
+{% block card_content %}
+
+<div class="crm-header">
+
+{% if obj.developer %}
+
+<span class="crm-badge blue">
+DEV{{ obj.developer.id|stringformat:"03d" }}
+</span>
+
+<div class="crm-title">
+{{ obj.developer.title }}
+</div>
+
+<div class="crm-meta">
+👤 {{ obj.developer.contact_person|default:"-" }}
+</div>
+
+<div class="crm-meta">
+📞 {{ obj.developer.contact_no|default:"-" }}
+</div>
+
+<div class="crm-meta">
+📍 {{ obj.developer.city|default:"-" }}
+</div>
+
+{% elif obj.project %}
+
+<span class="crm-badge green">
+PRJ{{ obj.project.id|stringformat:"03d" }}
+</span>
+
+<div class="crm-title">
+{{ obj.project.project_name }}
+</div>
+
+<div class="crm-meta">
+🏢 {{ obj.project.developer }}
+</div>
+
+<div class="crm-meta">
+📍 {{ obj.project.city }}
+</div>
+
+{% elif obj.architect %}
+
+<span class="crm-badge orange">
+ARC{{ obj.architect.id|stringformat:"03d" }}
+</span>
+
+<div class="crm-title">
+{{ obj.architect.title }}
+</div>
+
+<div class="crm-meta">
+📞 {{ obj.architect.contact_no }}
+</div>
+
+{% elif obj.engineer %}
+
+<span class="crm-badge red">
+ENG{{ obj.engineer.id|stringformat:"03d" }}
+</span>
+
+<div class="crm-title">
+{{ obj.engineer.title }}
+</div>
+
+<div class="crm-meta">
+📞 {{ obj.engineer.contact_no }}
+</div>
+
+{% endif %}
+
+</div>
+
+<!-- ================= MEETING ================= -->
+
+<div class="section">
+
+<div class="section-title">
+
+🤝 Meeting Details
+
+<span class="badge dark">
+MT{{ obj.id|stringformat:"03d" }}
+</span>
+
+</div>
+
+<div class="row">
+
+<b>Status :</b>
+
+{{ obj.status }}
+
+</div>
+
+<div class="row">
+
+<b>Meeting Date :</b>
+
+{{ obj.meeting_date|date:"d M Y h:i A"|default:"-" }}
+
+</div>
+
+<div class="row">
+
+<b>Assigned :</b>
+
+{{ obj.assigned_to|default:"-" }}
+
+</div>
+
+{% if obj.comment %}
+
+<div class="row">
+
+<b>Comment :</b>
+
+{{ obj.comment }}
+
+</div>
+
+{% endif %}
+
+</div>
+
+<!-- ================= TRACKING ================= -->
+
+<div class="section">
+
+<div class="section-title">
+
+Tracking
+
+</div>
+
+<div class="row">
+
+Created By :
+
+{{ obj.created_by|default:"-" }}
+
+</div>
+
+<div class="row">
+
+Created :
+
+{{ obj.create_at|date:"d M Y h:i A" }}
+
+</div>
+
+<div class="row">
+
+Updated By :
+
+{{ obj.updated_by|default:"-" }}
+
+</div>
+
+<div class="row">
+
+Updated :
+
+{{ obj.update_at|date:"d M Y h:i A" }}
+
+</div>
+
+</div>
+
+<!-- ================= ACTIONS ================= -->
+
+<div class="actions">
+
+
+    <!-- ================= Developer ================= -->
+
+    {% if obj.developer %}
+
+        {% if obj.developer.contact_no %}
+
+        <a href="tel:+91{{ obj.developer.contact_no }}"
+           class="call">
+            <i class="fas fa-phone"></i>
+            Call
+        </a>
+
+        <a href="https://wa.me/91{{ obj.developer.contact_no }}"
+           target="_blank"
+           class="whatsapp">
+            <i class="fab fa-whatsapp"></i>
+            WhatsApp
+        </a>
+
+        {% endif %}
+
+        <a href="{% url opts|admin_urlname:'change' obj.pk %}"
+           class="edit">
+            <i class="fas fa-handshake"></i>
+            Edit Meeting
+        </a>
+
+        <a href="{% url 'admin:properties_developer_change' obj.developer.pk %}"
+           class="response">
+            <i class="fas fa-building"></i>
+            Developer
+        </a>
+
+    {% endif %}
+
+
+
+    <!-- ================= Project ================= -->
+
+    {% if obj.project %}
+
+        <a href="{% url opts|admin_urlname:'change' obj.pk %}"
+           class="edit">
+            <i class="fas fa-handshake"></i>
+            Edit Meeting
+        </a>
+
+        <a href="{% url 'admin:properties_project_change' obj.project.pk %}"
+           class="response">
+            <i class="fas fa-city"></i>
+            Project
+        </a>
+
+        {% if obj.project.developer %}
+
+        <a href="{% url 'admin:properties_developer_change' obj.project.developer.pk %}"
+           class="company">
+            <i class="fas fa-building"></i>
+            Developer
+        </a>
+
+        {% endif %}
+
+    {% endif %}
+
+
+
+    <!-- ================= Architect ================= -->
+
+    {% if obj.architect %}
+
+        {% if obj.architect.contact_no %}
+
+        <a href="tel:+91{{ obj.architect.contact_no }}"
+           class="call">
+            <i class="fas fa-phone"></i>
+            Call
+        </a>
+
+        <a href="https://wa.me/91{{ obj.architect.contact_no }}"
+           target="_blank"
+           class="whatsapp">
+            <i class="fab fa-whatsapp"></i>
+            WhatsApp
+        </a>
+
+        {% endif %}
+
+        <a href="{% url opts|admin_urlname:'change' obj.pk %}"
+           class="edit">
+            <i class="fas fa-handshake"></i>
+            Edit Meeting
+        </a>
+
+        <a href="{% url 'admin:properties_architects_change' obj.architect.pk %}"
+           class="company">
+            <i class="fas fa-drafting-compass"></i>
+            Architect
+        </a>
+
+    {% endif %}
+
+
+
+    <!-- ================= Engineer ================= -->
+
+    {% if obj.engineer %}
+
+        {% if obj.engineer.contact_no %}
+
+        <a href="tel:+91{{ obj.engineer.contact_no }}"
+           class="call">
+            <i class="fas fa-phone"></i>
+            Call
+        </a>
+
+        <a href="https://wa.me/91{{ obj.engineer.contact_no }}"
+           target="_blank"
+           class="whatsapp">
+            <i class="fab fa-whatsapp"></i>
+            WhatsApp
+        </a>
+
+        {% endif %}
+
+        <a href="{% url opts|admin_urlname:'change' obj.pk %}"
+           class="edit">
+            <i class="fas fa-handshake"></i>
+            Edit Meeting
+        </a>
+
+        <a href="{% url 'admin:properties_engineer_change' obj.engineer.pk %}"
+           class="realestate">
+            <i class="fas fa-hard-hat"></i>
+            Engineer
+        </a>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

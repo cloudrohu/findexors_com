@@ -1,0 +1,435 @@
+{% extends "admin/change_list.html" %}
+{% load static %}
+
+<link rel="stylesheet"
+      href="{% static 'admin/css/properties/crm.css' %}">
+{% load admin_urls %}
+
+{% block extrastyle %}
+{{ block.super }}
+
+{% endblock %}
+
+{% block result_list %}
+
+<div class="cards">
+
+{% for obj in cl.result_list %}
+
+<div class="card">
+
+<div class="header">
+
+<div class="logo">
+
+{% if obj.logo %}
+<img src="{{ obj.logo.url }}">
+{% else %}
+<span>🏢</span>
+{% endif %}
+
+</div>
+
+<div class="info">
+
+<div class="badges">
+
+<span class="badge blue">
+DEV{{ obj.id|stringformat:"03d" }}
+</span>
+
+{% if obj.featured_builder %}
+<span class="badge green">
+⭐ Featured
+</span>
+{% endif %}
+
+<span class="badge orange">
+{{ obj.calling_status }} - 
+</span>
+</div>
+
+<div class="title">
+{{ obj.title }}
+</div>
+
+</div>
+
+</div>
+
+<div class="section">
+
+<div class="row">
+<b>📍{{ obj.locality|default:"-" }} - {{ obj.city|default:"-" }}</b>
+
+</div>
+
+
+<div class="row">
+{{ obj.address|default:"-" }}
+</div>
+<div class="row">
+{{ obj.postal_code|default:"-" }}
+</div>
+
+<div class="meta">
+👤 {{ obj.contact_person|default:"-" }}
+</div>
+
+
+<div class="meta">
+📞 {{ obj.contact_no|default:"-" }}
+</div>
+
+<div class="meta">
+✉ {{ obj.email|default:"-" }}
+</div>
+<div class="meta">
+🌐 {{ obj.web_site|default:"-" }}
+</div>
+
+{% if obj.about_developer %}
+<div class="row">
+{{ obj.about_developer|truncatechars:220 }}
+</div>
+{% endif %}
+<div class="row">
+<b>Created By :</b>
+{{ obj.created_by|default:"-" }} - ({{ obj.create_at|date:"d M Y h:i A" }})
+</div>
+
+<div class="row">
+<b>Updated By :</b>
+{{ obj.updated_by|default:"-" }} - ({{ obj.update_at|date:"d M Y h:i A" }})
+</div>
+
+{% if obj.note %}
+
+<div class="row">
+<b>Note :</b><br>
+{{ obj.note|truncatechars:200 }}
+</div>
+
+</div>
+
+
+<!-- ================= TRACKING ================= -->
+
+
+
+{% endif %}
+
+</div>
+
+<!-- ================= LATEST FOLLOWUP ================= -->
+<div class="section">
+
+    <div class="section-title">
+        📌 Followup
+    </div>
+
+    {% if obj.followup %}
+
+    <div class="followup-box">
+
+        <div class="row">
+            <b>Status :</b>
+            {{ obj.followup.status }}
+        </div>
+
+        <div class="row">
+            <b>Date :</b>
+            {{ obj.followup.followup_date|date:"d M Y h:i A" }}
+        </div>
+
+        <div class="row">
+            <b>Assigned :</b>
+            {{ obj.followup.assigned_to|default:"-" }}
+        </div>
+
+        {% if obj.followup.comment %}
+        <div class="row">
+            <b>Comment :</b> 
+            {{ obj.followup.comment }}
+        </div>
+        {% endif %}
+
+        <div class="meta">
+            👤 {{ obj.followup.created_by|default:"-" }} -- 🕒 {{ obj.followup.create_at|date:"d M Y h:i A" }}
+        </div>
+
+    </div>
+
+    {% else %}
+
+    <div class="meta">
+        No followup available.
+    </div>
+
+    {% endif %}
+
+</div>
+
+
+
+<!-- ================= LATEST MEETING ================= -->
+
+<div class="section">
+
+    <div class="section-title">
+        🤝 Meetings ({{ obj.meeting|yesno:"1,0" }})
+    </div>
+
+    {% if obj.meeting %}
+
+    <div class="meeting-box">
+
+        <div class="row">
+            <b>Status :</b>
+            {{ obj.meeting.status }}
+        </div>
+
+        <div class="row">
+            <b>Date :</b>
+            {{ obj.meeting.meeting_date|date:"d M Y h:i A" }}
+        </div>
+
+        <div class="row">
+            <b>Meeting Type :</b>
+            {{ obj.meeting.meeting_type|default:"-" }}
+        </div>
+
+        <div class="row">
+            <b>Location :</b>
+            {{ obj.meeting.location|default:"-" }}
+        </div>
+
+        {% if obj.meeting.comment %}
+        <div class="row">
+            <b>Comment :</b>  
+            {{ obj.meeting.comment }}
+        </div>
+        {% endif %}
+
+        <div class="meta">
+            👤 {{ obj.meeting.created_by|default:"-" }} -- 🕒 {{ obj.meeting.create_at|date:"d M Y h:i A" }}
+        </div>
+
+
+    </div>
+
+    {% else %}
+
+    <div class="meta">
+        No meeting available.
+    </div>
+
+    {% endif %}
+
+</div>
+
+<!-- ================= LAST VISIT ================= -->
+<div class="section">
+
+    <div class="section-title">
+        🚗 Visits ({{ obj.visits.count }})
+    </div>
+
+    {% for visit in obj.visits.all %}
+
+    <div class="timeline-box">
+
+        <div class="row">
+            <b>Visit Type :</b>
+            {{ visit.visit_type|default:"-" }}
+        </div>
+
+        <div class="row">
+            <b>Status :</b>
+            {{ visit.visit_status|default:"-" }}
+        </div>
+
+        {% if visit.comment %}
+        <div class="row">
+            <b>Comment :</b>
+            {{ visit.comment }}
+        </div>
+        {% endif %}
+
+        <div class="meta">
+            
+            👤 {{ visit.created_by|default:"-" }} - 🕒 {{ visit.create_at|date:"d M Y h:i A" }}
+        </div>
+
+
+    </div>
+
+    {% empty %}
+
+    <div class="meta">
+        No visits found.
+
+    </div>
+
+    {% endfor %}
+
+</div>
+
+
+
+<!-- ================= LAST COMMENT ================= -->
+{% if obj.comments.all %}
+
+<div class="section">
+
+    <div class="section-title">
+        💬 Comments ({{ obj.comments.count }})
+    </div>
+
+    {% for comment in obj.comments.all %}
+
+    <div style="padding:10px 0;border-bottom:1px solid #edf2f7;">
+
+        <div class="row">
+            {{ comment.comment }}
+        </div>
+
+        <div class="meta">
+            👤 {{ comment.created_by|default:"-" }} - 🕒 {{ comment.create_at|date:"d M Y h:i A" }}
+        </div>
+
+    </div>
+
+    {% empty %}
+
+    <div class="meta">
+        No comments found.
+    </div>
+
+    {% endfor %}
+
+</div>
+
+{% endif %}
+
+
+
+<!-- ================= LAST VOICE ================= -->
+<div class="section">
+
+    <div class="section-title">
+        🎤 Voice Recordings ({{ obj.voice_recordings.count }})
+    </div>
+
+    {% for voice in obj.voice_recordings.all %}
+
+    <div class="voice-box">
+
+        {% if voice.file %}
+        <audio controls style="width:100%;margin-bottom:10px;">
+            <source src="{{ voice.file.url }}">
+            Your browser does not support the audio element.
+        </audio>
+        {% endif %}
+
+        {% if voice.title %}
+        <div class="row">
+            <b>Title :</b>
+            {{ voice.title }}
+        </div>
+        {% endif %}
+
+        {% if voice.note %}
+        <div class="row">
+            <b>Note :</b>
+            {{ voice.note }}
+        </div>
+        {% endif %}
+
+        <div class="meta">
+            👤 {{ voice.uploaded_by|default:"-" }}
+        </div>
+
+        <div class="meta">
+            🕒 {{ voice.create_at|date:"d M Y h:i A" }}
+        </div>
+
+    </div>
+
+    {% empty %}
+
+    <div class="meta">
+        No voice recordings found.
+    </div>
+
+    {% endfor %}
+
+</div>
+<!-- ================= ACTIONS ================= -->
+
+<div class="actions">
+
+{% if obj.contact_no %}
+
+<a href="tel:+91{{ obj.contact_no }}"
+class="call">
+
+📞 Call
+
+</a>
+
+<a href="https://wa.me/91{{ obj.contact_no }}"
+target="_blank"
+class="whatsapp">
+
+💬 WhatsApp
+
+</a>
+
+{% endif %}
+
+
+
+{% if obj.web_site %}
+
+<a href="{% if 'http' in obj.web_site %}{{ obj.web_site }}{% else %}https://{{ obj.web_site }}{% endif %}"
+target="_blank"
+class="website">
+
+🌐 Website
+
+</a>
+
+{% endif %}
+
+
+
+{% if obj.google_map %}
+
+<a href="{{ obj.google_map }}"
+target="_blank"
+class="map">
+
+📍 Map
+
+</a>
+
+{% endif %}
+
+
+<a href="{% url opts|admin_urlname:'change' obj.pk %}"
+class="edit">
+
+✏ Edit Developer
+
+</a>
+
+</div>
+
+</div>
+
+{% endfor %}
+
+</div>
+
+{% endblock %}

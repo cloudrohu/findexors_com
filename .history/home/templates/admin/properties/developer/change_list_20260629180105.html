@@ -1,0 +1,446 @@
+{% extends "admin/properties/crm_card_base.html" %}
+{% load admin_urls %}
+
+{% block card_content %}
+
+<div class="crm-header">
+
+<div style="display:flex;gap:15px;align-items:flex-start;">
+
+<div>
+
+{% if obj.logo %}
+
+<img src="{{ obj.logo.url }}"
+style="
+width:70px;
+height:70px;
+border-radius:12px;
+object-fit:cover;
+border:1px solid #eee;">
+
+{% else %}
+
+<div style="
+width:70px;
+height:70px;
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:34px;
+background:#f4f4f4;
+border-radius:12px;">
+
+🏢
+
+</div>
+
+{% endif %}
+
+</div>
+
+<div style="flex:1;">
+
+<span class="crm-badge blue">
+DEV{{ obj.id|stringformat:"03d" }}
+</span>
+
+<div class="crm-title">
+
+{{ obj.title }}
+
+</div>
+
+<div class="crm-meta">
+
+👤 {{ obj.contact_person|default:"-" }}
+
+</div>
+
+<div class="crm-meta">
+
+📞 {{ obj.contact_no|default:"-" }}
+
+</div>
+
+<div class="crm-meta">
+
+✉️ {{ obj.email|default:"-" }}
+
+</div>
+
+<div class="crm-meta">
+
+🌐 {{ obj.web_site|default:"-" }}
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+<!-- BASIC INFO -->
+
+<div class="section">
+
+<div class="section-title">
+
+Developer Information
+
+</div>
+
+<div class="row">
+
+<b>City :</b>
+
+{{ obj.city|default:"-" }}
+
+</div>
+
+<div class="row">
+
+<b>Locality :</b>
+
+{{ obj.locality|default:"-" }}
+
+</div>
+
+<div class="row">
+
+<b>Postal Code :</b>
+
+{{ obj.postal_code|default:"-" }}
+
+</div>
+
+<div class="row">
+
+<b>Address :</b>
+
+{{ obj.address|default:"-" }}
+
+</div>
+
+<div class="row">
+
+<b>Google Map :</b>
+
+{{ obj.google_map|default:"-" }}
+
+</div>
+
+<div class="row">
+
+<b>Featured Builder :</b>
+
+{{ obj.featured_builder|yesno:"Yes,No" }}
+
+</div>
+
+<div class="row">
+
+<b>Calling Status :</b>
+
+{{ obj.calling_status }}
+
+</div>
+
+<div class="row">
+
+<b>Assigned To :</b>
+
+{{ obj.assigned_to|default:"-" }}
+
+</div>
+
+</div>
+
+
+
+<!-- ABOUT -->
+
+{% if obj.about_developer %}
+
+<div class="section">
+
+<div class="section-title">
+
+About Developer
+
+</div>
+
+<div class="row">
+
+{{ obj.about_developer|linebreaks }}
+
+</div>
+
+</div>
+
+{% endif %}
+
+
+
+<!-- NOTE -->
+
+{% if obj.note %}
+
+<div class="section">
+
+<div class="section-title">
+
+Internal Note
+
+</div>
+
+<div class="row">
+
+{{ obj.note|linebreaks }}
+
+</div>
+
+</div>
+
+{% endif %}
+
+
+
+<!-- CRM SUMMARY -->
+
+<div class="section">
+
+<div class="section-title">
+
+CRM Summary
+
+</div>
+
+<div class="row">
+
+🏢 Projects :
+<b>{{ obj.project_set.count }}</b>
+
+</div>
+
+<div class="row">
+
+🤝 Meetings :
+<b>{{ obj.meeting_set.count }}</b>
+
+</div>
+
+<div class="row">
+
+📌 Followups :
+<b>{{ obj.followup_set.count }}</b>
+
+</div>
+
+<div class="row">
+
+💬 Comments :
+<b>{{ obj.comment_set.count }}</b>
+
+</div>
+
+<div class="row">
+
+🚗 Visits :
+<b>{{ obj.visit_set.count }}</b>
+
+</div>
+
+<div class="row">
+
+🎤 Voice Recordings :
+<b>{{ obj.voicerecording_set.count }}</b>
+
+</div>
+
+</div>
+
+
+
+<!-- TRACKING -->
+
+<div class="section">
+
+<div class="section-title">
+
+Tracking
+
+</div>
+
+<div class="row">
+
+Created By :
+
+{{ obj.created_by }}
+
+</div>
+
+<div class="row">
+
+Created :
+
+{{ obj.create_at|date:"d M Y h:i A" }}
+
+</div>
+
+<div class="row">
+
+Updated By :
+
+{{ obj.updated_by }}
+
+</div>
+
+<div class="row">
+
+Updated :
+
+{{ obj.update_at|date:"d M Y h:i A" }}
+
+</div>
+
+</div>
+
+
+
+<!-- ACTIONS -->
+
+<div class="actions">
+
+
+        {% if obj.contact_no %}
+
+    <a href="tel:+91{{ obj.contact_no }}"
+       class="call">
+        <i class="fas fa-phone"></i>
+        Call
+    </a>
+
+    <a href="https://wa.me/91{{ obj.contact_no }}"
+       target="_blank"
+       class="whatsapp">
+        <i class="fab fa-whatsapp"></i>
+        WhatsApp
+    </a>
+
+    {% endif %}
+
+
+
+    {% if obj.web_site %}
+
+    <a href="{{ obj.web_site }}"
+       target="_blank"
+       class="response">
+
+        <i class="fas fa-globe"></i>
+
+        Website
+
+    </a>
+
+    {% endif %}
+
+
+
+    {% if obj.google_map %}
+
+    <a href="{{ obj.google_map }}"
+       target="_blank"
+       class="company">
+
+        <i class="fas fa-map-marker-alt"></i>
+
+        Google Map
+
+    </a>
+
+    {% endif %}
+
+
+
+    <a href="{% url 'admin:properties_project_changelist' %}?developer__id__exact={{ obj.id }}"
+       class="response">
+
+        <i class="fas fa-city"></i>
+
+        Projects
+
+    </a>
+
+
+
+    <a href="{% url 'admin:properties_meeting_changelist' %}?developer__id__exact={{ obj.id }}"
+       class="company">
+
+        <i class="fas fa-handshake"></i>
+
+        Meetings
+
+    </a>
+
+
+
+    <a href="{% url 'admin:properties_followup_changelist' %}?developer__id__exact={{ obj.id }}"
+       class="realestate">
+
+        <i class="fas fa-calendar-check"></i>
+
+        Followups
+
+    </a>
+
+
+
+    <a href="{% url 'admin:properties_comment_changelist' %}?developer__id__exact={{ obj.id }}"
+       class="response">
+
+        <i class="fas fa-comments"></i>
+
+        Comments
+
+    </a>
+
+
+
+    <a href="{% url 'admin:properties_visit_changelist' %}?developer__id__exact={{ obj.id }}"
+       class="company">
+
+        <i class="fas fa-car"></i>
+
+        Visits
+
+    </a>
+
+
+
+    <a href="{% url 'admin:properties_voicerecording_changelist' %}?developer__id__exact={{ obj.id }}"
+       class="realestate">
+
+        <i class="fas fa-microphone"></i>
+
+        Voice Recordings
+
+    </a>
+
+
+
+    <a href="{% url opts|admin_urlname:'change' obj.pk %}"
+       class="edit">
+
+        <i class="fas fa-pen"></i>
+
+        Edit Developer
+
+    </a>
+
+</div>
+
+{% endblock %}

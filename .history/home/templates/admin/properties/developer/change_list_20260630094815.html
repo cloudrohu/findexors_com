@@ -1,0 +1,409 @@
+{% extends "admin/change_list.html" %}
+{% load static %}
+{% load admin_urls %}
+
+{% block extrastyle %}
+{{ block.super }}
+
+<style>
+
+.cards{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(420px,1fr));
+    gap:20px;
+    margin-top:20px;
+}
+
+.card{
+    background:#fff;
+    border-radius:18px;
+    overflow:hidden;
+    border:1px solid #e5e7eb;
+    box-shadow:0 10px 25px rgba(0,0,0,.06);
+    transition:.25s;
+}
+
+.card:hover{
+    transform:translateY(-3px);
+}
+
+.header{
+    display:flex;
+    gap:18px;
+    padding:22px;
+    border-bottom:1px solid #eef2f7;
+}
+
+.logo{
+    width:72px;
+    height:72px;
+    border-radius:14px;
+    overflow:hidden;
+    background:#f3f4f6;
+    flex-shrink:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+.logo img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+}
+
+.logo span{
+    font-size:34px;
+}
+
+.info{
+    flex:1;
+}
+
+.badges{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    margin-bottom:10px;
+}
+
+.badge{
+    padding:5px 12px;
+    border-radius:999px;
+    font-size:11px;
+    font-weight:800;
+}
+
+.blue{
+    background:#DBEAFE;
+    color:#1D4ED8;
+}
+
+.green{
+    background:#DCFCE7;
+    color:#166534;
+}
+
+.orange{
+    background:#FED7AA;
+    color:#C2410C;
+}
+
+.red{
+    background:#FEE2E2;
+    color:#991B1B;
+}
+
+.gray{
+    background:#F3F4F6;
+    color:#374151;
+}
+
+.title{
+    font-size:22px;
+    font-weight:900;
+    color:#111827;
+}
+
+.meta{
+    margin-top:7px;
+    font-size:13px;
+    color:#475569;
+    line-height:1.7;
+}
+
+.section{
+    padding:20px;
+    border-top:1px solid #eef2f7;
+}
+
+.section-title{
+    font-size:14px;
+    font-weight:900;
+    margin-bottom:12px;
+    color:#111827;
+}
+
+.row{
+    margin-top:8px;
+    font-size:13px;
+    color:#374151;
+    line-height:1.7;
+}
+
+.stats{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:10px;
+}
+
+.stat{
+    background:#f8fafc;
+    border-radius:12px;
+    padding:14px;
+    text-align:center;
+}
+
+.stat-number{
+    font-size:24px;
+    font-weight:900;
+}
+
+.stat-title{
+    font-size:11px;
+    color:#64748b;
+}
+
+.actions{
+    padding:20px;
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+}
+
+.actions a{
+    padding:10px 16px;
+    border-radius:999px;
+    color:#fff;
+    text-decoration:none;
+    font-size:12px;
+    font-weight:800;
+}
+
+.call{background:#16a34a;}
+.whatsapp{background:#25D366;}
+.website{background:#2563eb;}
+.map{background:#7c3aed;}
+.project{background:#ea580c;}
+.followup{background:#0891b2;}
+.meeting{background:#dc2626;}
+.comment{background:#4338ca;}
+.visit{background:#059669;}
+.voice{background:#92400e;}
+.edit{background:#111827;}
+
+@media(max-width:640px){
+
+.cards{
+grid-template-columns:1fr;
+}
+
+.stats{
+grid-template-columns:repeat(2,1fr);
+}
+
+.actions a{
+flex:1;
+text-align:center;
+}
+
+}
+
+</style>
+
+{% endblock %}
+
+{% block result_list %}
+
+<div class="cards">
+
+{% for obj in cl.result_list %}
+
+<div class="card">
+
+<div class="header">
+
+<div class="logo">
+
+{% if obj.logo %}
+<img src="{{ obj.logo.url }}">
+{% else %}
+<span>🏢</span>
+{% endif %}
+
+</div>
+
+<div class="info">
+
+<div class="badges">
+
+<span class="badge blue">
+DEV{{ obj.id|stringformat:"03d" }}
+</span>
+
+{% if obj.featured_builder %}
+<span class="badge green">
+⭐ Featured
+</span>
+{% endif %}
+
+<span class="badge orange">
+{{ obj.calling_status }}
+</span>
+
+</div>
+
+<div class="title">
+{{ obj.title }}
+</div>
+
+<div class="meta">
+👤 {{ obj.contact_person|default:"-" }}
+</div>
+
+<div class="meta">
+📞 {{ obj.contact_no|default:"-" }}
+</div>
+
+<div class="meta">
+✉ {{ obj.email|default:"-" }}
+</div>
+
+<div class="meta">
+📍 {{ obj.city|default:"-" }},
+{{ obj.locality|default:"-" }}
+</div>
+
+</div>
+
+</div>
+
+<div class="section">
+
+<div class="section-title">
+🏢 Developer Information
+</div>
+
+<div class="row">
+<b>Website :</b>
+{{ obj.web_site|default:"-" }}
+</div>
+
+<div class="row">
+<b>Postal :</b>
+{{ obj.postal_code|default:"-" }}
+</div>
+
+<div class="row">
+<b>Address :</b>
+{{ obj.address|default:"-" }}
+</div>
+
+{% if obj.about_developer %}
+<div class="row">
+{{ obj.about_developer|truncatechars:220 }}
+</div>
+{% endif %}
+
+</div>
+
+
+<!-- ================= TRACKING ================= -->
+
+<div class="section">
+
+<div class="section-title">
+⚙️ System Information
+</div>
+
+<div class="row">
+<b>Created By :</b>
+{{ obj.created_by|default:"-" }} - ({{ obj.create_at|date:"d M Y h:i A" }})
+</div>
+
+<div class="row">
+<b>Created :</b>
+
+</div>
+
+<div class="row">
+<b>Updated By :</b>
+{{ obj.updated_by|default:"-" }}
+</div>
+
+<div class="row">
+<b>Updated :</b>
+{{ obj.update_at|date:"d M Y h:i A" }}
+</div>
+
+{% if obj.note %}
+
+<div class="row">
+<b>Note :</b><br>
+{{ obj.note|truncatechars:200 }}
+</div>
+
+{% endif %}
+
+</div>
+
+
+
+<!-- ================= ACTIONS ================= -->
+
+<div class="actions">
+
+{% if obj.contact_no %}
+
+<a href="tel:+91{{ obj.contact_no }}"
+class="call">
+
+📞 Call
+
+</a>
+
+<a href="https://wa.me/91{{ obj.contact_no }}"
+target="_blank"
+class="whatsapp">
+
+💬 WhatsApp
+
+</a>
+
+{% endif %}
+
+
+
+{% if obj.web_site %}
+
+<a href="{% if 'http' in obj.web_site %}{{ obj.web_site }}{% else %}https://{{ obj.web_site }}{% endif %}"
+target="_blank"
+class="website">
+
+🌐 Website
+
+</a>
+
+{% endif %}
+
+
+
+{% if obj.google_map %}
+
+<a href="{{ obj.google_map }}"
+target="_blank"
+class="map">
+
+📍 Map
+
+</a>
+
+{% endif %}
+
+
+<a href="{% url opts|admin_urlname:'change' obj.pk %}"
+class="edit">
+
+✏ Edit Developer
+
+</a>
+
+</div>
+
+</div>
+
+{% endfor %}
+
+</div>
+
+{% endblock %}

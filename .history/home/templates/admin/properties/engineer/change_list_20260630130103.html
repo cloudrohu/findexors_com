@@ -1,0 +1,30 @@
+{% extends "admin/properties/crm_card_base.html" %}
+
+{% load static %}
+{% load admin_urls %}
+
+{% block crm_code %}ENG{% endblock %}
+
+{% block crm_title %}
+Engineer Information
+{% endblock %}
+
+{% block about_title %}
+About Engineer
+{% endblock %}
+
+{% block about_field %}
+{{ obj.about_engineer }}
+{% endblock %}
+
+{% block featured %}
+{% if obj.featured_engineer %}
+<span class="badge green">
+⭐ Featured
+</span>
+{% endif %}
+{% endblock %}
+
+{% block edit_text %}
+✏ Edit Engineer
+{% endblock %}

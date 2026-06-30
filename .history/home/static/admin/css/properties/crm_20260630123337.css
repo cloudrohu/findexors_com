@@ -1,0 +1,292 @@
+
+<style>
+.info-box{
+    background:#f8fafc;
+    border-left:4px solid #ec4899;
+    border-radius:12px;
+    padding:14px;
+    margin-top:12px;
+}
+
+.info-box .row{
+    margin:10px 0;
+}
+
+.info-footer{
+    margin-top:12px;
+    padding-top:10px;
+    border-top:1px dashed #d1d5db;
+    color:#64748b;
+    font-size:12px;
+}
+.cards{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(340px,1fr));
+    gap:18px;
+}
+
+.meeting-box{
+    background:#f8fafc;
+    border-left:4px solid #2563eb;
+    border-radius:10px;
+    padding:12px;
+    margin-bottom:12px;
+}
+.followup-box{
+    background:#f8fafc;
+    border-left:4px solid #f59e0b;
+    border-radius:10px;
+    padding:12px;
+    margin-bottom:12px;
+}
+.card{
+    display:flex;
+    flex-direction:column;
+}
+
+.actions{
+    margin-top:auto;
+}
+
+.card:hover{
+    transform:translateY(-3px);
+}
+
+.header{
+    display:flex;
+    gap:18px;
+    padding:22px;
+    border-bottom:1px solid #eef2f7;
+}
+
+.logo{
+    width:50px;
+    height:50px;
+    border-radius:14px;
+    overflow:hidden;
+    background:#f3f4f6;
+    flex-shrink:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+.logo img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+}
+
+.logo span{
+    font-size:25px;
+}
+
+.info{
+    flex:1;
+}
+
+.badges{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    margin-bottom:10px;
+}
+
+.badge{
+    padding:5px 12px;
+    border-radius:999px;
+    font-size:11px;
+    font-weight:800;
+}
+
+.blue{
+    background:#DBEAFE;
+    color:#1D4ED8;
+}
+
+.green{
+    background:#DCFCE7;
+    color:#166534;
+}
+
+.orange{
+    background:#FED7AA;
+    color:#C2410C;
+}
+
+.red{
+    background:#FEE2E2;
+    color:#991B1B;
+}
+
+.gray{
+    background:#F3F4F6;
+    color:#374151;
+}
+
+.title{
+    font-size:16px;
+    font-weight:900;
+    color:#111827;
+}
+
+.meta{
+    margin-top:7px;
+    font-size:13px;
+    color:#475569;
+    line-height:1.7;
+}
+
+.section{
+    padding:20px;
+    border-top:1px solid #eef2f7;
+}
+
+.section-title{
+    font-size:14px;
+    font-weight:900;
+    margin-bottom:12px;
+    color:#111827;
+}
+
+.row{
+    margin-top:8px;
+    font-size:13px;
+    color:#374151;
+    line-height:1.7;
+}
+
+.stats{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:10px;
+}
+
+.stat{
+    background:#f8fafc;
+    border-radius:12px;
+    padding:14px;
+    text-align:center;
+}
+
+.stat-number{
+    font-size:24px;
+    font-weight:900;
+}
+
+.stat-title{
+    font-size:11px;
+    color:#64748b;
+}
+
+.actions{
+    padding:10px;
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+}
+
+.actions a{
+    padding:8px 10px;
+    border-radius:999px;
+    color:#fff;
+    text-decoration:none;
+    font-size:12px;
+    font-weight:800;
+}
+
+.call{background:#16a34a;}
+.whatsapp{background:#25D366;}
+.website{background:#2563eb;}
+.map{background:#7c3aed;}
+.project{background:#ea580c;}
+.followup{background:#0891b2;}
+.meeting{background:#dc2626;}
+.comment{background:#4338ca;}
+.visit{background:#059669;}
+.voice{background:#92400e;}
+.edit{background:#111827;}
+
+@media(max-width:640px){
+
+.cards{
+grid-template-columns:1fr;
+}
+
+.stats{
+grid-template-columns:repeat(2,1fr);
+}
+
+.actions a{
+flex:1;
+text-align:center;
+}
+
+}
+
+.timeline-box,
+.voice-box{
+    background:#f8fafc;
+    border-radius:10px;
+    padding:12px;
+    border:1px solid #e5e7eb;
+    margin-bottom:12px;
+}
+
+.voice-box{
+    border-left:4px solid #92400e;
+}
+.info-box{
+    background:#fff;
+    border:1px solid #e5e7eb;
+    border-radius:12px;
+    padding:16px;
+}
+
+.info-title{
+    font-size:15px;
+    font-weight:700;
+    color:#111827;
+    margin-bottom:15px;
+}
+
+.info-box .row{
+    margin-bottom:10px;
+    line-height:1.7;
+    color:#374151;
+    font-size:13px;
+    word-break:break-word;
+}
+
+.info-box .label{
+    font-weight:700;
+    color:#111827;
+}
+
+.info-box a{
+    color:#2563eb;
+    text-decoration:none;
+}
+
+.info-box a:hover{
+    text-decoration:underline;
+}
+
+.about-box{
+    margin-top:15px;
+    border-left:4px solid #8b5cf6;
+}
+
+.system-box{
+    margin-top:15px;
+    border-left:4px solid #64748b;
+}
+
+.system-box hr{
+    margin:12px 0;
+    border:none;
+    border-top:1px dashed #d1d5db;
+}
+
+
+</style>
