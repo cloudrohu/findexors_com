@@ -139,7 +139,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='architects',
             name='contact_no',
-            field=models.CharField(blank=True, max_length=20, null=True),
+            field=models.CharField(blank=True, max_length=20, null=True, unique=True),
         ),
         migrations.AlterField(
             model_name='architects',
@@ -159,7 +159,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='developer',
             name='contact_no',
-            field=models.CharField(blank=True, max_length=20, null=True),
+            field=models.CharField(blank=True, max_length=20, null=True, unique=True),
         ),
         migrations.AlterField(
             model_name='developer',
@@ -179,7 +179,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='engineer',
             name='contact_no',
-            field=models.CharField(blank=True, max_length=20, null=True),
+            field=models.CharField(blank=True, max_length=20, null=True, unique=True),
         ),
         migrations.AlterField(
             model_name='engineer',

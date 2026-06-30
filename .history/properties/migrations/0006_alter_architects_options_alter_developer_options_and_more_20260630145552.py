@@ -159,7 +159,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='developer',
             name='contact_no',
-            field=models.CharField(blank=True, max_length=20, null=True),
+            field=models.CharField(blank=True, max_length=20, null=True, null=True),
         ),
         migrations.AlterField(
             model_name='developer',
