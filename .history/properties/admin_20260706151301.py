@@ -1459,10 +1459,10 @@ class MeetingAdmin(admin.ModelAdmin):
     )
 
     search_fields = (
-        "developer_title",
-        "architect_title",
-        "engineer_title",
-        "project_project_name",
+        "developer__title",
+        "architect__title",
+        "engineer__title",
+        "project__project_name",
     )
 
     readonly_fields = (
