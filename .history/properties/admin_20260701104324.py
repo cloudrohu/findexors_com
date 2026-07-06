@@ -1145,7 +1145,7 @@ class BankOfferInline(admin.TabularInline):
 
 @admin.register(Project)
 class ProjectAdmin(AutoUserAdminMixin, MPTTModelAdmin):
-    list_display = ('id',
+    list_display = (
         'project_name', 'city', 'locality','postal_code', 'developer','architects','engineer',
         'construction_status', 'possession_month', 'possession_year',
         'featured_property', 'active', 'image_preview', 'youtube_preview'
