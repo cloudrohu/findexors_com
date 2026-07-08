@@ -1,0 +1,842 @@
+import re
+from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
+from django.db import models
+from django.db.models import Min, Max
+from django.urls import reverse
+from django.utils.html import mark_safe
+from django.utils.text import slugify
+from mptt.fields import TreeForeignKey
+from mptt.models import MPTTModel
+from multiselectfield import MultiSelectField
+
+# External utility / custom apps imports
+from utility.models import City, Locality, PossessionIn, PropertyType, ProjectAmenities, Bank, Postal_Code
+
+
+def clean_phone_last10(phone):
+    if not phone:
+        return None
+    digits = re.sub(r"\D", "", str(phone))
+    return digits[-10:] if len(digits) >= 10 else digits
+
+
+def format_price_range(price_min, price_max):
+    """Convert rupees to Lakh/Cr format cleanly."""
+    def fmt(value):
+        if value >= 1e7:
+            return f"₹{value / 1e7:.2f}Cr".rstrip('0').rstrip('.')
+        elif value >= 1e5:
+            return f"₹{value / 1e5:.0f}L"
+        return f"₹{value:,}"
+
+    if price_min == price_max:
+        return fmt(price_min)
+    return f"{fmt(price_min)}–{fmt(price_max)}"
+
+
+# ==========================================
+# 1. CORE ENTITIES (Developer, Architect, Engineer)
+# ==========================================
+
+class Developer(models.Model):
+    CALLING_STATUS_CHOICES = [
+        ("New", "New"),
+        ("Meeting", "Meeting"),
+        ("FollowUp", "Follow Up"),
+        ("Meeting_FollowUp", "Meeting-Follow Up"),
+        ("Not Received", "Not Received"),
+        ("Not Interested", "Not Interested"),
+        ("Deal Done", "Deal Done"),
+    ]
+
+    city = models.ForeignKey(City, on_delete=models.CASCADE, null=True, blank=True)
+    locality = models.ForeignKey(Locality, on_delete=models.CASCADE, null=True, blank=True)
+    title = models.CharField(max_length=150, unique=True)
+    contact_person = models.CharField(max_length=255, null=True, blank=True)
+    contact_no = models.CharField(max_length=20, blank=True, null=True)
+    email = models.EmailField(null=True, blank=True)
+    google_map = models.CharField(max_length=1000, blank=True)
+    web_site = models.CharField(max_length=150, blank=True)
+    address = models.CharField(max_length=500, null=True, blank=True)
+    postal_code = models.ForeignKey(Postal_Code, on_delete=models.SET_NULL, null=True, blank=True)
+    keywords = models.CharField(max_length=255, null=True, blank=True)
+    about_developer = models.TextField(max_length=5000, null=True, blank=True)
+    note = models.TextField(max_length=5000, null=True, blank=True)
+    logo = models.ImageField(upload_to="developer/logo/", null=True, blank=True)
+    featured_builder = models.BooleanField(default=False)
+    calling_status = models.CharField(max_length=25, choices=CALLING_STATUS_CHOICES, default="New", null=True, blank=True)
+    assigned_to = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name="developer_assigned")
+    is_active = models.BooleanField(default=True)
+    is_verified = models.BooleanField(default=False)
+    is_featured = models.BooleanField(default=False)
+    slug = models.SlugField(max_length=500, unique=True, blank=True, null=True)
+    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name="developer_created")
+    updated_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name="developer_updated")
+    create_at = models.DateTimeField(auto_now_add=True)
+    update_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["-create_at"]
+        verbose_name_plural = "1. Developer"
+
+    def __str__(self):
+        return self.title
+
+    def save(self, *args, **kwargs):
+        if self.contact_no:
+            self.contact_no = clean_phone_last10(self.contact_no)
+        is_new = self.pk is None
+        super().save(*args, **kwargs)
+        if is_new and not self.slug:
+            self.slug = f"{slugify(self.title)}-{self.pk}"
+            super().save(update_fields=["slug"])
+
+    def get_absolute_url(self):
+        return reverse("developer_detail", kwargs={"slug": self.slug})
+
+    def logo_preview(self):
+        if self.logo and hasattr(self.logo, 'url'):
+            return mark_safe(f'<img src="{self.logo.url}" width="60" style="border-radius:6px;" />')
+        return "No Image"
+    logo_preview.short_description = "Logo"
+
+
+class Architects(models.Model):
+    CALLING_STATUS_CHOICES = [
+        ("New", "New"),
+        ("Meeting", "Meeting"),
+        ("FollowUp", "Follow Up"),
+        ("Meeting_FollowUp", "Meeting-Follow Up"),
+        ("Not Received", "Not Received"),
+        ("Not Interested", "Not Interested"),
+        ("Deal Done", "Deal Done"),
+    ]
+
+    city = models.ForeignKey(City, on_delete=models.CASCADE, null=True, blank=True)
+    locality = models.ForeignKey(Locality, on_delete=models.CASCADE, null=True, blank=True)
+    title = models.CharField(max_length=150, unique=True)
+    contact_person = models.CharField(max_length=255, null=True, blank=True)
+    contact_no = models.CharField(max_length=20, unique=True, null=True, blank=True)
+    email = models.EmailField(null=True, blank=True)
+    google_map = models.CharField(max_length=1000, blank=True)
+    web_site = models.CharField(max_length=150, blank=True)
+    address = models.CharField(max_length=500, null=True, blank=True)
+    postal_code = models.ForeignKey(Postal_Code, on_delete=models.SET_NULL, null=True, blank=True)
+    keywords = models.CharField(max_length=255, null=True, blank=True)
+    about_architect = models.TextField(max_length=5000, null=True, blank=True)
+    note = models.TextField(max_length=5000, null=True, blank=True)
+    logo = models.ImageField(upload_to="architect/logo/", null=True, blank=True)
+    featured_architect = models.BooleanField(default=False)
+    calling_status = models.CharField(max_length=25, choices=CALLING_STATUS_CHOICES, default="New")
+    assigned_to = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name="architect_assigned")
+    is_active = models.BooleanField(default=True)
+    is_verified = models.BooleanField(default=False)
+    is_featured = models.BooleanField(default=False)
+    slug = models.SlugField(max_length=500, unique=True, blank=True, null=True)
+    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name="architect_created")
+    updated_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name="architect_updated")
+    create_at = models.DateTimeField(auto_now_add=True)
+    update_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["-create_at"]
+        verbose_name_plural = "2. Architects"
+
+    def __str__(self):
+        return self.title
+
+    def save(self, *args, **kwargs):
+        if self.contact_no:
+            self.contact_no = clean_phone_last10(self.contact_no)
+        is_new = self.pk is None
+        super().save(*args, **kwargs)
+        if is_new and not self.slug:
+            self.slug = f"{slugify(self.title)}-{self.pk}"
+            super().save(update_fields=["slug"])
+
+    def get_absolute_url(self):
+        return reverse("architect_detail", kwargs={"slug": self.slug})
+
+    def logo_preview(self):
+        if self.logo and hasattr(self.logo, 'url'):
+            return mark_safe(f'<img src="{self.logo.url}" width="60" style="border-radius:6px;" />')
+        return "No Image"
+    logo_preview.short_description = "Logo"
+
+
+class Engineer(models.Model):
+    CALLING_STATUS_CHOICES = [
+        ("New", "New"),
+        ("Meeting", "Meeting"),
+        ("FollowUp", "Follow Up"),
+        ("Meeting_FollowUp", "Meeting-Follow Up"),
+        ("Not Received", "Not Received"),
+        ("Not Interested", "Not Interested"),
+        ("Deal Done", "Deal Done"),
+    ]
+
+    city = models.ForeignKey(City, on_delete=models.CASCADE, null=True, blank=True)
+    locality = models.ForeignKey(Locality, on_delete=models.CASCADE, null=True, blank=True)
+    title = models.CharField(max_length=150, unique=True)
+    contact_person = models.CharField(max_length=255, null=True, blank=True)
+    contact_no = models.CharField(max_length=20, unique=True, null=True, blank=True)
+    email = models.EmailField(null=True, blank=True)
+    google_map = models.CharField(max_length=1000, blank=True)
+    web_site = models.CharField(max_length=150, blank=True)
+    address = models.CharField(max_length=500, null=True, blank=True)
+    postal_code = models.ForeignKey(Postal_Code, on_delete=models.SET_NULL, null=True, blank=True)
+    keywords = models.CharField(max_length=255, null=True, blank=True)
+    about_engineer = models.TextField(max_length=5000, null=True, blank=True)
+    note = models.TextField(max_length=5000, null=True, blank=True)
+    logo = models.ImageField(upload_to="engineer/logo/", null=True, blank=True)
+    featured_engineer = models.BooleanField(default=False)
+    calling_status = models.CharField(max_length=25, choices=CALLING_STATUS_CHOICES, default="New")
+    assigned_to = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name="engineer_assigned")
+    is_active = models.BooleanField(default=True)
+    is_verified = models.BooleanField(default=False)
+    is_featured = models.BooleanField(default=False)
+    slug = models.SlugField(max_length=500, unique=True, blank=True, null=True)
+    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name="engineer_created")
+    updated_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name="engineer_updated")
+    create_at = models.DateTimeField(auto_now_add=True)
+    update_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["-create_at"]
+        verbose_name_plural = "3. Engineer"
+
+    def __str__(self):
+        return self.title
+
+    def save(self, *args, **kwargs):
+        if self.contact_no:
+            self.contact_no = clean_phone_last10(self.contact_no)
+        is_new = self.pk is None
+        super().save(*args, **kwargs)
+        if is_new and not self.slug:
+            self.slug = f"{slugify(self.title)}-{self.pk}"
+            super().save(update_fields=["slug"])
+
+    def get_absolute_url(self):
+        return reverse("engineer_detail", kwargs={"slug": self.slug})
+
+    def logo_preview(self):
+        if self.logo and hasattr(self.logo, 'url'):
+            return mark_safe(f'<img src="{self.logo.url}" width="60" style="border-radius:6px;" />')
+        return "No Image"
+    logo_preview.short_description = "Logo"
+
+
+# ==========================================
+# 2. MAIN PROJECT MODEL
+# ==========================================
+
+class Project(MPTTModel):
+    CALLING_STATUS_CHOICES = [
+        ("New", "New"),
+        ("Meeting", "Meeting"),
+        ("FollowUp", "Follow Up"),
+        ("Meeting_FollowUp", "Meeting-Follow Up"),
+        ("Not Received", "Not Received"),
+        ("Not Interested", "Not Interested"),
+        ("Deal Done", "Deal Done"),
+    ]
+
+    BHK_CHOICES = (
+        ('1 BHK', '1 BHK'), ('2 BHK', '2 BHK'), ('3 BHK', '3 BHK'), ('4 BHK', '4 BHK'), ('5 BHK', '5 BHK'), 
+        ('6 BHK', '6 BHK'), ('7 BHK', '7 BHK'), ('8 BHK', '8 BHK'), ('9 BHK', '9 BHK'), ('10 BHK', '10 BHK'), 
+        ('10+ BHK', '10+ BHK'),
+    )
+
+    CONSTRUCTION_STATUS_CHOICES = (
+        ('Under Construction', 'Under Construction'), ('New Launch', 'New Launch'),
+        ('Partially Ready To Move', 'Partially Ready To Move'), ('Ready To Move', 'Ready To Move'),
+        ('Deleverd', 'Deleverd'),
+    )
+    
+    MONTH_CHOICES = [
+        ('January', 'January'), ('February', 'February'), ('March', 'March'), ('April', 'April'), 
+        ('May', 'May'), ('June', 'June'), ('July', 'July'), ('August', 'August'),
+        ('September', 'September'), ('October', 'October'), ('November', 'November'), ('December', 'December'),
+    ]
+    
+    CERTIFICATE_CHOICES = (('Yes', 'Yes'), ('No', 'No'),)
+    
+    calling_status = models.CharField(max_length=25, choices=CALLING_STATUS_CHOICES, default="New", null=True, blank=True)
+    Occupancy_Certificate = models.CharField(max_length=25, choices=CERTIFICATE_CHOICES, null=True, blank=True)
+    Commencement_Certificate = models.CharField(max_length=25, choices=CERTIFICATE_CHOICES, null=True, blank=True)
+    construction_status = models.CharField(max_length=25, choices=CONSTRUCTION_STATUS_CHOICES)
+    property_type = models.ForeignKey(PropertyType, on_delete=models.CASCADE) 
+
+    # MPTT Hierarchy
+    parent = TreeForeignKey('self', blank=True, null=True, related_name='children', on_delete=models.CASCADE)
+    project_name = models.CharField(max_length=250)
+    
+    # Foreign Keys
+    developer = models.ForeignKey(Developer, on_delete=models.CASCADE) 
+    architects = models.ForeignKey(Architects, on_delete=models.CASCADE, null=True, blank=True) 
+    engineer = models.ForeignKey(Engineer, on_delete=models.CASCADE, null=True, blank=True) 
+    city = models.ForeignKey(City, on_delete=models.CASCADE)
+    locality = models.ForeignKey(Locality, on_delete=models.CASCADE) 
+    postal_code = models.ForeignKey(Postal_Code, on_delete=models.CASCADE, null=True, blank=True) 
+    
+    land_parcel = models.CharField(max_length=50, null=True, blank=True)
+    bhk_type = MultiSelectField(choices=BHK_CHOICES, max_length=50, null=True, blank=True)
+    floor = models.CharField(max_length=50, null=True, blank=True)
+    possession_year = models.ForeignKey(PossessionIn, on_delete=models.CASCADE, null=True, blank=True) 
+    possession_month = models.CharField(max_length=20, choices=MONTH_CHOICES, blank=True, null=True, help_text="Select Possession Month")
+    
+    luxurious = models.CharField(max_length=50, null=True, blank=True)
+    priceing = models.CharField(max_length=50, null=True, blank=True) 
+    youtube_embed_id = models.CharField(max_length=50, blank=True, null=True, verbose_name="YouTube Video ID")
+    featured_property = models.BooleanField(default=False)
+    balcony = models.BooleanField(default=False)
+    active = models.BooleanField(default=False)
+    image = models.ImageField(upload_to='images/', null=True, blank=True)
+    google_map_iframe = models.TextField(null=True, blank=True)
+    
+    slug = models.SlugField(unique=True, null=True, blank=True, max_length=555)
+    create_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    update_at = models.DateTimeField(auto_now=True, null=True, blank=True)
+    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name="projects_created")
+    updated_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name="projects_updated")
+
+    class Meta:
+        verbose_name_plural = '1. Project'
+
+    class MPTTMeta:
+        order_insertion_by = ['project_name']
+
+    def __str__(self):
+        full_path = [str(node.project_name) for node in self.get_ancestors(include_self=True)]
+        return ' / '.join(full_path)
+
+    def save(self, *args, **kwargs):
+        if not self.id:
+            super().save(*args, **kwargs)
+
+        locality_name = str(self.locality) if self.locality else ''
+        city_name = str(self.city) if self.city else ''
+        base_slug = slugify(f"{self.project_name} {locality_name}")
+        new_slug = f"{base_slug}-{self.id}"
+
+        if self.slug != new_slug:
+            self.slug = new_slug
+            if self.pk:
+                super().save(update_fields=['slug'])
+            else:
+                super().save(*args, **kwargs)
+        else:
+            super().save(*args, **kwargs)
+
+    def image_tag(self):
+        if self.image and hasattr(self.image, 'url'):
+            return mark_safe(f'<img src="{self.image.url}" height="50"/>')
+        return ""
+    image_tag.short_description = "Preview"
+
+    def get_absolute_url(self):
+        return reverse("project_details", kwargs={'id': self.id, 'slug': self.slug})
+
+    def get_configuration_details(self):
+        configs = self.configurations.all()
+        if not configs.exists():
+            return ""
+
+        summary_lines = []
+        bhk_types = sorted(set(configs.values_list("bhk_type", flat=True)))
+
+        for bhk in bhk_types:
+            bhk_configs = configs.filter(bhk_type=bhk)
+            area_min = bhk_configs.aggregate(Min("area_sqft"))["area_sqft__min"]
+            area_max = bhk_configs.aggregate(Max("area_sqft"))["area_sqft__max"]
+            area_range = f"{area_min}" if area_min == area_max else f"{area_min}-{area_max}"
+
+            price_min = bhk_configs.aggregate(Min("price_in_rupees"))["price_in_rupees__min"]
+            price_max = bhk_configs.aggregate(Max("price_in_rupees"))["price_in_rupees__max"]
+            price_range = format_price_range(price_min, price_max)
+
+            summary_lines.append(f"{bhk} {area_range} Sq.ft {price_range}")
+
+        return "\n".join(summary_lines)
+
+    def get_carpet_area_range(self):
+        qs = self.configurations.all()
+        if not qs.exists():
+            return "NA"
+        area_min = qs.aggregate(Min("area_sqft"))["area_sqft__min"]
+        area_max = qs.aggregate(Max("area_sqft"))["area_sqft__max"]
+        if area_min == area_max:
+            return f"{area_min} sqft"
+        return f"{area_min}–{area_max} sqft"
+
+    def get_price_range(self):
+        qs = self.configurations.all()
+        if not qs.exists():
+            return "Price on Request"
+
+        price_min = qs.aggregate(Min("price_in_rupees"))["price_in_rupees__min"]
+        price_max = qs.aggregate(Max("price_in_rupees"))["price_in_rupees__max"]
+
+        def fmt(value):
+            if value >= 10000000:
+                return f"{value / 10000000:.2f} Cr"
+            elif value >= 100000:
+                return f"{value / 100000:.0f} L"
+            return f"{value:,}"
+
+        if price_min == price_max:
+            return f"₹ {fmt(price_min)}"
+        return f"₹ {fmt(price_min)} – {fmt(price_max)}"
+
+
+# ==========================================
+# 3. PROJECT SUBSIDIARY MODELS
+# ==========================================
+
+class BookingOffer(models.Model):
+    Project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="BookingOffer")
+    title = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.title
+
+
+class WelcomeTo(models.Model):
+    Project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="welcomes")
+    description = models.TextField(null=True, blank=True, max_length=5500)
+    read_more = models.TextField(null=True, blank=True, max_length=5500)
+
+    def __str__(self):
+        return self.description[:50] if self.description else "Welcome To"
+
+
+class WebSlider(models.Model):
+    Project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="sliders")
+    image = models.ImageField(upload_to='web_slider/')
+    caption = models.CharField(max_length=255, blank=True)
+
+    def __str__(self):
+        return self.caption or f"Slider #{self.pk}"
+
+
+class Overview(models.Model):
+    Project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="overviews")
+    heading = models.CharField(max_length=255)
+    content = models.TextField()
+
+    def __str__(self):
+        return self.heading
+
+
+class AboutUs(models.Model):
+    Project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="aboutus")
+    content = models.TextField()
+
+    def __str__(self):
+        return f"About Us - {self.Project.project_name}"
+
+
+class USP(models.Model):
+    Project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="usps")
+    point = models.CharField(null=True, blank=True, max_length=150)
+
+    def __str__(self):
+        return self.point or f"USP #{self.pk}"
+
+
+class Configuration(models.Model):
+    Project = models.ForeignKey("Project", on_delete=models.CASCADE, related_name="configurations")
+    bhk_type = models.CharField(max_length=50)
+    area_sqft = models.IntegerField(verbose_name="Area (Sq.ft)", help_text="Enter area in numeric square feet.") 
+    parking = models.BooleanField(default=False)
+    unit_plan = models.ImageField(null=True, blank=True, upload_to='images/')
+    price_in_rupees = models.IntegerField(verbose_name="Price (in ₹)", help_text="Enter price in total rupees.")
+
+    class Meta:
+        ordering = ['bhk_type']
+
+    def __str__(self):
+        return f"{self.Project.project_name} - {self.bhk_type} ({self.area_sqft} sq.ft)"
+
+
+class Connectivity(models.Model):
+    Project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="configs")
+    title = models.CharField(max_length=50)
+
+    def __str__(self):
+        return f"{self.title}"
+
+
+class Amenities(models.Model):
+    Project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="amenities")
+    amenities = models.ForeignKey(ProjectAmenities, on_delete=models.CASCADE, related_name="amenities")
+    
+    def __str__(self):
+        return f"{self.Project.project_name} - {self.amenities.title}"
+
+
+class Gallery(models.Model):
+    Project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="gallery")
+    image = models.ImageField(upload_to='gallery/')
+
+    def __str__(self):
+        return f"Image #{self.pk}"
+
+
+class Header(models.Model):
+    Project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="headers")    
+    title = models.CharField(max_length=2000, null=True, blank=True)
+    keywords = models.CharField(max_length=2000, null=True, blank=True)
+    meta_description = models.CharField(max_length=5000, null=True, blank=True)
+    logo = models.ImageField(null=True, blank=True, upload_to='images/')
+    welcome_to_bg = models.ImageField(null=True, blank=True, upload_to='headers/')
+    virtual_site_visit_bg = models.ImageField(null=True, blank=True, upload_to='headers/')
+    schedule_a_site_visit = models.ImageField(null=True, blank=True, upload_to='headers/')
+
+    def __str__(self):
+        return self.keywords or f"Header #{self.pk}"
+
+
+class RERA_Info(models.Model):
+    Project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="rera")
+    qr_image = models.ImageField(null=True, blank=True, upload_to='overviewimage/')
+    registration_no = models.CharField(null=True, blank=True, max_length=50)
+    project_registered = models.CharField(null=True, blank=True, max_length=50)
+    government_rera_authorised_advertiser = models.CharField(null=True, blank=True, max_length=150)
+    site_address = models.CharField(null=True, blank=True, max_length=500)
+    contact_us = models.CharField(null=True, blank=True, max_length=500)
+    disclaimer = models.CharField(null=True, blank=True, max_length=1500)
+    document = models.FileField(null=True, blank=True, upload_to='rera_docs/')
+
+    def __str__(self):
+        return self.registration_no or f"RERA Info #{self.pk}"
+
+
+class WhyInvest(models.Model):
+    Project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="why_invest")
+    title = models.CharField(max_length=350, null=True, blank=True)
+    description = models.CharField(max_length=500, null=True, blank=True)
+
+    def __str__(self):
+        return self.title or f"Why Invest - {self.pk}"
+
+
+class BankOffer(models.Model):
+    Project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="bank_offers")
+    bank = models.ForeignKey(Bank, on_delete=models.CASCADE, related_name="bank_offers")
+    
+    def __str__(self):
+        return f"{self.Project.project_name} - {self.bank.title}"
+
+
+class ProjectFAQ(models.Model):
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="faqs")
+    question = models.CharField(max_length=255)
+    answer = models.TextField()
+    order = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ["order"]
+
+    def __str__(self):
+        return f"{self.project.project_name} - {self.question}"
+
+
+class Enquiry(models.Model):
+    project = models.ForeignKey('Project', on_delete=models.CASCADE, related_name='enquiries')
+    name = models.CharField(max_length=120)
+    email = models.EmailField(blank=True, null=True)
+    phone = models.CharField(max_length=20)
+    message = models.TextField(blank=True)
+    contacted_on = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = 'Project Enquiry'
+        verbose_name_plural = '3. Project Enquiries'
+        ordering = ['-contacted_on']
+
+    def __str__(self):
+        return f"Enquiry for {self.project.project_name} by {self.name}"
+
+
+class ProjectContactPerson(models.Model):
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="contact_persons")
+    name = models.CharField(max_length=150)
+    designation = models.CharField(max_length=100, blank=True, null=True)
+    mobile = models.CharField(max_length=20, blank=True, null=True)
+    whatsapp = models.CharField(max_length=20, blank=True, null=True)
+    email = models.EmailField(blank=True, null=True)
+    is_primary = models.BooleanField(default=False)
+    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name="project_contact_created")
+    updated_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name="+")
+    create_at = models.DateTimeField(auto_now_add=True)
+    update_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Project Contact"
+        verbose_name_plural = "Project Contacts"
+
+    def __str__(self):
+        return f"{self.project.project_name} - {self.name}"
+
+
+# ==========================================
+# 4. COMMUNICATIONS & LOGS (Comments, Visits, Followups, Meetings)
+# ==========================================
+
+class Comment(models.Model):
+    TYPE_CHOICES = (
+        ("Developer", "Developer"),
+        ("Architect", "Architect"),
+        ("Engineer", "Engineer"),
+        ("Project", "Project"),
+    )
+
+    type = models.CharField(max_length=20, choices=TYPE_CHOICES, blank=True, null=True)
+    developer = models.ForeignKey(Developer, on_delete=models.CASCADE, null=True, blank=True, related_name="comments")
+    architect = models.ForeignKey(Architects, on_delete=models.CASCADE, null=True, blank=True, related_name="comments")
+    engineer = models.ForeignKey(Engineer, on_delete=models.CASCADE, null=True, blank=True, related_name="comments")
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, null=True, blank=True, related_name="comments")
+    comment = models.TextField(blank=True, null=True)
+    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name="property_comments_created")
+    updated_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name="+")
+    create_at = models.DateTimeField(auto_now_add=True)
+    update_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["-create_at"]
+
+    def __str__(self):
+        if self.project: return f"{self.project.project_name}"
+        if self.developer: return self.developer.title
+        if self.architect: return self.architect.title
+        if self.engineer: return self.engineer.title
+        return "Comment"
+
+    def clean(self):
+        total = sum([bool(self.project), bool(self.developer), bool(self.architect), bool(self.engineer)])
+        if total == 0:
+            raise ValidationError("Please select Developer, Architect, Engineer or Project.")
+        if total > 1:
+            raise ValidationError("Only one relation is allowed.")
+
+    def save(self, *args, **kwargs):
+        if self.project: self.type = "Project"
+        elif self.developer: self.type = "Developer"
+        elif self.architect: self.type = "Architect"
+        elif self.engineer: self.type = "Engineer"
+        self.full_clean()
+        super().save(*args, **kwargs)
+
+
+class VoiceRecording(models.Model):
+    TYPE_CHOICES = (
+        ("Developer", "Developer"),
+        ("Architect", "Architect"),
+        ("Engineer", "Engineer"),
+        ("Project", "Project"),
+    )
+
+    type = models.CharField(max_length=20, choices=TYPE_CHOICES, blank=True, null=True)
+    developer = models.ForeignKey(Developer, on_delete=models.CASCADE, null=True, blank=True, related_name="voice_recordings")
+    architect = models.ForeignKey(Architects, on_delete=models.CASCADE, null=True, blank=True, related_name="voice_recordings")
+    engineer = models.ForeignKey(Engineer, on_delete=models.CASCADE, null=True, blank=True, related_name="voice_recordings")
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, null=True, blank=True, related_name="voice_recordings")
+    file = models.FileField(upload_to="voice_recordings/")
+    uploaded_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name="property_voice_uploaded")
+    updated_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name="+")
+    create_at = models.DateTimeField(auto_now_add=True)
+    update_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["-create_at"]
+
+    def __str__(self):
+        if self.project: return f"{self.project.project_name} Voice"
+        if self.developer: return f"{self.developer.title} Voice"
+        if self.architect: return f"{self.architect.title} Voice"
+        if self.engineer: return f"{self.engineer.title} Voice"
+        return f"Voice {self.pk}"
+
+    def clean(self):
+        total = sum([bool(self.project), bool(self.developer), bool(self.architect), bool(self.engineer)])
+        if total == 0:
+            raise ValidationError("Please select Developer, Architect, Engineer or Project.")
+        if total > 1:
+            raise ValidationError("Only one relation is allowed.")
+
+    def save(self, *args, **kwargs):
+        if self.project: self.type = "Project"
+        elif self.developer: self.type = "Developer"
+        elif self.architect: self.type = "Architect"
+        elif self.engineer: self.type = "Engineer"
+        self.full_clean()
+        super().save(*args, **kwargs)
+
+
+class Visit(models.Model):
+    TYPE_CHOICES = (
+        ("Developer", "Developer"),
+        ("Architect", "Architect"),
+        ("Engineer", "Engineer"),
+        ("Project", "Project"),
+    )
+    VISIT_FOR_CHOICES = (
+        ("Meeting", "Meeting"),
+        ("Door To Door", "Door To Door"),
+        ("Site Visit", "Site Visit"),
+        ("Follow Up", "Follow Up"),
+        ("Negotiation", "Negotiation"),
+    )
+    VISIT_TYPE_CHOICES = (
+        ("1st Visit", "1st Visit"),
+        ("2nd Visit", "2nd Visit"),
+        ("3rd Visit", "3rd Visit"),
+        ("4th Visit", "4th Visit"),
+        ("5th Visit", "5th Visit"),
+    )
+    VISIT_STATUS_CHOICES = (
+        ("Meeting", "Meeting"),
+        ("Interested", "Interested"),
+        ("Follow Up", "Follow Up"),
+        ("Deal Done", "Deal Done"),
+        ("Not Interested", "Not Interested"),
+        ("Owner Not Available", "Owner Not Available"),
+    )
+
+    type = models.CharField(max_length=20, choices=TYPE_CHOICES, blank=True, null=True)
+    developer = models.ForeignKey(Developer, on_delete=models.CASCADE, null=True, blank=True, related_name="visits")
+    architect = models.ForeignKey(Architects, on_delete=models.CASCADE, null=True, blank=True, related_name="visits")
+    engineer = models.ForeignKey(Engineer, on_delete=models.CASCADE, null=True, blank=True, related_name="visits")
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, null=True, blank=True, related_name="visits")
+    visit_for = models.CharField(max_length=50, choices=VISIT_FOR_CHOICES)
+    visit_type = models.CharField(max_length=50, choices=VISIT_TYPE_CHOICES)
+    visit_status = models.CharField(max_length=50, choices=VISIT_STATUS_CHOICES)
+    comment = models.TextField(blank=True, null=True)
+    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name="property_visit_created")
+    updated_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name="+")
+    create_at = models.DateTimeField(auto_now_add=True)
+    update_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["-create_at"]
+
+    def __str__(self):
+        return f"Visit #{self.pk}"
+
+    def clean(self):
+        total = sum([bool(self.project), bool(self.developer), bool(self.architect), bool(self.engineer)])
+        if total == 0:
+            raise ValidationError("Please select Developer, Architect, Engineer or Project.")
+        if total > 1:
+            raise ValidationError("Only one relation is allowed.")
+
+    def save(self, *args, **kwargs):
+        if self.project: self.type = "Project"
+        elif self.developer: self.type = "Developer"
+        elif self.architect: self.type = "Architect"
+        elif self.engineer: self.type = "Engineer"
+        self.full_clean()
+        super().save(*args, **kwargs)
+
+
+class Followup(models.Model):
+    TYPE_CHOICES = (
+        ("Developer", "Developer"),
+        ("Architect", "Architect"),
+        ("Engineer", "Engineer"),
+        ("Project", "Project"),
+    )
+    FOLLOWUP_STATUS_CHOICES = (
+        ("New Followup", "New Followup"),
+        ("Re Followup", "Re Followup"),
+        ("Cancelled", "Cancelled"),
+        ("Deal Done", "Deal Done"),
+    )
+
+    type = models.CharField(max_length=20, choices=TYPE_CHOICES, blank=True, null=True)
+    developer = models.OneToOneField(Developer, on_delete=models.CASCADE, null=True, blank=True, related_name="followup")
+    architect = models.OneToOneField(Architects, on_delete=models.CASCADE, null=True, blank=True, related_name="followup")
+    engineer = models.OneToOneField(Engineer, on_delete=models.CASCADE, null=True, blank=True, related_name="followup")
+    project = models.OneToOneField(Project, on_delete=models.CASCADE, null=True, blank=True, related_name="followup")
+    status = models.CharField(max_length=25, choices=FOLLOWUP_STATUS_CHOICES, default="New Followup")
+    followup_date = models.DateTimeField(null=True, blank=True)
+    assigned_to = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name="property_followup_assigned")
+    comment = models.TextField(blank=True, null=True)
+    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name="property_followup_created")
+    updated_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name="+")
+    create_at = models.DateTimeField(auto_now_add=True)
+    update_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["-create_at"]
+
+    def __str__(self):
+        return f"Followup #{self.pk}"
+
+    def clean(self):
+        total = sum([bool(self.project), bool(self.developer), bool(self.architect), bool(self.engineer)])
+        if total == 0:
+            raise ValidationError("Please select Developer, Architect, Engineer or Project.")
+        if total > 1:
+            raise ValidationError("Only one relation is allowed.")
+
+    def save(self, *args, **kwargs):
+        if self.project: self.type = "Project"
+        elif self.developer: self.type = "Developer"
+        elif self.architect: self.type = "Architect"
+        elif self.engineer: self.type = "Engineer"
+        self.full_clean()
+        super().save(*args, **kwargs)
+
+
+class Meeting(models.Model):
+    TYPE_CHOICES = (
+        ("Developer", "Developer"),
+        ("Architect", "Architect"),
+        ("Engineer", "Engineer"),
+        ("Project", "Project"),
+    )
+    MEETING_STATUS_CHOICES = (
+        ("New Meeting", "New Meeting"),
+        ("Re Meeting", "Re Meeting"),
+        ("Cancelled", "Cancelled"),
+        ("Deal Done", "Deal Done"),
+    )
+
+    type = models.CharField(max_length=20, choices=TYPE_CHOICES, blank=True, null=True)
+    developer = models.OneToOneField(Developer, on_delete=models.CASCADE, null=True, blank=True, related_name="meeting")
+    architect = models.OneToOneField(Architects, on_delete=models.CASCADE, null=True, blank=True, related_name="meeting")
+    engineer = models.OneToOneField(Engineer, on_delete=models.CASCADE, null=True, blank=True, related_name="meeting")
+    project = models.OneToOneField(Project, on_delete=models.CASCADE, null=True, blank=True, related_name="meeting")
+    status = models.CharField(max_length=25, choices=MEETING_STATUS_CHOICES, default="New Meeting")
+    meeting_date = models.DateTimeField(null=True, blank=True)
+    assigned_to = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name="property_meeting_assigned")
+    comment = models.TextField(blank=True, null=True)
+    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name="property_meeting_created")
+    updated_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name="+")
+    create_at = models.DateTimeField(auto_now_add=True)
+    update_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["-create_at"]
+
+    def __str__(self):
+        return f"Meeting #{self.pk}"
+
+    def clean(self):
+        total = sum([bool(self.project), bool(self.developer), bool(self.architect), bool(self.engineer)])
+        if total == 0:
+            raise ValidationError("Please select Developer, Architect, Engineer or Project.")
+        if total > 1:
+            raise ValidationError("Only one relation is allowed.")
+
+    def save(self, *args, **kwargs):
+        if self.project: self.type = "Project"
+        elif self.developer: self.type = "Developer"
+        elif self.architect: self.type = "Architect"
+        elif self.engineer: self.type = "Engineer"
+        self.full_clean()
+        super().save(*args, **kwargs)

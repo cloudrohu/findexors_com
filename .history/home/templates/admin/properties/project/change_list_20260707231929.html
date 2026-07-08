@@ -1,0 +1,129 @@
+<div class="header">
+
+    <div class="logo">
+
+        {% if obj.image %}
+            <img src="{{ obj.image.url }}">
+        {% else %}
+            <span>🏢</span>
+        {% endif %}
+
+    </div>
+
+    <div class="info">
+
+        <div class="badges">
+
+            <span class="badge blue">
+                PRO{{ obj.id|stringformat:"03d" }}
+            </span>
+
+            {% if obj.featured_property %}
+                <span class="badge green">
+                    ⭐ Featured
+                </span>
+            {% endif %}
+
+            {% if obj.active %}
+                <span class="badge success">
+                    Active
+                </span>
+            {% else %}
+                <span class="badge danger">
+                    Inactive
+                </span>
+            {% endif %}
+
+        </div>
+
+        <div class="title">
+            {{ obj.project_name }}
+        </div>
+
+        <div class="meta">
+            🏗 {{ obj.developer }}
+        </div>
+
+    </div>
+
+</div>
+
+<!-- ================= GALLERY ================= -->
+
+<div class="section">
+
+    <div class="section-title">
+        🖼 Gallery ({{ obj.gallery.count }})
+    </div>
+
+    {% if obj.gallery.exists %}
+
+    <div class="gallery-grid">
+
+        {% for image in obj.gallery.all|slice:":6" %}
+
+        <div class="gallery-item">
+
+            <img src="{{ image.image.url }}">
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+    {% else %}
+
+    <div class="meta">
+        No Gallery Images
+    </div>
+
+    {% endif %}
+
+</div>
+
+<!-- ================= CONFIGURATIONS ================= -->
+
+<div class="section">
+
+    <div class="section-title">
+        🏠 Configurations ({{ obj.configurations.count }})
+    </div>
+
+    {% for config in obj.configurations.all %}
+
+    <div class="timeline-box">
+
+        <div class="row">
+            <b>{{ config.bhk_type }}</b>
+        </div>
+
+        {% if config.carpet_area %}
+        <div class="meta">
+            📐 Carpet : {{ config.carpet_area }}
+        </div>
+        {% endif %}
+
+        {% if config.builtup_area %}
+        <div class="meta">
+            📏 Builtup : {{ config.builtup_area }}
+        </div>
+        {% endif %}
+
+        {% if config.price %}
+        <div class="meta">
+            💰 {{ config.price }}
+        </div>
+        {% endif %}
+
+    </div>
+
+    {% empty %}
+
+    <div class="meta">
+        No Configurations
+    </div>
+
+    {% endfor %}
+
+</div>

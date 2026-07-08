@@ -1,0 +1,44 @@
+{% load i18n admin_urls %}
+
+<div class="submit-row-modern">
+
+    {% if show_save %}
+        <button type="submit"
+                name="_save"
+                class="btn btn-primary">
+            💾 Save
+        </button>
+    {% endif %}
+
+    {% if show_save_and_continue %}
+        <button type="submit"
+                name="_continue"
+                class="btn btn-info">
+            🔄 Save & Continue
+        </button>
+    {% endif %}
+
+    {% if show_save_as_new %}
+        <button type="submit"
+                name="_saveasnew"
+                class="btn btn-secondary">
+            📄 Save As New
+        </button>
+    {% endif %}
+
+    {% if show_save_and_add_another %}
+        <button type="submit"
+                name="_addanother"
+                class="btn btn-success">
+            ➕ Save & Add Another
+        </button>
+    {% endif %}
+
+    {% if show_delete_link and original %}
+        <a href="{% url opts|admin_urlname:'delete' original.pk|admin_urlquote %}"
+           class="btn btn-danger">
+            🗑 Delete
+        </a>
+    {% endif %}
+
+</div>

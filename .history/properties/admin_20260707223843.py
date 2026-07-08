@@ -1142,14 +1142,14 @@ class BankOfferInline(admin.TabularInline):
     model = BankOffer
     extra = 1
 
+
 @admin.register(Project)
 class ProjectAdmin(AutoUserAdminMixin, MPTTModelAdmin):
-    change_form_template = "admin/properties/project/change_form.html"
-
     list_display = (
         'id',
         'project_name',
-        
+        'created_by_name',
+        'created_by_email',
         'city',
         'locality',
         'postal_code',
@@ -1164,8 +1164,6 @@ class ProjectAdmin(AutoUserAdminMixin, MPTTModelAdmin):
         'image_preview',
         'youtube_preview',
         'create_at',
-        'created_by_name',
-        'created_by_email',
     )
     ordering = ('-id',)
 

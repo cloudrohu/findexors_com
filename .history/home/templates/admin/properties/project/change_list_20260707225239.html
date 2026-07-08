@@ -1,0 +1,166 @@
+{% extends "admin/change_form.html" %}
+{% load i18n admin_urls static admin_modify %}
+
+{% block extrastyle %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{% static 'admin/css/project.css' %}">
+{% endblock %}
+
+{% block extrahead %}
+    {{ block.super }}
+    <script src="{% static 'admin/js/project.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+<div class="project-admin-wrapper">
+
+    <div class="project-header">
+        <div>
+            <h1>{{ original|default:"Add New Project" }}</h1>
+            <p>Manage project information, media and configuration.</p>
+        </div>
+
+        <div class="project-actions">
+            {{ block.super }}
+        </div>
+    </div>
+
+</div>
+{% endblock %}
+
+
+{% block field_sets %}
+
+<div class="project-grid">
+
+    {% for fieldset in adminform %}
+
+    <div class="project-card">
+
+        <div class="project-card-header">
+
+            <h3>{{ fieldset.name }}</h3>
+
+            {% if fieldset.description %}
+                <small>{{ fieldset.description|safe }}</small>
+            {% endif %}
+
+        </div>
+
+        <div class="project-card-body">
+
+            {% include "admin/includes/fieldset.html" %}
+
+        </div>
+
+    </div>
+
+    {% endfor %}
+
+</div>
+
+{% endblock %}
+
+{% block content %}
+
+<div class="project-layout">
+
+    <!-- Left Content -->
+    <div class="project-main">
+
+        {% for fieldset in adminform %}
+            <div class="project-card">
+
+                <div class="project-card-header">
+                    <h3>{{ fieldset.name }}</h3>
+                </div>
+
+                <div class="project-card-body">
+                    {% include "admin/includes/fieldset.html" %}
+                </div>
+
+            </div>
+        {% endfor %}
+
+        {% block inline_field_sets %}
+            {% for inline_admin_formset in inline_admin_formsets %}
+                {% include inline_admin_formset.opts.template %}
+            {% endfor %}
+        {% endblock %}
+
+    </div>
+
+    <!-- Right Sidebar -->
+    <aside class="project-sidebar">
+
+        <div class="sidebar-card">
+
+            <h3>Project Status</h3>
+
+            <table class="status-table">
+
+                <tr>
+                    <td>Created By</td>
+                    <td>{{ original.created_by|default:"-" }}</td>
+                </tr>
+
+                <tr>
+                    <td>Updated By</td>
+                    <td>{{ original.updated_by|default:"-" }}</td>
+                </tr>
+
+                <tr>
+                    <td>Created</td>
+                    <td>{{ original.create_at|date:"d M Y H:i" }}</td>
+                </tr>
+
+                <tr>
+                    <td>Updated</td>
+                    <td>{{ original.update_at|date:"d M Y H:i" }}</td>
+                </tr>
+
+            </table>
+
+        </div>
+
+        <div class="sidebar-card">
+
+            {% submit_row %}
+
+        </div>
+
+    </aside>
+
+</div>
+
+{% endblock %}
+
+{% if original.image %}
+<div class="sidebar-card">
+
+    <h3>Project Image</h3>
+
+    <img src="{{ original.image.url }}"
+         class="project-preview">
+
+</div>
+{% endif %}
+
+{% if original.youtube_embed_id %}
+
+<div class="sidebar-card">
+
+    <h3>YouTube Video</h3>
+
+    <a href="https://youtube.com/watch?v={{ original.youtube_embed_id }}"
+       target="_blank">
+
+        <img
+        class="project-preview"
+        src="https://img.youtube.com/vi/{{ original.youtube_embed_id }}/hqdefault.jpg">
+
+    </a>
+
+</div>
+
+{% endif %}

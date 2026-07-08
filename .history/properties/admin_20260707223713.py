@@ -1142,14 +1142,14 @@ class BankOfferInline(admin.TabularInline):
     model = BankOffer
     extra = 1
 
+
 @admin.register(Project)
 class ProjectAdmin(AutoUserAdminMixin, MPTTModelAdmin):
-    change_form_template = "admin/properties/project/change_form.html"
-
     list_display = (
         'id',
         'project_name',
-        
+        'created_by_name',
+        'created_by_email',
         'city',
         'locality',
         'postal_code',
@@ -1164,8 +1164,6 @@ class ProjectAdmin(AutoUserAdminMixin, MPTTModelAdmin):
         'image_preview',
         'youtube_preview',
         'create_at',
-        'created_by_name',
-        'created_by_email',
     )
     ordering = ('-id',)
 
@@ -1198,27 +1196,17 @@ class ProjectAdmin(AutoUserAdminMixin, MPTTModelAdmin):
 
     fieldsets = (
         ('Basic Info', {
-        'fields': (
-            'project_name',
-            'slug',
-            'parent',
-            'developer',
-            'city',
-            'locality',
-            'postal_code',
-            'propert_type',
-            'image',
-            'construction_status',
-            'image_preview',
-            'youtube_embed_id',
-            'youtube_preview',
-            'created_by',
-            'updated_by',
-            'create_at',
-            'update_at',
-            'google_map_iframe',
-        )
-    }),
+            'fields': (
+                'project_name', 'slug', 'parent', 'developer',
+                'city', 'locality','postal_code', 'propert_type',
+                'image',
+                'construction_status',
+                'image_preview',
+                'youtube_embed_id', 'youtube_preview',
+                'create_at', 'update_at',
+                'google_map_iframe',      
+            )
+        }),
         ('More Info', {
             'fields': (
                 
@@ -1289,18 +1277,6 @@ class ProjectAdmin(AutoUserAdminMixin, MPTTModelAdmin):
             )
         return "No Video"
     youtube_preview.short_description = "YouTube Preview"
-    @admin.display(description="Created By")
-    def created_by_name(self, obj):
-        if obj.created_by:
-            return obj.created_by.get_full_name() or obj.created_by.username
-        return "-"
-
-
-    @admin.display(description="Email")
-    def created_by_email(self, obj):
-        if obj.created_by:
-            return obj.created_by.email
-        return "-"
 
 
 @admin.register(Enquiry)

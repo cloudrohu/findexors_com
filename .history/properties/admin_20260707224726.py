@@ -1144,6 +1144,7 @@ class BankOfferInline(admin.TabularInline):
 
 @admin.register(Project)
 class ProjectAdmin(AutoUserAdminMixin, MPTTModelAdmin):
+    change_list_template = "admin/properties/project/change_list.html"
     change_form_template = "admin/properties/project/change_form.html"
 
     list_display = (

@@ -1,0 +1,335 @@
+
+<style>
+.gallery-grid{
+
+display:grid;
+
+grid-template-columns:repeat(3,1fr);
+
+gap:10px;
+
+margin-top:15px;
+
+}
+
+.gallery-item img{
+
+width:100%;
+
+height:110px;
+
+object-fit:cover;
+
+border-radius:10px;
+
+}
+
+.chips{
+
+display:flex;
+
+flex-wrap:wrap;
+
+gap:8px;
+
+margin-top:10px;
+
+}
+
+.chip{
+
+padding:6px 14px;
+
+background:#eef2ff;
+
+border-radius:30px;
+
+font-size:13px;
+
+font-weight:600;
+
+color:#1e40af;
+
+}
+
+</style>
+
+<div class="header">
+
+    <div class="logo">
+
+        {% if obj.image %}
+            <img src="{{ obj.image.url }}">
+        {% else %}
+            <span>🏢</span>
+        {% endif %}
+
+    </div>
+
+    <div class="info">
+
+        <div class="badges">
+
+            <span class="badge blue">
+                PRO{{ obj.id|stringformat:"03d" }}
+            </span>
+
+            {% if obj.featured_property %}
+                <span class="badge green">
+                    ⭐ Featured
+                </span>
+            {% endif %}
+
+            {% if obj.active %}
+                <span class="badge success">
+                    Active
+                </span>
+            {% else %}
+                <span class="badge danger">
+                    Inactive
+                </span>
+            {% endif %}
+
+        </div>
+
+        <div class="title">
+            {{ obj.project_name }}
+        </div>
+
+        <div class="meta">
+            🏗 {{ obj.developer }}
+        </div>
+
+    </div>
+
+</div>
+
+<div class="section">
+
+    <div class="row">
+        <b>📍 {{ obj.locality|default:"-" }} - {{ obj.city|default:"-" }}</b>
+    </div>
+
+    <div class="row">
+        📮 {{ obj.postal_code|default:"-" }}
+    </div>
+
+    <div class="row">
+        🏠 {{ obj.bhk_type|default:"-" }}
+    </div>
+
+    <div class="row">
+        🏢 {{ obj.floor|default:"-" }}
+    </div>
+
+    <div class="row">
+        📐 {{ obj.land_parcel|default:"-" }}
+    </div>
+
+    <div class="row">
+        🏗 {{ obj.construction_status }}
+    </div>
+
+    <div class="row">
+        📅 {{ obj.possession_month }} {{ obj.possession_year }}
+    </div>
+
+</div>
+
+<div class="timeline-box" style="margin-top:15px;">
+
+    <b>💰 Price Details</b>
+
+    <div class="row">
+        {{ obj.get_price_range }}
+    </div>
+
+    <div class="row">
+        {{ obj.get_carpet_area_range }}
+    </div>
+
+</div>
+
+
+<!-- ================= GALLERY ================= -->
+
+<div class="section">
+
+    <div class="section-title">
+        🖼 Gallery ({{ obj.gallery.count }})
+    </div>
+
+    {% if obj.gallery.exists %}
+
+    <div class="gallery-grid">
+
+        {% for image in obj.gallery.all|slice:":6" %}
+
+        <div class="gallery-item">
+
+            <img src="{{ image.image.url }}">
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+    {% else %}
+
+    <div class="meta">
+        No Gallery Images
+    </div>
+
+    {% endif %}
+
+</div>
+
+<!-- ================= AMENITIES ================= -->
+
+<div class="section">
+
+    <div class="section-title">
+        🌴 Amenities ({{ obj.amenities.count }})
+    </div>
+
+    {% if obj.amenities.exists %}
+
+    <div class="chips">
+
+        {% for amenity in obj.amenities.all %}
+
+        <span class="chip">
+
+            {{ amenity.amenities.title }}
+
+        </span>
+
+        {% endfor %}
+
+    </div>
+
+    {% else %}
+
+    <div class="meta">
+        No Amenities
+    </div>
+
+    {% endif %}
+
+</div>
+
+
+<!-- ================= CONTACT PERSON ================= -->
+
+<div class="section">
+
+<div class="section-title">
+
+👤 Contact Persons ({{ obj.contact_persons.count }})
+
+</div>
+
+{% for person in obj.contact_persons.all %}
+
+<div class="timeline-box">
+
+<div class="row">
+
+<b>{{ person.name }}</b>
+
+</div>
+
+{% if person.designation %}
+<div class="meta">
+
+💼 {{ person.designation }}
+
+</div>
+{% endif %}
+
+{% if person.mobile %}
+<div class="meta">
+
+📞 {{ person.mobile }}
+
+</div>
+{% endif %}
+
+{% if person.whatsapp %}
+<div class="meta">
+
+💬 {{ person.whatsapp }}
+
+</div>
+{% endif %}
+
+{% if person.email %}
+<div class="meta">
+
+✉ {{ person.email }}
+
+</div>
+{% endif %}
+
+</div>
+
+{% empty %}
+
+<div class="meta">
+
+No Contact Person
+
+</div>
+
+{% endfor %}
+
+</div>
+
+
+
+<!-- ================= CONFIGURATIONS ================= -->
+
+<div class="section">
+
+    <div class="section-title">
+        🏠 Configurations ({{ obj.configurations.count }})
+    </div>
+
+    {% for config in obj.configurations.all %}
+
+    <div class="timeline-box">
+
+        <div class="row">
+            <b>{{ config.bhk_type }}</b>
+        </div>
+
+        {% if config.carpet_area %}
+        <div class="meta">
+            📐 Carpet : {{ config.carpet_area }}
+        </div>
+        {% endif %}
+
+        {% if config.builtup_area %}
+        <div class="meta">
+            📏 Builtup : {{ config.builtup_area }}
+        </div>
+        {% endif %}
+
+        {% if config.price %}
+        <div class="meta">
+            💰 {{ config.price }}
+        </div>
+        {% endif %}
+
+    </div>
+
+    {% empty %}
+
+    <div class="meta">
+        No Configurations
+    </div>
+
+    {% endfor %}
+
+</div>

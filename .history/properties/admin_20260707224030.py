@@ -1142,10 +1142,9 @@ class BankOfferInline(admin.TabularInline):
     model = BankOffer
     extra = 1
 
+
 @admin.register(Project)
 class ProjectAdmin(AutoUserAdminMixin, MPTTModelAdmin):
-    change_form_template = "admin/properties/project/change_form.html"
-
     list_display = (
         'id',
         'project_name',
