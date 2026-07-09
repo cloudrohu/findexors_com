@@ -1,423 +1,942 @@
-{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- ================= BASIC ================= -->
-    <meta charset="UTF-8">
-    <title>{% block title %}Findexors – Find Trusted Businesses{% endblock %}</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <!-- ================= SEO ================= -->
-    <meta name="description" content="{% block meta_description %}Find trusted local businesses near you on Findexors.{% endblock %}">
-    <meta name="keywords" content="{% block meta_keywords %}business listing, local services, findexors{% endblock %}">
-    <meta name="author" content="Findexors">
-
-    <!-- ================= FAVICON ================= -->
-    <link rel="icon" href="{% static 'assets/images/favicon.png' %}">
-
-    <!-- ================= TAILWIND ================= -->
-    <script src="https://cdn.tailwindcss.com"></script>
-
-    <!-- ================= FONT AWESOME ================= -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-
-    {% block extra_css %}{% endblock %}
-</head>
-
-<body class="bg-gray-50 text-gray-800">
-
-<header class="hidden lg:block bg-white shadow-sm border-b border-gray-100 sticky top-0 z-50">
-    <div class="max-w-7xl px-4 mx-auto h-[90px] flex items-center justify-between">
-        
-        <div class="flex-shrink-0">
-            <h2 class="text-2xl font-black tracking-tight text-blue-600">Findexors</h2>
-        </div>
-
-        <form method="get" action="{% url 'business:company_list' %}" class="flex items-center bg-gray-100 border border-gray-200 rounded-lg overflow-hidden w-[35%] ml-6">
-
-                <input type="hidden" name="city" id="selectedCityId" value="">
-
-                <input type="text" name="q" id="searchInputHeader" placeholder="Search businesses..." class="bg-transparent px-4 py-2 flex-1 focus:outline-none text-sm text-gray-700" >
-
-                <button type="submit" class="bg-blue-600 text-white px-5 py-3 hover:bg-blue-700">
-                    Search
-                </button>
-
-        </form>
-
-        <nav class="flex items-center gap-5 ml-auto pl-4">
-            <div class="flex items-center gap-5 text-[15px] font-semibold text-gray-600">
-                <a href="#" class="hover:text-blue-600 transition">Businesses</a>
-                <a href="#" class="hover:text-blue-600 transition">Jobs</a>
-                <a href="#" class="hover:text-blue-600 transition">About</a>
-                <a href="#" class="hover:text-blue-600 transition">Contact</a>
-            </div>
-
-            <div class="flex items-center gap-3 ml-2">
-                <a href="#" class="bg-green-600 text-white px-4 py-2 text-sm font-bold hover:bg-green-700 transition shadow-sm">
-                    Post Job
-                </a>
-                <a href="#" class="bg-yellow-500 text-white px-4 py-2 text-sm font-bold hover:bg-yellow-600 transition shadow-sm">
-                    Add Business
-                </a>
-            </div>
-
-            <a href="#" class="text-[15px] font-bold text-gray-700 hover:text-blue-600 transition ml-2 border-l pl-5 border-gray-200">
-                Login
-            </a>
-        </nav>
-        
-    </div>
-</header>
-
-<main>
-    {% block content %}{% endblock %}
-</main>
+{% load static %}
 
 
-<footer class="bg-gray-900 text-gray-300 mt-20">
-    <div class="max-w-7xl mx-auto px-6 py-10 grid md:grid-cols-4 gap-8">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-        <div>
-            <h3 class="text-xl font-bold text-white mb-3">Findexors</h3>
-            <p class="text-sm">Discover trusted local businesses near you.</p>
-        </div>
+<title>{% block title %}Findexors{% endblock %}</title>
 
-        <div>
-            <h4 class="font-semibold text-white mb-3">Quick Links</h4>
-            <ul class="space-y-2 text-sm">
-                <li><a href="/" class="hover:text-white">Home</a></li>
-                <li><a href="#" class="hover:text-white">Categories</a></li>
-                <li><a href="#" class="hover:text-white">Add Business</a></li>
-            </ul>
-        </div>
+<meta name="description"
+      content="{% block meta_description %}Find Trusted Businesses Near You{% endblock %}">
 
-        <div>
-            <h4 class="font-semibold text-white mb-3">Support</h4>
-            <ul class="space-y-2 text-sm">
-                <li><a href="#" class="hover:text-white">Privacy Policy</a></li>
-                <li><a href="#" class="hover:text-white">Terms</a></li>
-            </ul>
-        </div>
+<link rel="icon"
+      href="{% static 'assets/images/favicon.png' %}">
 
-        <div>
-            <h4 class="font-semibold text-white mb-3">Follow Us</h4>
-            <div class="flex gap-4 text-lg">
-                <a href="#"><i class="fab fa-facebook"></i></a>
-                <a href="#"><i class="fab fa-instagram"></i></a>
-                <a href="#"><i class="fab fa-linkedin"></i></a>
-            </div>
-        </div>
-    </div>
+<script src="https://cdn.tailwindcss.com"></script>
 
-    <div class="text-center text-sm py-4 border-t border-gray-700">
-        © {% now "Y" %} Findexors. All rights reserved.
-    </div>
-</footer>
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
-<div id="cityPopup" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[9999] hidden">
-
-  <div class="bg-white w-[650px] max-w-[95%] p-8 rounded-xl shadow-2xl animate-[popup_.35s_ease]">
-
-
-    <!-- SEARCH -->
-    <h1 class="flex items-center gap-2 text-lg mb-4 bg-gray-100 text-gray-600 shadow-md px-4 py-2 font-medium">
-      <i class="fa-solid fa-location-dot"></i>
-        Please Select A City First...
-    </h1>
-
-    <div class="relative mb-6">
-      <input type="text" id="citySearch" placeholder="Search city..." class="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400">
-            <i class="fa fa-search absolute right-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
-    </div>
-
-    <h4 class="text-gray-700 mb-4 text-sm font-semibold border-b pb-2">
-        Popular Cities
-    </h4>
-
-    <!-- CITY GRID -->
-   <div id="cityList" class="grid grid-cols-2 gap-3 md:grid-cols-4 sm:grid-cols-2 max-h-[350px] overflow-y-auto">
-        {% for city in cities %}
-             <div class="city bg-gray-100 p-3 rounded-lg text-center cursor-pointer font-medium transition hover:bg-orange-500 hover:text-white">{{ city.name|slice:":20" }}</div>
-        {% endfor %}
-    </div>
-
-  </div>
-
-</div> 
+{% block extra_css %}{% endblock %}
 
 <style>
-.city.active-city{
-    background:#ff7a00;
-    color:white;
-    font-weight:600;
-}
 
-@keyframes popup{
-    from{opacity:0;transform:scale(.9)}
-    to{opacity:1;transform:scale(1)}
-}
+    body{
+        font-family:Inter,sans-serif;
+    }
+
+    .glass{
+
+    background:rgba(255,255,255,.92);
+
+    backdrop-filter:blur(20px);
+
+    }
+
+    .menu-link{
+
+    position:relative;
+
+    transition:.3s;
+
+    }
+
+    .menu-link:hover{
+
+    color:#2563eb;
+
+    }
+
+    .menu-link::after{
+
+    content:"";
+
+    position:absolute;
+
+    left:0;
+
+    bottom:-8px;
+
+    width:0;
+
+    height:2px;
+
+    background:#2563eb;
+
+    transition:.3s;
+
+    }
+
+    .menu-link:hover::after{
+
+    width:100%;
+
+    }
+
+    .btn-hover{
+
+    transition:.3s;
+
+    }
+
+    .btn-hover:hover{
+
+    transform:translateY(-2px);
+
+    }
 
 </style>
 
+</head>
+
+<body class="bg-slate-50">
+
+<!-- ================= HEADER ================= -->
+
+<header class="glass sticky top-0 z-50 border-b border-slate-200">
+
+<div class="max-w-[1700px] mx-auto">
+
+<div class="h-20 flex items-center justify-between px-6 lg:px-10">
+
+<!-- LOGO -->
+
+<a href="/" class="flex items-center">
+
+<img src="{% static 'main/images/logo3-removebg-preview.png' %}"
+
+class="h-16 lg:h-20"
+
+alt="">
+
+</a>
+
+<!-- SEARCH -->
+
+<div class="hidden lg:flex w-[34%] relative">
+
+<form action="{% url 'business:company_list' %}"
+
+class="w-full">
+
+<div class="flex">
+
+<input
+
+type="text"
+
+name="q"
+
+placeholder="Search Businesses, Services..."
+
+class="w-full h-12 rounded-l-xl border border-slate-300 px-5 outline-none focus:ring-2 focus:ring-blue-500">
+
+<button
+
+class="bg-blue-600 text-white px-7 rounded-r-xl hover:bg-blue-700">
+
+<i class="fa fa-search"></i>
+
+</button>
+
+</div>
+
+</form>
+
+</div>
+
+<!-- DESKTOP MENU -->
+
+<nav class="hidden xl:flex items-center gap-8">
+
+
+
+
+</nav>
+
+<!-- CTA -->
+
+<div class="hidden lg:flex items-center gap-3">
+
+<a href="#"
+
+class="btn-hover flex items-center gap-3 bg-gradient-to-r from-green-600 to-green-500 text-white rounded-xl px-5 py-3 shadow-lg">
+
+<div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
+
+<i class="fa-solid fa-briefcase"></i>
+
+</div>
+
+<div>
+
+<p class="text-[11px] opacity-80">
+
+Find & Post
+
+</p>
+
+<p class="font-semibold">
+
+Jobs
+
+</p>
+
+</div>
+
+</a>
+
+<a href="#"
+
+class="btn-hover flex items-center gap-3 bg-gradient-to-r from-blue-600 to-indigo-500 text-white rounded-xl px-5 py-3 shadow-lg">
+
+<div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
+
+<i class="fa-solid fa-building"></i>
+
+</div>
+
+<div>
+
+<p class="text-[11px] opacity-80">
+
+Find & Post
+
+</p>
+
+<p class="font-semibold">
+
+Property
+
+</p>
+
+</div>
+
+</a>
+
+<a href="#"
+
+class="btn-hover flex items-center gap-3 bg-gradient-to-r from-orange-500 to-amber-500 text-white rounded-xl px-5 py-3 shadow-lg">
+
+<div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
+
+<i class="fa-solid fa-store"></i>
+
+</div>
+
+<div>
+
+<p class="text-[11px] opacity-80">
+
+Register
+
+</p>
+
+<p class="font-semibold">
+
+Business
+
+</p>
+
+</div>
+
+</a>
+
+<a href="#"
+
+class="font-semibold text-slate-700 hover:text-blue-600">
+
+Login
+
+</a>
+
+</div>
+
+<!-- MOBILE -->
+
+<div class="lg:hidden flex items-center gap-5">
+
+<button id="mobileSearchBtn">
+
+<i class="fa-solid fa-magnifying-glass text-xl"></i>
+
+</button>
+
+<button id="mobileMenuBtn">
+
+<i class="fa-solid fa-bars text-2xl"></i>
+
+</button>
+
+</div>
+
+</div>
+
+<!-- TABLET SEARCH -->
+
+<div class="lg:hidden px-4 pb-4">
+
+<form action="{% url 'business:company_list' %}">
+
+<div class="flex">
+
+<input
+
+type="text"
+
+placeholder="Search Businesses..."
+
+name="q"
+
+class="flex-1 border border-slate-300 rounded-l-xl px-4 h-12">
+
+<button
+
+class="bg-blue-600 text-white px-5 rounded-r-xl">
+
+<i class="fa fa-search"></i>
+
+</button>
+
+</div>
+
+</form>
+
+</div>
+
+</div>
+
+</header>
+
+<!-- ================= MOBILE SIDEBAR ================= -->
+
+<div id="mobileMenu"
+class="fixed inset-0 z-[9999] hidden">
+
+    <!-- Overlay -->
+    <div id="menuOverlay"
+    class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
+
+    <!-- Sidebar -->
+    <aside
+    class="absolute left-0 top-0 h-full w-[320px] bg-white shadow-2xl overflow-y-auto">
+
+        <!-- Logo -->
+
+        <div class="bg-gradient-to-r from-blue-700 to-blue-500 p-6 text-white">
+
+            <div class="flex items-center justify-between">
+
+                <img src="{% static 'main/images/logo3-removebg-preview.png' %}"
+                     class="h-14 bg-white rounded-lg p-1">
+
+                <button id="closeMenu"
+                class="text-2xl">
+
+                    <i class="fa-solid fa-xmark"></i>
+
+                </button>
+
+            </div>
+
+            <h3 class="mt-5 text-xl font-bold">
+                Welcome to Findexors
+            </h3>
+
+            <p class="text-sm text-blue-100 mt-1">
+                India's Smart Business Directory
+            </p>
+
+        </div>
+
+        <!-- Search -->
+
+        <div class="p-5">
+
+            <form action="{% url 'business:company_list' %}">
+
+                <div class="relative">
+
+                    <input
+                    type="text"
+                    name="q"
+                    placeholder="Search..."
+                    class="w-full border rounded-xl h-12 pl-12 pr-4">
+
+                    <i class="fa fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"></i>
+
+                </div>
+
+            </form>
+
+        </div>
+
+        <!-- Menu -->
+
+        <div class="px-5">
+
+            <a href="#"
+            class="flex items-center gap-4 py-4 border-b hover:text-blue-600">
+
+                <i class="fa fa-building w-5"></i>
+
+                Businesses
+
+            </a>
+
+            <a href="#"
+            class="flex items-center gap-4 py-4 border-b hover:text-blue-600">
+
+                <i class="fa fa-briefcase w-5"></i>
+
+                Jobs
+
+            </a>
+
+            <a href="#"
+            class="flex items-center gap-4 py-4 border-b hover:text-blue-600">
+
+                <i class="fa fa-house w-5"></i>
+
+                Properties
+
+            </a>
+
+            <a href="#"
+            class="flex items-center gap-4 py-4 border-b hover:text-blue-600">
+
+                <i class="fa fa-layer-group w-5"></i>
+
+                Categories
+
+            </a>
+
+            <a href="#"
+            class="flex items-center gap-4 py-4 border-b hover:text-blue-600">
+
+                <i class="fa fa-circle-info w-5"></i>
+
+                About
+
+            </a>
+
+            <a href="#"
+            class="flex items-center gap-4 py-4 border-b hover:text-blue-600">
+
+                <i class="fa fa-phone w-5"></i>
+
+                Contact
+
+            </a>
+
+        </div>
+
+        <!-- CTA -->
+
+        <div class="p-5 space-y-4">
+
+            <a href="#"
+            class="flex items-center gap-4 rounded-xl bg-green-600 text-white p-4">
+
+                <i class="fa-solid fa-briefcase text-xl"></i>
+
+                <div>
+
+                    <h4 class="font-semibold">
+                        Find & Post Jobs
+                    </h4>
+
+                    <p class="text-xs opacity-80">
+                        Hire or Get Hired
+                    </p>
+
+                </div>
+
+            </a>
+
+            <a href="#"
+            class="flex items-center gap-4 rounded-xl bg-blue-600 text-white p-4">
+
+                <i class="fa-solid fa-building text-xl"></i>
+
+                <div>
+
+                    <h4 class="font-semibold">
+                        Find & Post Properties
+                    </h4>
+
+                    <p class="text-xs opacity-80">
+                        Buy • Sell • Rent
+                    </p>
+
+                </div>
+
+            </a>
+
+            <a href="#"
+            class="flex items-center gap-4 rounded-xl bg-orange-500 text-white p-4">
+
+                <i class="fa-solid fa-store text-xl"></i>
+
+                <div>
+
+                    <h4 class="font-semibold">
+                        Add Business
+                    </h4>
+
+                    <p class="text-xs opacity-80">
+                        List your business FREE
+                    </p>
+
+                </div>
+
+            </a>
+
+        </div>
+
+    </aside>
+
+</div>
+
+
+
+<!-- ================= SEARCH POPUP ================= -->
+
+<div id="mobileSearch"
+class="fixed inset-0 hidden bg-black/70 z-[9998]">
+
+    <div class="bg-white p-5">
+
+        <form action="{% url 'business:company_list' %}">
+
+            <div class="relative">
+
+                <input
+                type="text"
+                name="q"
+                placeholder="Search Businesses..."
+                class="w-full h-14 rounded-xl border pl-12 pr-4">
+
+                <i class="fa fa-search absolute left-4 top-1/2 -translate-y-1/2"></i>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+
+<!-- ================= MOBILE BOTTOM NAV ================= -->
+
+<nav
+class="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t shadow-xl z-50">
+
+<div class="grid grid-cols-5">
+
+<a href="/"
+class="py-3 flex flex-col items-center">
+
+<i class="fa fa-home text-xl"></i>
+
+<span class="text-[11px] mt-1">
+Home
+</span>
+
+</a>
+
+<a href="#"
+class="py-3 flex flex-col items-center">
+
+<i class="fa fa-building text-xl"></i>
+
+<span class="text-[11px] mt-1">
+Business
+</span>
+
+</a>
+
+<a href="#"
+class="-mt-6">
+
+<div
+class="w-16 h-16 rounded-full bg-blue-600 text-white shadow-xl flex items-center justify-center mx-auto">
+
+<i class="fa fa-plus text-2xl"></i>
+
+</div>
+
+<p class="text-center text-[11px] mt-1">
+Add
+</p>
+
+</a>
+
+<a href="#"
+class="py-3 flex flex-col items-center">
+
+<i class="fa fa-briefcase text-xl"></i>
+
+<span class="text-[11px] mt-1">
+Jobs
+</span>
+
+</a>
+
+<a href="#"
+class="py-3 flex flex-col items-center">
+
+<i class="fa fa-user text-xl"></i>
+
+<span class="text-[11px] mt-1">
+Account
+</span>
+
+</a>
+
+</div>
+
+</nav>
+
+{% block content %}
+
+{% include "home/hero.html" %}
+{% include "home/categories.html" %}
+{% include "home/featured_businesses.html" %}
+{% include "home/properties_jobs.html" %}
+{% include "home/extras.html" %}
+
+{% endblock %}
+
+
+<!-- ================= FOOTER ================= -->
+
+<footer class="bg-slate-900 text-slate-300 mt-20">
+
+    <div class="max-w-7xl mx-auto px-6 py-14 grid lg:grid-cols-4 md:grid-cols-2 gap-10">
+
+        <!-- Logo -->
+
+        <div>
+
+            <img src="{% static 'main/images/logo3-removebg-preview.png' %}"
+                 class="h-20 bg-white rounded-xl p-2 mb-5">
+
+            <p class="text-sm leading-7 text-slate-400">
+
+                Findexors helps you discover trusted Businesses,
+                Jobs, Properties and Services across India.
+
+            </p>
+
+            <div class="flex gap-4 mt-6">
+
+                <a href="#" class="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center hover:bg-blue-600 transition">
+
+                    <i class="fab fa-facebook-f"></i>
+
+                </a>
+
+                <a href="#" class="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center hover:bg-pink-600 transition">
+
+                    <i class="fab fa-instagram"></i>
+
+                </a>
+
+                <a href="#" class="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center hover:bg-sky-500 transition">
+
+                    <i class="fab fa-twitter"></i>
+
+                </a>
+
+                <a href="#" class="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center hover:bg-blue-700 transition">
+
+                    <i class="fab fa-linkedin"></i>
+
+                </a>
+
+            </div>
+
+        </div>
+
+
+        <!-- Quick Links -->
+
+        <div>
+
+            <h3 class="text-white font-bold text-lg mb-5">
+
+                Quick Links
+
+            </h3>
+
+            <ul class="space-y-3">
+
+                <li><a href="/" class="hover:text-white">Home</a></li>
+
+                <li><a href="#">Businesses</a></li>
+
+                <li><a href="#">Jobs</a></li>
+
+                <li><a href="#">Properties</a></li>
+
+                <li><a href="#">Contact</a></li>
+
+            </ul>
+
+        </div>
+
+
+        <!-- Categories -->
+
+        <div>
+
+            <h3 class="text-white font-bold text-lg mb-5">
+
+                Categories
+
+            </h3>
+
+            <ul class="space-y-3">
+
+                <li>Restaurants</li>
+
+                <li>Hospitals</li>
+
+                <li>Hotels</li>
+
+                <li>Education</li>
+
+                <li>Shopping</li>
+
+            </ul>
+
+        </div>
+
+
+        <!-- Contact -->
+
+        <div>
+
+            <h3 class="text-white font-bold text-lg mb-5">
+
+                Contact
+
+            </h3>
+
+            <ul class="space-y-4">
+
+                <li>
+
+                    <i class="fa-solid fa-location-dot mr-3"></i>
+
+                    Mumbai, India
+
+                </li>
+
+                <li>
+
+                    <i class="fa-solid fa-phone mr-3"></i>
+
+                    +91 9876543210
+
+                </li>
+
+                <li>
+
+                    <i class="fa-solid fa-envelope mr-3"></i>
+
+                    info@findexors.com
+
+                </li>
+
+            </ul>
+
+        </div>
+
+    </div>
+
+    <div class="border-t border-slate-800 py-5 text-center text-sm">
+
+        © {% now "Y" %} Findexors. All Rights Reserved.
+
+    </div>
+
+</footer>
+
+
+
+<!-- ================= LOADING ================= -->
+
+<div id="pageLoader"
+class="fixed inset-0 bg-white z-[99999] flex items-center justify-center hidden">
+
+    <div class="w-14 h-14 rounded-full border-4 border-blue-600 border-t-transparent animate-spin">
+
+    </div>
+
+</div>
+
+
+
+<!-- ================= JAVASCRIPT ================= -->
+
 <script>
-document.addEventListener("DOMContentLoaded", () => {
 
-const cityPopup = document.getElementById("cityPopup");
-const cityToggle = document.getElementById("cityToggle");
-const cityDropdown = document.getElementById("cityDropdown");
-const selectedCityName = document.getElementById("selectedCityName");
-const cityList = document.getElementById("cityList");
-const citySearch = document.getElementById("citySearch");
-const arrow = document.getElementById("cityArrow");
+const menu=document.getElementById("mobileMenu");
 
-const STORAGE_KEY = "selectedCity";
+const openBtn=document.getElementById("mobileMenuBtn");
+
+const closeBtn=document.getElementById("closeMenu");
+
+const overlay=document.getElementById("menuOverlay");
+
+if(openBtn){
+
+openBtn.onclick=()=>{
+
+menu.classList.remove("hidden");
+
+document.body.classList.add("overflow-hidden");
+
+}
+
+}
+
+if(closeBtn){
+
+closeBtn.onclick=()=>{
+
+menu.classList.add("hidden");
+
+document.body.classList.remove("overflow-hidden");
+
+}
+
+}
+
+if(overlay){
+
+overlay.onclick=()=>{
+
+menu.classList.add("hidden");
+
+document.body.classList.remove("overflow-hidden");
+
+}
+
+}
+
+</script>
 
 
 
-/* ==============================
-   LOAD SAVED CITY
-============================== */
+<script>
 
-const savedCity = localStorage.getItem(STORAGE_KEY);
+const mobileSearch=document.getElementById("mobileSearch");
 
-if(savedCity){
-    if(selectedCityName) selectedCityName.innerText = savedCity;
-    if(cityPopup) cityPopup.style.display = "none";
+const openSearch=document.getElementById("mobileSearchBtn");
+
+if(openSearch){
+
+openSearch.onclick=()=>{
+
+mobileSearch.classList.remove("hidden");
+
+}
+
+}
+
+if(mobileSearch){
+
+mobileSearch.onclick=(e)=>{
+
+if(e.target===mobileSearch){
+
+mobileSearch.classList.add("hidden");
+
+}
+
+}
+
+}
+
+</script>
+
+
+
+<script>
+
+window.addEventListener("scroll",()=>{
+
+const header=document.querySelector("header");
+
+if(window.scrollY>40){
+
+header.classList.add("shadow-xl");
+
 }else{
-    if(cityPopup) cityPopup.style.display = "flex";
-}
 
-
-
-/* ==============================
-   DROPDOWN TOGGLE
-============================== */
-
-if(cityToggle){
-cityToggle.addEventListener("click",(e)=>{
-
-    e.stopPropagation();
-
-    cityDropdown.classList.toggle("hidden");
-
-    if(arrow){
-        arrow.classList.toggle("rotate-180");
-    }
-
-});
-}
-
-
-
-/* ==============================
-   SELECT CITY
-============================== */
-
-function selectCity(cityName){
-
-    localStorage.setItem(STORAGE_KEY, cityName);
-
-    if(selectedCityName){
-        selectedCityName.innerText = cityName;
-    }
-
-    cityDropdown.classList.add("hidden");
-
-    if(arrow){
-        arrow.classList.remove("rotate-180");
-    }
-
-    if(cityPopup){
-        cityPopup.style.display="none";
-    }
-
-}
-
-
-
-/* ==============================
-   DROPDOWN CITY SELECT
-============================== */
-
-document.querySelectorAll(".city-option").forEach(city => {
-
-city.addEventListener("click",()=>{
-
-    const name = city.innerText.trim();
-
-    selectCity(name);
-
-});
-
-});
-
-
-
-/* ==============================
-   POPUP CITY SELECT
-============================== */
-
-document.querySelectorAll(".city").forEach(city => {
-
-city.addEventListener("click",()=>{
-
-    const name = city.innerText.trim();
-
-    selectCity(name);
-
-});
-
-});
-
-
-
-/* ==============================
-   SEARCH CITY
-============================== */
-
-if(citySearch){
-
-citySearch.addEventListener("keyup",()=>{
-
-    const query = citySearch.value.trim();
-
-    if(query.length < 2) return;
-
-    fetch(`/search-city/?q=${query}`)
-    .then(res => res.json())
-    .then(data=>{
-
-        if(!cityList) return;
-
-        cityList.innerHTML="";
-
-        data.forEach(city=>{
-
-            const div = document.createElement("div");
-
-            div.className="city bg-gray-100 p-3 rounded-lg text-center cursor-pointer font-medium hover:bg-orange-500 hover:text-white";
-
-            div.innerText=city.name;
-
-            div.onclick=()=>selectCity(city.name);
-
-            cityList.appendChild(div);
-
-        });
-
-    });
-
-});
-
-}
-
-
-
-/* ==============================
-   OUTSIDE CLICK CLOSE
-============================== */
-
-document.addEventListener("click",(e)=>{
-
-if(!cityToggle.contains(e.target) && !cityDropdown.contains(e.target)){
-
-    cityDropdown.classList.add("hidden");
-
-    if(arrow){
-        arrow.classList.remove("rotate-180");
-    }
+header.classList.remove("shadow-xl");
 
 }
 
 });
 
-});
 </script>
+
+
 
 <script>
 
-const searchInput = document.getElementById("searchInputHeader");
-const suggestionsBox = document.getElementById("searchSuggestions");
+document.querySelectorAll("a").forEach(link=>{
 
+link.addEventListener("click",()=>{
 
-    // Example Data
-    const businesses = [
+const loader=document.getElementById("pageLoader");
 
-    "Digital Marketing Agency",
-    "SEO Expert",
-    "Graphic Designer",
-    "Website Developer",
-    "Hospital Near Me",
-    "Best Doctor",
-    "Car Repair Shop",
-    "Interior Designer",
-    "Real Estate Agent",
-    "Fitness Trainer",
-    "Salon Near Me",
-    "Restaurant Near Me"
+loader.classList.remove("hidden");
 
-    ];
-
-
-    searchInput.addEventListener("input", function(){
-
-    let value = this.value.toLowerCase();
-
-    suggestionsBox.innerHTML = "";
-
-    if(value.length < 1){
-    suggestionsBox.classList.add("hidden");
-    return;
-    }
-
-    let filtered = businesses.filter(item =>
-    item.toLowerCase().includes(value)
-    );
-
-    if(filtered.length === 0){
-    suggestionsBox.classList.add("hidden");
-    return;
-    }
-
-
-    filtered.forEach(item => {
-
-    let div = document.createElement("div");
-
-    div.className = "px-4 py-2 text-sm hover:bg-gray-100 cursor-pointer";
-
-    div.innerText = item;
-
-    div.onclick = function(){
-
-    searchInput.value = item;
-
-    suggestionsBox.classList.add("hidden");
-
-    };
-
-    suggestionsBox.appendChild(div);
-
-    });
-
-    suggestionsBox.classList.remove("hidden");
-
-    });
-
-
-    // click outside close
-
-    document.addEventListener("click", function(e){
-
-    if(!searchInput.contains(e.target)){
-    suggestionsBox.classList.add("hidden");
-    }
+});
 
 });
 
 </script>
+
+
+
+<script>
+
+document.addEventListener("keydown",(e)=>{
+
+if(e.key==="Escape"){
+
+if(menu){
+
+menu.classList.add("hidden");
+
+}
+
+if(mobileSearch){
+
+mobileSearch.classList.add("hidden");
+
+}
+
+}
+
+});
+
+</script>
+
+
 
 {% block extra_js %}{% endblock %}
+
 </body>
 </html>

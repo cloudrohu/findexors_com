@@ -1,0 +1,221 @@
+{% load static %}
+<section class="relative overflow-hidden bg-gradient-to-br from-blue-700 via-blue-600 to-indigo-700">
+
+    <!-- Background -->
+    <div class="absolute inset-0">
+        <div class="absolute -top-20 -left-20 h-72 w-72 rounded-full bg-white/10 blur-3xl"></div>
+        <div class="absolute bottom-0 right-0 h-96 w-96 rounded-full bg-cyan-400/20 blur-3xl"></div>
+    </div>
+
+    <div class="relative max-w-7xl mx-auto px-6 lg:px-10 py-20 lg:py-28">
+
+        <div class="grid lg:grid-cols-2 gap-12 items-center">
+
+            <!-- Left -->
+            <div>
+
+                <span class="inline-flex items-center gap-2 rounded-full bg-white/15 px-4 py-2 text-sm text-white backdrop-blur">
+                    <i class="fa-solid fa-circle-check text-green-300"></i>
+                    Trusted by Thousands
+                </span>
+
+                <h1 class="mt-6 text-4xl lg:text-6xl font-extrabold leading-tight text-white">
+
+                    Find Trusted
+                    <span class="text-yellow-300">
+
+                        Businesses,
+
+                    </span>
+
+                    Jobs &
+                    Properties
+                    Near You
+
+                </h1>
+
+                <p class="mt-6 text-lg text-blue-100 leading-8 max-w-xl">
+
+                    Search verified businesses, discover your dream job,
+                    buy or rent properties and connect with trusted local
+                    services across India.
+
+                </p>
+
+                <!-- Search -->
+
+                <form action="{% url 'business:company_list' %}"
+                      method="get"
+                      class="mt-8">
+
+                    <div class="bg-white rounded-2xl shadow-2xl p-2 flex flex-col lg:flex-row gap-2">
+
+                        <input
+                                type="text"
+                                name="q"
+                                placeholder="Search businesses, jobs, properties..."
+                                class="flex-1 h-14 px-5 rounded-xl outline-none">
+
+                        <select
+                                name="city"
+                                class="h-14 px-4 rounded-xl border">
+
+                            <option value="">All Cities</option>
+
+                            {% for city in cities %}
+                            <option value="{{ city.id }}">
+                                {{ city.name }}
+                            </option>
+                            {% endfor %}
+
+                        </select>
+
+                        <button
+                                class="bg-blue-600 hover:bg-blue-700 text-white h-14 px-8 rounded-xl font-semibold">
+
+                            <i class="fa fa-search mr-2"></i>
+
+                            Search
+
+                        </button>
+
+                    </div>
+
+                </form>
+
+                <!-- Trending -->
+
+                <div class="mt-6 flex flex-wrap gap-3">
+
+                    <span class="text-white/80">
+                        Trending :
+                    </span>
+
+                    <a href="#"
+                       class="rounded-full bg-white/15 px-4 py-2 text-sm text-white hover:bg-white hover:text-blue-700 transition">
+
+                        Restaurants
+
+                    </a>
+
+                    <a href="#"
+                       class="rounded-full bg-white/15 px-4 py-2 text-sm text-white hover:bg-white hover:text-blue-700 transition">
+
+                        Hospitals
+
+                    </a>
+
+                    <a href="#"
+                       class="rounded-full bg-white/15 px-4 py-2 text-sm text-white hover:bg-white hover:text-blue-700 transition">
+
+                        Real Estate
+
+                    </a>
+
+                    <a href="#"
+                       class="rounded-full bg-white/15 px-4 py-2 text-sm text-white hover:bg-white hover:text-blue-700 transition">
+
+                        Jobs
+
+                    </a>
+
+                </div>
+
+            </div>
+
+            <!-- Right -->
+
+            <div class="hidden lg:block">
+
+                <div class="relative">
+
+                    <img
+                        src="{% static 'main/images/hero-banner.png' %}"
+                        class="w-full drop-shadow-2xl"
+                        alt="Hero">
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<section class="bg-white shadow-lg -mt-10 relative z-10">
+
+    <div class="max-w-7xl mx-auto px-6 py-8">
+
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-6">
+
+            <div class="text-center">
+
+                <h2 class="text-4xl font-bold text-blue-600">
+
+                    50K+
+
+                </h2>
+
+                <p class="mt-2 text-gray-500">
+
+                    Businesses
+
+                </p>
+
+            </div>
+
+            <div class="text-center">
+
+                <h2 class="text-4xl font-bold text-green-600">
+
+                    10K+
+
+                </h2>
+
+                <p class="mt-2 text-gray-500">
+
+                    Jobs
+
+                </p>
+
+            </div>
+
+            <div class="text-center">
+
+                <h2 class="text-4xl font-bold text-orange-500">
+
+                    5K+
+
+                </h2>
+
+                <p class="mt-2 text-gray-500">
+
+                    Properties
+
+                </p>
+
+            </div>
+
+            <div class="text-center">
+
+                <h2 class="text-4xl font-bold text-purple-600">
+
+                    100+
+
+                </h2>
+
+                <p class="mt-2 text-gray-500">
+
+                    Cities
+
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
