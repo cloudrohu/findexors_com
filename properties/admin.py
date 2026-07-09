@@ -647,6 +647,7 @@ class DeveloperAdmin(AutoUserAdminMixin, admin.ModelAdmin):
         FollowupDeveloperInline,
         MeetingDeveloperInline,
     ]
+    list_per_page = 30
     list_display = (
         'id',
         'calling_status',
